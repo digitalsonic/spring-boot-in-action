@@ -97,10 +97,134 @@ $ spring run HelloController.groovy
 ```
 
 You may have also noticed that it wasn’t even necessary to compile the code. The Spring Boot CLI was able to run it from its uncompiled form.  
-你应该已经注意到了，你甚至都没有编译代码，Spring Boot CLI可以运行未经编译的代码。
+相比你已经注意到了，这里甚至都没有编译代码，Spring Boot CLI可以运行未经编译的代码。
 
 I chose to write this example controller in Groovy because the simplicity of the Groovy language presents well alongside the simplicity of Spring Boot. But Spring Boot doesn’t require that you use Groovy. In fact, much of the code we’ll write in this book will be in Java. But there’ll be some Groovy here and there, where appropriate.  
 我之所以选择用Groovy来写这个范例控制器，是因为Groovy语言的简单性与Spring Boot的简单性有异曲同工之妙。但Spring Boot并不强制你使用Groovy。实际上，本书中的很多代码都是用Java写的，但在恰当的时候，偶尔也会出现一些Groovy代码。
 
 Feel free to look ahead to section 1.21 to see how to install the Spring Boot CLI, so that you can try out this little web application. But for now, we’ll look at the key pieces of Spring Boot to see how it changes Spring application development.  
 不要客气，直接跳到1.21小节吧，看看如何安装Spring Boot CLI，这样你就能试试这个小小的Web应用程序了。现在，我们将看到Spring Boot的关键部分，看看它是如何改变Spring应用程序的开发方式的。
+
+### 1.1.2 Examining Spring Boot essentials
+### 1.1.2 Spring Boot精要
+
+Spring Boot brings a great deal of magic to Spring application development. But there are four core tricks that it performs:  
+Spring Boot将很多魔法带入了Spring应用程序的开发之中，其中最重要的就是以下四个核心：
+
+* Automatic configuration—Spring Boot can automatically provide configuration for application functionality common to many Spring applications.  
+___自动配置___——针对很多Spring应用程序常见的应用功能，Spring Boot能自动提供相关配置。
+* Starter dependencies—You tell Spring Boot what kind of functionality you need, and it will ensure that the libraries needed are added to the build.  
+___起步依赖___——告诉Spring Boot你需要什么功能，它就能引入你需要的库。
+* The command-line interface—This optional feature of Spring Boot lets you write complete applications with just application code, but no need for a traditional project build.  
+___命令行界面___——这是Spring Boot的可选特性，让你只用写代码就能完成完整的应用程序，无需传统项目构建。
+* The Actuator—Gives you insight into what’s going on inside of a running Spring Boot application.  
+___Actuator___——让你能够深入运行中的Spring Boot应用程序，一探究竟。
+
+Each of these features serves to simplify Spring application development in its own way. We’ll look at how to employ them to their fullest throughout this book. But for now, let’s take a quick look at what each offers.  
+这每一个特性都在通过其自己的方式简化着Spring应用程序的开发。全书会让你了解到如何将它们发挥到极致，但就目前而言，先简单看看它们都提供了哪些东西吧。
+
+#### AUTO-CONFIGURATION
+#### 自动配置
+
+In any given Spring application’s source code, you’ll find either Java configuration or XML configuration (or both) that enables certain supporting features and functionality for the application. For example, if you’ve ever written an application that accesses a relational database with JDBC, you’ve probably configured Spring’s JdbcTemplate as a bean in the Spring application context. I’ll bet the configuration looked a lot like this:  
+在任何Spring应用程序的源代码里，你都会找到Java配置或者XML配置（或者两者皆而有之），它们为应用程序开启了特定的特性和功能。举个例子，如果你写过用JDBC访问关系型数据库的应用程序，那你一定在Spring应用程序上下文里配置过`JdbcTemplate`这个Bean。我打赌那段配置看起来是这样的：
+
+```java
+@Bean
+public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+  return new JdbcTemplate(dataSource);
+}
+```
+
+This very simple bean declaration creates an instance of JdbcTemplate, injecting it with its one dependency, a DataSource. Of course, that means that you’ll also need to configure a DataSource bean so that the dependency will be met. To complete this configuration scenario, suppose that you were to configure an embedded H2 database as the DataSource bean:  
+这段非常简单的Bean声明创建了一个`JdbcTemplate`的实例，通过它的依赖注入了一个`DataSource`。当然，这意味着你还需要配置一个`DataSource`的Bean，这样才能满足依赖。假设你将配置一个嵌入式H2数据库作为`DataSource` Bean，完成这个配置场景的代码大概是这样的：
+
+```java
+@Bean
+public DataSource dataSource() {
+  return new EmbeddedDatabaseBuilder()
+          .setType(EmbeddedDatabaseType.H2)
+          .addScripts('schema.sql', 'data.sql')
+          .build();
+}
+```
+
+This bean configuration method creates an embedded database, specifying two SQL scripts to execute on the embedded database. The build() method returns a DataSource that references the embedded database.  
+这个Bean配置方法创建了一个嵌入式数据库，并指定在该数据库上执行两段SQL脚本。`build()`方法返回了一个指向该数据库的引用。
+
+Neither of these two bean configuration methods is terribly complex or lengthy. But they represent just a fraction of the configuration in a typical Spring application. Moreover, there are countless Spring applications that will have these exact same methods. Any application that needs an embedded database and a JdbcTemplate will need those methods. In short, it’s boilerplate configuration.  
+这两个Bean配置方法都不复杂，也不是很长，但它们只是典型Spring应用程序配置的一个很小的部分。除此之外，还有无数的Spring应用程序有着完全相同的方法。所有需要用到嵌入式数据库和`JdbcTemplate`的应用程序都会用到那些方法。简而言之，这就是一个样板配置。
+
+If it’s so common, then why should you have to write it?  
+既然它如此常见，那为什么还要你去写呢？
+
+Spring Boot can automatically configure these common configuration scenarios. If Spring Boot detects that you have the H2 database library in your application’s classpath, it will automatically configure an embedded H2 database. If JdbcTemplate is in the classpath, then it will also configure a JdbcTemplate bean for you. There’s no need for you to worry about configuring those beans. They’ll be configured for you, ready to inject into any of the beans you write.  
+Spring Boot会为这些常见配置场景进行自动配置。如果Spring Boot在应用程序的Classpath里发现H2的库，那么它就自动配置一个嵌入式H2数据库。如果Classpath里发现`JdbcTemplate`，那么它还会为你配置一个`JdbcTemplate`的Bean。你无需操心那些Bean的配置，Spring Boot会准备好那些Bean，随时可以注入到你写的Bean里。
+
+There’s a lot more to Spring Boot auto-configuration than embedded databases and JdbcTemplate. There are several dozen ways that Spring Boot can take the burden of configuration off your hands, including auto-configuration for the Java Persistence API (JPA), Thymeleaf templates, security, and Spring MVC. We’ll dive into auto-configuration starting in chapter 2.  
+Spring Boot的自动配置远不止嵌入式数据库和`JdbcTemplate`，它有大把的办法帮你减轻配置负担，这些自动配置涉及Java Persistence API（JPA）、Thymeleaf模板、安全和Spring MVC。在第2章里我们还会深入讨论自动配置这个话题。
+
+#### STARTER DEPENDENCIES
+#### 起步依赖
+
+It can be challenging to add dependencies to a project’s build. What library do you need? What are its group and artifact? Which version do you need? Will that version play well with other dependencies in the same project?  
+向项目中添加依赖是件富有挑战的事。你需要什么库？它的Group和Artifact是什么？你需要哪个版本？哪个版本不会和项目中的其他依赖发生冲突？
+
+Spring Boot offers help with project dependency management by way of starter dependencies. Starter dependencies are really just special Maven (and Gradle) dependencies that take advantage of transitive dependency resolution to aggregate commonly used libraries under a handful of feature-defined dependencies.  
+Spring Boot通过起步依赖的方式为项目的依赖管理提供帮助。起步依赖其实就是特殊的Maven（和Gradle）依赖，它们利用了传递依赖解析把常用库聚合在一起，组成了几个为特定功能而定制的依赖。
+
+For example, suppose that you’re going to build a REST API with Spring MVC that works with JSON resource representations. Additionally, you want to apply declarative validation per the JSR-303 specification and serve the application using an embedded Tomcat server. To accomplish all of this, you’ll need (at minimum) the following eight dependencies in your Maven or Gradle build:  
+举个例子，假设你正在用Spring MVC构造一个REST API，并将JSON作为资源表述。此外，你还想运用遵循JSR-303规范的声明式校验，并使用嵌入式的Tomcat服务器来提供服务。要实现以上目标，你在Maven或Gradle里将（最少）需要以下八个依赖：
+
+* org.springframework:spring-core
+* org.springframework:spring-web
+* org.springframework:spring-webmvc
+* com.fasterxml.jackson.core:jackson-databind
+* org.hibernate:hibernate-validator
+* org.apache.tomcat.embed:tomcat-embed-core
+* org.apache.tomcat.embed:tomcat-embed-el
+* org.apache.tomcat.embed:tomcat-embed-logging-juli
+
+On the other hand, if you were to take advantage of Spring Boot starter dependencies, you could simply add the Spring Boot “web” starter (org.springframework.boot:spring-boot-starter-web) as a build dependency. This single dependency will transitively pull in all of those other dependencies so you don’t have to ask for them all.  
+但如果你打算利用Spring Boot的起步依赖，就只需添加Spring Boot “web”起步依赖（org.springframework.boot:spring-boot-starter-web），仅此一个。它会根据依赖传递把其他所需依赖引入项目里，你都不用考虑它们。
+
+But there’s something more subtle about starter dependencies than simply reducing build dependency count. Notice that by adding the “web” starter to your build, you’re specifying a type of functionality that your application needs. Your app is a web application, so you add the “web” starter. Likewise, if your application will use JPA persistence, then you can add the “jpa” starter. If it needs security, you can add the “security” starter. In short, you no longer need to think about what libraries you’ll need to support certain functionality; you simply ask for that functionality by way of the pertinent starter dependency.  
+比起减少依赖数量，起步依赖还引入了一些微妙的变化。向项目中添加了“web”起步依赖后，你实际是指定了应用程序所需的一类功能。因为你的应用是个Web应用程序，所以你加入了“web”。类似的，如果你的应用程序要用到JPA持久化，那么久可以加入“jpa”起步依赖。如果需要安全功能，那就加入“security”。简而言之，你不再需要考虑支持某种功能要用什么库了，只要引入相关起步依赖就行了。
+
+Also note that Spring Boot’s starter dependencies free you from worrying about which versions of these libraries you need. The versions of the libraries that the starters pull in have been tested together so that you can be confident that there will be no incompatibilities between them.  
+此外，Spring Boot的起步依赖还把你从“需要这些库的哪些版本”这个问题里解放了出来。起步依赖引入的库的版本都是经过测试的，因此你可以完全放心，它们之间不会出现不兼容的情况。
+
+Along with auto-configuration, we’ll begin using starter dependencies right away, starting in chapter 2.  
+和自动配置一样，我们马上会在第2章里用到起步依赖。
+
+#### THE COMMAND-LINE INTERFACE (CLI)
+#### 命令行界面（CLI）
+
+In addition to auto-configuration and starter dependencies, Spring Boot also offers an intriguing new way to quickly write Spring applications. As you saw earlier in section 1.1, the Spring Boot CLI makes it possible to write applications by doing more than writing the application code.  
+除了自动配置和起步依赖，Spring Boot还提供了一种很有意思的方法，可以快速开发Spring应用程序。正如之前在1.1节里看到的那样，Spring Boot CLI让只写代码就能实现应用程序成为可能。
+
+Spring Boot’s CLI leverages starter dependencies and auto-configuration to let you focus on writing code. Not only that, did you notice that there are no import lines in listing 1.1? How did the CLI know what packages RequestMapping and RestController come from? For that matter, how did those classes end up in the classpath?  
+Spring Boot CLI利用了起步依赖和自动配置，让你能专注于代码本身。不仅如此，你是否注意到代码1.1里没有`import`？CLI是怎么知道`RequestMapping`和`RestController`来自哪个包呢？说到这个问题，那些类最终又是怎么跑到Classpath里的呢？
+
+The short answer is that the CLI detected that those types are being used, and it knows which starter dependencies to add to the classpath to make it work. Once those dependencies are in the classpath, a series of auto-configuration kicks in and ensures that DispatcherServlet and Spring MVC are enabled so that the controller can respond to HTTP requests.  
+说的简单一点，CLI检测到你使用了哪些类，它知道要向Classpath中添加哪些起步依赖才能让它运转起来。一旦那些依赖出现在Classpath中，一系列自动配置就会接踵而来，确保启用了`DispatcherServlet`和Spring MVC，这样就能响应HTTP请求了。
+
+Spring Boot’s CLI is an optional piece of Spring Boot’s power. Although it provides tremendous power and simplicity for Spring development, it also introduces a rather unconventional development model. If this development model is too extreme for your taste, then no problem. You can still take advantage of everything else that Spring Boot has to offer even if you don’t use the CLI. But if you like what the CLI provides, you’ll definitely want to look at chapter 5 where we’ll dig deeper into Spring Boot’s CLI.  
+Spring Boot CLI是Spring Boot的一个非必要组成部分。虽然它为Spring开发带来了惊人的力量，并大大简化了开发，但还是引入了一套不太常规的开发模型。要是这种开发模型与你的口味相去胜远也没关系，就算不用CLI，你还是可以利用Spring Boot提供的其他东西。但要是你喜欢CLI，你一定会想看看第5章，其中深入探讨了Spring Boot CLI。
+
+#### THE ACTUATOR
+#### Actuator
+
+The final piece of the Spring Boot puzzle is the Actuator. Where the other parts of Spring Boot simplify Spring development, the Actuator instead offers the ability to inspect the internals of your application at runtime. With the Actuator installed, you can inspect the inner workings of your application, including details such as
+
+* What beans have been configured in the Spring application context
+* What decisions were made by Spring Boot’s auto-configuration
+* What environment variables, system properties, configuration properties, and command-line arguments are available to your application
+* The current state of the threads in and supporting your application
+* A trace of recent HTTP requests handled by your application
+* Various metrics pertaining to memory usage, garbage collection, web requests,
+and data source usage
+
+The Actuator exposes this information in two ways: via web endpoints or via a shell interface. In the latter case, you can actually open a secure shell (SSH) into your application and issue commands to inspect your application as it runs.
+
+We’ll explore the Actuator’s capabilities in detail when we get to chapter 7.
