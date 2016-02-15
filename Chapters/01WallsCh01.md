@@ -215,16 +215,88 @@ Spring Boot CLI是Spring Boot的一个非必要组成部分。虽然它为Spring
 #### THE ACTUATOR
 #### Actuator
 
-The final piece of the Spring Boot puzzle is the Actuator. Where the other parts of Spring Boot simplify Spring development, the Actuator instead offers the ability to inspect the internals of your application at runtime. With the Actuator installed, you can inspect the inner workings of your application, including details such as
+The final piece of the Spring Boot puzzle is the Actuator. Where the other parts of Spring Boot simplify Spring development, the Actuator instead offers the ability to inspect the internals of your application at runtime. With the Actuator installed, you can inspect the inner workings of your application, including details such as  
+Spring Boot里的最后一块拼图是Actuator，其他几个部分都是旨在简化Spring开发，而Actuator则是要提供在运行时检视应用程序内部情况的能力。安装了Actuator之后，就能窥探应用程序的内部情况了，包括如下细节
 
-* What beans have been configured in the Spring application context
-* What decisions were made by Spring Boot’s auto-configuration
-* What environment variables, system properties, configuration properties, and command-line arguments are available to your application
-* The current state of the threads in and supporting your application
-* A trace of recent HTTP requests handled by your application
+* What beans have been configured in the Spring application context  
+Spring应用程序上下文里配置了什么Bean
+* What decisions were made by Spring Boot’s auto-configuration  
+Spring Boot的自动配置做了什么决策
+* What environment variables, system properties, configuration properties, and command-line arguments are available to your application  
+应用程序取到了什么环境变量、系统属性、配置属性和命令行参数
+* The current state of the threads in and supporting your application  
+应用程序里线程的当前状态
+* A trace of recent HTTP requests handled by your application  
+应用程序最近处理过的HTTP请求的追踪情况
 * Various metrics pertaining to memory usage, garbage collection, web requests,
-and data source usage
+and data source usage  
+各种和内存用量、垃圾回收、Web请求和数据源用量相关的指标
 
-The Actuator exposes this information in two ways: via web endpoints or via a shell interface. In the latter case, you can actually open a secure shell (SSH) into your application and issue commands to inspect your application as it runs.
+The Actuator exposes this information in two ways: via web endpoints or via a shell interface. In the latter case, you can actually open a secure shell (SSH) into your application and issue commands to inspect your application as it runs.  
+Actuator通过两种方式向外提供信息：Web端点和Shell界面。在第二种方式里，你可以打开一个安全Shell（SSH），登入运行中的应用程序，发送指令查看它的情况。
 
-We’ll explore the Actuator’s capabilities in detail when we get to chapter 7.
+We’ll explore the Actuator’s capabilities in detail when we get to chapter 7.  
+在第7章里我们会一起探索Actuator的细节。
+
+### 1.1.3 What Spring Boot isn’t
+### 1.1.3 Spring Boot不是什么
+
+Because of the amazing things Spring Boot does, there has been a lot of talk about Spring Boot in the past year or so. Depending on what you’ve heard or read about Spring Boot before reading this book, you may have a few misconceptions about Spring Boot that should be cleared up before continuing.  
+因为Spring Boot实在是太惊艳了，过去一年多的时间里有不少和它相关的言论。鉴于在阅读本书前你听到或看到的东西，可能给你造成了一些误解，在继续本书前应该先澄清一下。
+
+First, Spring Boot is not an application server. This misconception stems from the fact that it’s possible to create web applications as self-executable JAR files that can be run at the command line without deploying applications to a conventional Java application server. Spring Boot accomplishes this by embedding a servlet container (Tomcat, Jetty, or Undertow) within the application. But it’s the embedded servlet container that provides application server functionality, not Spring Boot itself.  
+首先，Spring Boot不是一个应用服务器。造成这个误解的原因是这样的，Spring Boot可以把Web应用程序变为可自执行的JAR文件，不用部署到传统Java应用服务器里就能在命令行里运行。Spring Boot在应用程序里嵌入了一个Servlet容器（Tomcat、Jetty或Undertow），藉此来实现这一功能的。但这是内嵌的Servlet容器提供的功能，不是Spring Boot实现的。
+
+Similarly, Spring Boot doesn’t implement any enterprise Java specifications such as JPA or JMS. It does support several enterprise Java specifications, but it does so by automatically configuring beans in Spring that support those features. For instance, Spring Boot doesn’t implement JPA, but it does support JPA by auto-configuring the appropriate beans for a JPA implementation (such as Hibernate).  
+类似的，Spring Boot也没有实现诸如JPA或JMS之类的企业级Java规范。它的确支持不少企业级Java规范，但是通过在Spring里自动配置Bean来支持那些特性的。例如，Spring Boot没有实现JPA，不过它自动配置了某个JPA实现（比如Hibernate）的Bean。
+
+Finally, Spring Boot doesn’t employ any form of code generation to accomplish its magic. Instead, it leverages conditional configuration features from Spring 4, along with transitive dependency resolution offered by Maven and Gradle, to automatically configure beans in the Spring application context.  
+最后，Spring Boot没有引入任何形式的代码生成，而是利用了Spring 4的条件配置特性，以及Maven和Gradle提供的传递依赖解析，以此实现Spring应用程序上下文里的自动配置。
+
+In short, at its heart, Spring Boot is just Spring. Inside, Spring Boot is doing the same kind of bean configuration in Spring that you might do on your own if Spring Boot didn’t exist. Thankfully, because Spring Boot does exist, you’re freed from dealing with explicit boilerplate configuration and are able to focus on the logic that makes your application unique.  
+简而言之，从本质上来说，Spring Boot就是Spring，它做了那些没有它你自己也会去做的Spring Bean配置。谢天谢地，幸好有Spring，你不用在写这些样板配置了，可以专注于应用程序的逻辑，这些才是让你的应用程序变得独一无二的东西。
+
+By now you should have a general idea of what Spring Boot brings to the table. It’s just about time for you to build your first application with Spring Boot. First things first, though. Let’s see how you can take your first steps with Spring Boot.  
+现在你应该对Spring Boot有个大概的认识了，现在是时候构建你的第一个Spring Boot应用程序了。先从重要的事情开始，该怎么入手呢？
+
+## 1.2 Getting started with Spring Boot
+## 1.2 Spring Boot入门
+
+Ultimately, a Spring Boot project is just a regular Spring project that happens to leverage Spring Boot starters and auto-configuration. Therefore, any technique or tool you may already be familiar with for creating a Spring project from scratch will apply to a Spring Boot project. There are, however, a few convenient options available for kickstarting your project with Spring Boot.
+
+The quickest way to get started with Spring Boot is to install the Spring Boot CLI so that you can start writing code, such as that in listing 1.1, that runs via the CLI.
+
+### 1.2.1 Installing the Spring Boot CLI
+
+As we discussed earlier, the Spring Boot CLI offers an interesting, albeit unconventional, approach to developing Spring applications. We’ll dive into the specifics of what the CLI offers in chapter 5. But for now let’s look at how to install the Spring Boot CLI so that you can run the code we looked at in listing 1.1.
+
+There are several ways to install the Spring Boot CLI:
+
+* From a downloaded distribution
+* Using the Groovy Environment Manager
+* With OS X Homebrew
+* As a port using MacPorts
+
+We’ll look at each installation option. In addition, we’ll also see how to install support for Spring Boot CLI command completion, which comes in handy if you’re using the CLI on BASH or zsh shells (sorry, Windows users). Let’s first look at how you can install the Spring Boot CLI manually from a distribution.
+
+#### MANUALLY INSTALLING THE SPRING BOOT CLI
+
+Perhaps the most straightforward way to install the Spring Boot CLI is to download it, unzip it, and add its bin directory to your path. You can download the distribution archive from either of these locations:
+
+* http://repo.spring.io/release/org/springframework/boot/spring-boot-cli/1.3.0.RELEASE/spring-boot-cli-1.3.0.RELEASE-bin.zip
+* http://repo.spring.io/release/org/springframework/boot/spring-boot-cli/1.3.0.RELEASE/spring-boot-cli-1.3.0.RELEASE-bin.tar.gz
+
+Once you’ve downloaded the distribution, unpack it somewhere in your filesystem. Inside of the unpacked archive, you’ll find a bin directory that contains a spring.bat script (for Windows) and a spring script for Unix. Add this bin directory to your system path and you’re ready to use the Spring Boot CLI.
+
+    __SYMBOLICALLY LINKING TO SPRING BOOT__ If you’re using the Spring Boot CLI on a Unix machine, it may be helpful to create a symbolic link to the unpacked
+archive and add the symbolic link to your path instead of the actual directory. This will make it easy to upgrade to a newer version of Spring Boot later (or even to flip between versions) by simply reassigning the symbolic link to the directory of the new version.
+
+You can kick the tires a little on the installation by verifying the version of the CLI that was installed:
+
+```
+$ spring --version
+```
+
+If everything is working, you’ll be shown the version of the Spring Boot CLI that was installed.
+
+Even though this is the manual installation, it’s an easy option that doesn’t require you to have anything additional installed. If you’re a Windows user, it’s also the only choice available to you. But if you’re on a Unix machine and are looking for something a little more automated, then maybe the Software Development Kit Manager can help.
