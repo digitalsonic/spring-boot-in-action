@@ -262,41 +262,149 @@ By now you should have a general idea of what Spring Boot brings to the table. I
 ## 1.2 Getting started with Spring Boot
 ## 1.2 Spring Boot入门
 
-Ultimately, a Spring Boot project is just a regular Spring project that happens to leverage Spring Boot starters and auto-configuration. Therefore, any technique or tool you may already be familiar with for creating a Spring project from scratch will apply to a Spring Boot project. There are, however, a few convenient options available for kickstarting your project with Spring Boot.
+Ultimately, a Spring Boot project is just a regular Spring project that happens to leverage Spring Boot starters and auto-configuration. Therefore, any technique or tool you may already be familiar with for creating a Spring project from scratch will apply to a Spring Boot project. There are, however, a few convenient options available for kickstarting your project with Spring Boot.  
+从根本上来说，Spring Boot的项目只是普通的Spring项目，只是它们正好用到了Spring Boot的起步依赖和自动配置而已。因此，那些你早已熟悉的从头创建Spring项目的技术或工具都能被用于Spring Boot项目。然而，还是有一些简便的途径来开始一个新的Spring Boot项目的。
 
-The quickest way to get started with Spring Boot is to install the Spring Boot CLI so that you can start writing code, such as that in listing 1.1, that runs via the CLI.
+The quickest way to get started with Spring Boot is to install the Spring Boot CLI so that you can start writing code, such as that in listing 1.1, that runs via the CLI.  
+最快的方法就是安装Spring Boot CLI，然后你就可以开始写代码了，就像代码1.1一样，接着通过CLI来运行就好了。
 
 ### 1.2.1 Installing the Spring Boot CLI
+### 1.2.1 安装Spring Boot CLI
 
-As we discussed earlier, the Spring Boot CLI offers an interesting, albeit unconventional, approach to developing Spring applications. We’ll dive into the specifics of what the CLI offers in chapter 5. But for now let’s look at how to install the Spring Boot CLI so that you can run the code we looked at in listing 1.1.
+As we discussed earlier, the Spring Boot CLI offers an interesting, albeit unconventional, approach to developing Spring applications. We’ll dive into the specifics of what the CLI offers in chapter 5. But for now let’s look at how to install the Spring Boot CLI so that you can run the code we looked at in listing 1.1.  
+如前文所述，Spring Boot CLI提供了一种有趣的、不同寻常的方式来开发Spring应用程序。在第5章里我们会详细了解CLI提供的功能，但先让我们来看看如何安装Spring Boot CLI，这样你才能运行代码1.1里的东西。
 
-There are several ways to install the Spring Boot CLI:
+There are several ways to install the Spring Boot CLI:  
+Spring Boot CLI有好几种安装方式：
 
-* From a downloaded distribution
-* Using the Groovy Environment Manager
-* With OS X Homebrew
-* As a port using MacPorts
+* From a downloaded distribution  
+用下载的分发包进行安装
+* Using the Groovy Environment Manager  
+使用Groovy Environment Manager进行安装
+* With OS X Homebrew  
+通过OS X Homebrew进行安装
+* As a port using MacPorts  
+使用MacPorts进行安装
 
-We’ll look at each installation option. In addition, we’ll also see how to install support for Spring Boot CLI command completion, which comes in handy if you’re using the CLI on BASH or zsh shells (sorry, Windows users). Let’s first look at how you can install the Spring Boot CLI manually from a distribution.
+We’ll look at each installation option. In addition, we’ll also see how to install support for Spring Boot CLI command completion, which comes in handy if you’re using the CLI on BASH or zsh shells (sorry, Windows users). Let’s first look at how you can install the Spring Boot CLI manually from a distribution.  
+让我们分别看一下这几种方式，除此之外，我们还将了解如何安装Spring Boot CLI的命令行补全支持，要是你是在BASH或zsh Shell里使用CLI这会非常有用（抱歉了，各位Windows用户们）。先让我们看看如何用分发包手工安装Spring Boot CLI吧。
 
 #### MANUALLY INSTALLING THE SPRING BOOT CLI
+#### 手工安装Spring Boot CLI
 
-Perhaps the most straightforward way to install the Spring Boot CLI is to download it, unzip it, and add its bin directory to your path. You can download the distribution archive from either of these locations:
+Perhaps the most straightforward way to install the Spring Boot CLI is to download it, unzip it, and add its bin directory to your path. You can download the distribution archive from either of these locations:  
+也许安装Spring Boot CLI最直接的方法就是下载、解压，随后将它的bin目录添加到系统路径里。你可以从以下这些地址下载到分发包：
 
 * http://repo.spring.io/release/org/springframework/boot/spring-boot-cli/1.3.0.RELEASE/spring-boot-cli-1.3.0.RELEASE-bin.zip
 * http://repo.spring.io/release/org/springframework/boot/spring-boot-cli/1.3.0.RELEASE/spring-boot-cli-1.3.0.RELEASE-bin.tar.gz
 
-Once you’ve downloaded the distribution, unpack it somewhere in your filesystem. Inside of the unpacked archive, you’ll find a bin directory that contains a spring.bat script (for Windows) and a spring script for Unix. Add this bin directory to your system path and you’re ready to use the Spring Boot CLI.
+Once you’ve downloaded the distribution, unpack it somewhere in your filesystem. Inside of the unpacked archive, you’ll find a bin directory that contains a spring.bat script (for Windows) and a spring script for Unix. Add this bin directory to your system path and you’re ready to use the Spring Boot CLI.  
+一旦下载完成，把它解压到文件系统的任意目录里，在解压后的目录里你会找到一个bin目录，其中包含了一个spring.bat脚本（用于Windows环境）和一个spring脚本（用于Unix环境）。把这个bin目录添加到系统路径里，然后你就能使用Spring Boot CLI了。
 
-    __SYMBOLICALLY LINKING TO SPRING BOOT__ If you’re using the Spring Boot CLI on a Unix machine, it may be helpful to create a symbolic link to the unpacked
-archive and add the symbolic link to your path instead of the actual directory. This will make it easy to upgrade to a newer version of Spring Boot later (or even to flip between versions) by simply reassigning the symbolic link to the directory of the new version.
+> __SYMBOLICALLY LINKING TO SPRING BOOT__ If you’re using the Spring Boot CLI on a Unix machine, it may be helpful to create a symbolic link to the unpacked archive and add the symbolic link to your path instead of the actual directory. This will make it easy to upgrade to a newer version of Spring Boot later (or even to flip between versions) by simply reassigning the symbolic link to the directory of the new version.  
+> __为Spring Boot建立符号链接__ 如果是在Unix机器上使用Spring Boot CLI，最好建立一个指向解压目录的符号链接，然后把这个符号链接添加到系统路径里，而不是实际的目录。这样在后续升级Spring Boot新版本时就会很方便，只要简单地重建一下符号链接，指向新版本就好了。
 
-You can kick the tires a little on the installation by verifying the version of the CLI that was installed:
+You can kick the tires a little on the installation by verifying the version of the CLI that was installed:  
+你可以先浅尝辄止一下，看看你所安装的CLI的版本号：
 
 ```
 $ spring --version
 ```
 
-If everything is working, you’ll be shown the version of the Spring Boot CLI that was installed.
+If everything is working, you’ll be shown the version of the Spring Boot CLI that was installed.  
+如果一切正常，你会看到安装好的Spring Boot CLI的版本号。
 
-Even though this is the manual installation, it’s an easy option that doesn’t require you to have anything additional installed. If you’re a Windows user, it’s also the only choice available to you. But if you’re on a Unix machine and are looking for something a little more automated, then maybe the Software Development Kit Manager can help.
+Even though this is the manual installation, it’s an easy option that doesn’t require you to have anything additional installed. If you’re a Windows user, it’s also the only choice available to you. But if you’re on a Unix machine and are looking for something a little more automated, then maybe the Software Development Kit Manager can help.  
+虽然这是手工安装的，但一切都很容易，而且不要求你安装任何附加的东西。如果你是一名Windows用户，那你也别无选择，这是唯一的安装方式。但如果你使用的是Unix机器，而且想要稍微自动化一点的方式，那么可以试试Software Development Kit Manager。
+
+#### INSTALLING WITH THE SOFTWARE DEVELOPMENT KIT MANAGER
+#### 使用Software Development Kit Manager进行安装
+
+The Software Development Kit Manager (SDKMAN; formerly known as GVM) can be used to install and manage multiple versions of Spring Boot CLI installations. In order to use SDKMAN, you’ll need to get and install the SDKMAN tool from http://sdkman.io. The easiest way to install SDKMAN is at the command line:  
+Software Development Kit Manage（SDKMAN，前称是GVM）也能用来安装和管理多个版本的Spring Boot CLI。为了使用SDKMAN，你需要先从[http://sdkman.io](http://sdkman.io)获取并安装SDKMAN，最简单的安装方式是用命令行：
+
+```
+$ curl -s get.sdkman.io | bash
+```
+
+Follow the instructions given in the output to complete the SDKMAN installation. For my machine, I had to perform the following command at the command line:  
+遵从输出的指示就能完成SDKMAN的安装，在我的机器上，我在命令行里执行了如下命令：
+
+```
+$ source "/Users/habuma/.sdkman/bin/sdkman-init.sh"
+```
+
+Note that this command will be different for different users. In my case, my home directory is at /Users/habuma, so that’s the root of the shell script’s path. You’ll want to adjust accordingly to fit your situation.  
+请注意，用户不同，这条命令也会有所不同。我的用户目录是`/Users/habuma`，所以这也是Shell脚本的根路径。你需要根据你的实际情况稍作调整。
+
+Once SDKMAN is installed, you can install Spring Boot’s CLI like this:  
+一旦安装好了SDKMAN，就可以用下面的方式来安装Spring Boot CLI了：
+
+```
+$ sdk install springboot
+$ spring --version
+```
+
+Assuming all goes well, you’ll be shown the current version of Spring Boot.  
+假设一切正常，你将看到Spring Boot的当前版本号。
+
+If you want to upgrade to a newer version of Spring Boot CLI, you just need to install it and start using it. To find out which versions of Spring Boot CLI are available, use SDKMAN’s list command:  
+如果想升级新版本的Spring Boot CLI，只需安装并使用就行了。要找到可用的版本，使用SDKMAN的`list`命令：
+
+```
+$ sdk list springboot
+```
+
+The list command shows all available versions, including which versions are installed and which is currently in use. From this list you can choose to install a version and then use it. For example, to install Spring Boot CLI version 1.3.0.RELEASE, you’d use the install command, specifying the version:  
+`list`命令列出了所有可用版本，包括已经安装的和正在使用的，从中选择一个进行安装后就可以正常使用了。举例来说，要安装Spring Boot CLI 1.3.0.RELEASE，直接使用`install`命令，指定版本号：
+
+```
+$ sdk install springboot 1.3.0.RELEASE
+```
+
+This will install the new version and ask if you’d like to make it the default version. If you choose not to make it the default version or if you wish to switch to a different version, you can use the use command:  
+这将安装一个新版本，随后会询问你是否将其设置为默认版本。要是你不想把它作为默认版本，或者想要切换到另一个版本，可以用`use`命令：
+
+```
+$ sdk use springboot 1.3.0.RELEASE
+```
+
+If you’d like that version to be the default for all shells, use the default command:  
+如果你希望把那个版本作为所有Shell的默认版本，使用`default`命令：
+
+```
+$ sdk default springboot 1.3.0.RELEASE
+```
+
+The nice thing about using SDKMAN to manage your Spring Boot CLI installation is that it allows you to easily switch between different versions of Spring Boot. This will enable you to try out snapshot, milestone, and release candidate builds before they’re formally released, but still switch back to a stable release for other work.  
+使用SDKMAN来管理Spring Boot CLI有一个好处，它允许你方便地在Spring Boot的不同版本之间进行切换。这样你可以在正式发布前试用快照版本（snapshot）、里程碑版本（milestone）和候选版本（release candidate），试用后再切回稳定版本进行其他工作。
+
+#### INSTALLING WITH HOMEBREW
+
+If you’ll be developing on an OS X machine, you have the option of using Homebrew to install the Spring Boot CLI. Homebrew is a package manager for OS X that is used to install many different applications and tools. The easiest way to install Homebrew is by running the installation Ruby script:
+
+```
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/ master/install)"
+```
+
+You can read more about Homebrew (and find other installation options) at http:// brew.sh.
+In order to install the Spring Boot CLI using Homebrew, you’ll need to “tap” Piv- otal’s tap:<sup>[1][]</sup>
+
+```
+$ brew tap pivotal/tap
+```
+
+Now that Homebrew is tapping Pivotal’s tap, you can install the Spring Boot CLI like this:
+
+```
+$ brew install springboot
+```
+Homebrew will install the Spring Boot CLI to /usr/local/bin, and it’s ready to go. You can verify the installation by checking the version that was installed:
+
+```
+$ spring --version
+```
+
+It should respond by showing you the version of Spring Boot that was installed. You can also try running the code in listing 1.1.
+
+[1]: # "Tapping is a way to add additional repositories to those that Homebrew works from. Pivotal, the company behind Spring and Spring Boot, has made the Spring Boot CLI available through its tap."
