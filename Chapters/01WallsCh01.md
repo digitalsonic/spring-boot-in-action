@@ -482,16 +482,125 @@ Even so, Spring Boot CLI's process is rather unconventional in contrast to how m
 [2]: # "You'll only be giving up features that require the flexibility of the Groovy language, such as automatic dependency and import resolution.只是让你放弃那些用到Groovy语言灵活性的特性，比如自动依赖和`import`解析。"
 
 ### 1.2.2 Initializing a Spring Boot project with Spring Initializr
+### 1.2.2 使用Spring Initializr初始化Spring Boot项目
 
-Sometimes the hardest part of a project is getting started. You need to set up a directory structure for various project artifacts, create a build file, and populate the build file with dependencies. The Spring Boot CLI removes much of this setup work, but if you favor a more traditional Java project structure, you’ll want to look at the Spring Initializr.
+Sometimes the hardest part of a project is getting started. You need to set up a directory structure for various project artifacts, create a build file, and populate the build file with dependencies. The Spring Boot CLI removes much of this setup work, but if you favor a more traditional Java project structure, you’ll want to look at the Spring Initializr.  
+万事开头难，你需要设置一个目录结构存放各种项目内容，创建构建文件，并在其中加入各种依赖。Spring Boot CLI消除了不少设置工作，但如果你更倾向于传统Java项目结构，那你应该看看Spring Initializr。
 
-The Spring Initializr is ultimately a web application that can generate a Spring Boot project structure for you. It doesn’t generate any application code, but it will give you a basic project structure and either a Maven or a Gradle build specification to build your code with. All you need to do is write the application code.
+The Spring Initializr is ultimately a web application that can generate a Spring Boot project structure for you. It doesn’t generate any application code, but it will give you a basic project structure and either a Maven or a Gradle build specification to build your code with. All you need to do is write the application code.  
+Spring Initializr从本质上来说就是一个Web应用程序，它能为你生成Spring Boot项目结构。虽然不能生成应用程序代码，但它能为你提供一个基本的项目结构，以及一个用于构建代码的Maven或Gradle构建说明文件。你只需要写应用程序的代码就好了。
 
-Spring Initializr can be used in several ways:
+Spring Initializr can be used in several ways:  
+Spring Initializr有几种用法：
 
-* Through a web-based interface
-* Via Spring Tool Suite
-* Via IntelliJ IDEA
-* Using the Spring Boot CLI
+* Through a web-based interface  
+通过Web界面
+* Via Spring Tool Suite  
+通过Spring Tool Suite
+* Via IntelliJ IDEA  
+通过IntelliJ IDEA
+* Using the Spring Boot CLI  
+使用Spring Boot CLI
 
-We’ll look at how to use each of these interfaces to the Initializr, starting with the webbased interface.
+We’ll look at how to use each of these interfaces to the Initializr, starting with the web-based interface.  
+我们来分别看看这几种用法，先从Web界面开始。
+
+#### USING SPRING INITIALIZR’S WEB INTERFACE
+#### 使用Spring Initializr的Web界面
+
+The most straightforward way to use the Spring Initializr is to point your web browser to http://start.spring.io. You should see a form similar to the one in figure 1.1.  
+要使用Spring Initializr，最直接的办法就是用浏览器打开[http://start.spring.io](http://start.spring.io)，你应该能看到类似图1.1的一个表单。
+
+The first two things that the form asks is whether you want to build your project with Maven or Gradle and which version of Spring Boot to use. It defaults to a Maven project using the latest release (non-milestone, non-snapshot) version of Spring Boot, but you’re welcome to choose a different one.  
+表单的头两个问题是你想用Maven还是Gradle来构建项目，以及使用Spring Boot的哪个版本。默认生成Maven项目，并使用Spring Boot的最新版本（非里程碑和快照版本），但你也可以自由选择其他选项。
+
+On the left side of the form, you’re asked to specify some project metadata. At minimum, you must provide the project’s group and artifact. But if you click the “Switch to the full version” link, you can specify additional metadata such as version and base package name. This metadata is used to populate the generated Maven pom.xml file (or Gradle build.gradle file).  
+表单左侧要你指定一些项目的基本信息，最起码你要提供项目的Group和Artifact，但如果你点击了“Switch to the full version”链接，还可以指定额外的信息，比如版本号和基础包名。这些信息是用来生成Maven的pom.xml文件（或者Gradle的build.gradle文件）的。
+
+![图1.1](../Figures/figure-1.1.png)
+
+__Figure 1.1 Spring Initializr is a web application that generates empty Spring projects as starting points for development.__  
+__图1.1 Spring Initializr是一个用来生成空Spring项目的Web应用程序，可以视为开发过程的第一步。__
+
+On the right side of the form, you’re asked to specify project dependencies. The easiest way to do that is to type the name of a dependency in the text box. As you type, a list of matching dependencies will appear. Select the one(s) you want and it will be added to the project. If you don’t see what you’re looking for, click the “Switch to the full version” link to get a complete list of available dependencies.  
+表单左侧要你指定项目依赖，最简单的方法就是在文本框里键入依赖的名称。随着你的输入会出现匹配依赖的列表，选中一个（或多个）依赖，它就被加入项目了。如果找不到你要的依赖，点击“Switch to the full version”就能看到可用依赖的完整列表。
+
+If you’ve glanced at appendix B, then you’ll recognize that the dependencies offered correspond to Spring Boot starter dependencies. In fact, by selecting any of these dependencies, you’re telling the Initializr to add the starters as dependencies to the project’s build file. (We’ll talk more about Spring Boot starters in chapter 2.)  
+要是你瞄过一眼附录B，就会发现这里的依赖和Spring Boot起步依赖是相互对应的。实际上，在这里选中依赖就相当于是告诉Initializr把对应的起步依赖加到项目的构建文件里。（在第2章里我们会更多地讨论Spring Boot起步依赖。）
+
+Once you’ve filled in the form and made your dependency selections, click the Generate Project button to have Spring Initializr generate a project for you. The project it generates will be presented to you as a zip file (whose name is determined by the value in the Artifact field) that is downloaded by your browser. The contents of the zip file will vary slightly, depending on the choices you made before clicking Generate Project. In any event, the zip file will contain a bare-bones project to get you started developing an application with Spring Boot.  
+填完表单，选好依赖，点击“Generate Project”按钮，Spring Initializr就会为你生成一个项目。浏览器将会以zip文件的形式（文件名取决于Artifact字段的内容）把这个项目下载下来。根据你的选择，zip文件的内容也会略有不同。不管怎样，zip文件都会包含一个极其基础的项目，让你能着手开发使用了Spring Boot的应用程序。
+
+For example, suppose that you were to specify the following to Spring Initializr:  
+举例来说，假设你在Spring Initializr里指定了如下信息：
+
+* Artifact: myapp  
+Artifact: myapp
+* Package Name: myapp  
+包名：myapp
+* Type: Gradle Project  
+类型：Gradle项目
+* Dependencies: Web and JPA  
+依赖：Web和JPA
+
+After clicking Generate Project, you’d be given a zip file named myapp.zip. After unzipping it, you’d have a project structure similar to what’s shown in figure 1.2.  
+点击“Generate Project”，就能获得一个名为myapp.zip的zip文件。解压后的项目结构同图1.2中的很类似。
+
+![图1.2](../Figures/figure-1.2.png)
+
+__Figure 1.2 Initializr-created projects provide a minimal foundation on which to build Spring Boot applications.__  
+__图1.2 Initializr创建的项目，提供了构建Spring Boot应用程序所需的基本内容。__
+
+As you can see, there’s very little code in this project. Aside from a couple of empty
+directories, it also includes the following:  
+如你所见，项目里基本没有代码，除了几个空目录外，还包含了如下几个东西：
+
+* build.gradle—A Gradle build specification. Had you chosen a Maven project, this would be replaced with pom.xml.  
+build.gradle——Gradle构建说明文件。如果选择了Maven项目，这就会换成pom.xml。
+* Application.java—A class with a main() method to bootstrap the application.  
+Application.java——一个带有`main()`方法的类，用于引导启动应用程序。
+* ApplicationTests.java—An empty JUnit test class instrumented to load a Spring application context using Spring Boot auto-configuration.  
+ApplicationTests.java——一个空的Junit测试类，它加载了一个使用Spring Boot自动配置功能的Spring应用程序上下文。
+* application.properties—An empty properties file for you to add configuration properties to as you see fit.  
+application.properties——一个空的properties文件，你可以根据需要添加配置属性。
+
+Even the empty directories have significance in a Spring Boot application. The static directory is where you can put any static content (JavaScript, stylesheets, images, and so on) to be served from the web application. And, as you’ll see later, you can put templates that render model data in the templates directory.  
+即使是空目录，在Spring Boot应用程序中都有自己的意义。static目录放置的是Web应用程序的静态内容（JavaScript、样式表、图片等等）。还有稍后将要看到的，你会把用于呈现模型数据的模板放在templates目录里。
+
+You’ll probably import the Initializr-created project into your IDE of choice. But if Spring Tool Suite is your IDE of choice, you can create the project directly in the IDE. Let’s have a look at Spring Tool Suite’s support for creating Spring Boot projects.  
+你很可能会把Initializr生成的项目导入到你的IDE里。要是你用的IDE是Spring Tool Suite，则可以直接在IDE里创建项目。让我们来看看Spring Tool Suite是怎么创建Spring Boot项目的。
+
+#### CREATING SPRING BOOT PROJECTS IN SPRING TOOL SUITE
+#### 在Spring Tool Suite里创建Spring Boot项目
+
+Spring Tool Suite3 has long been a fantastic IDE for developing Spring applications. Since version 3.4.0 it has also been integrated with the Spring Initializr, making it a great way to get started with Spring Boot.  
+长久以来，Spring Tool Suite<sup>[3][]</sup>一直都是开发Spring应用程序的不二之选。从3.4.0版本开始它就集成了Spring Initializr，这让它成为开始使用Spring Boot的好方法。
+
+To create a new Spring Boot application in Spring Tool Suite, select the New > Spring Starter Project menu item from the File menu. When you do, Spring Tool Suite will present you with a dialog box similar to the one shown in figure 1.3.  
+要在Spring Tool Suite里创建新的Spring Boot应用程序，在File菜单里选中New > Spring Starter Project菜单项，随后Spring Tool Suite会显示一个与图1.3类似的对话框。
+
+As you can see, this dialog box asks for the same information as the web-based Spring Initializr. In fact, the data you provide here will be fed to Spring Initializr to create a project zip file, just as with the web-based form.  
+如你所见，这个对话框要的信息和Spring Initializr的Web界面里是一样的。事实上，你在这里提供的数据会被发送给Spring Initializr用于创建项目zip文件，就和使用Web表单是一样的。
+
+If you’d like to specify where in the filesystem to create the project or whether to add it to a specific working set within the IDE, click the Next button. You’ll be presented with a second dialog box like the one shown in figure 1.4.  
+如果你想在文件系统上指定项目创建的位置，或者把它加入IDE里的特定工作集，就点击Next按钮。你会看到第二个对话框，类似于图1.4。
+
+The Location field specifies where the project will reside on the filesystem. If you take advantage of Eclipse’s working sets to organize your projects, you can have the project added to a specific working set by checking the Add Project to Working Sets check box and selecting a working set.
+
+The Site Info section simply describes the URL that will be used to contact the Initializr. For the most part, you can ignore this section. If, however, you were to deploy your own Initializr server (by cloning the code at https://github.com/spring-io/initializr), you could plug in the base URL of your Initializr here.
+
+[3]: # "Spring Tool Suite is a distribution of the Eclipse IDE that is outfitted with several features to aid with Spring development. You can download Spring Tool Suite from http://spring.io/tools/sts."
+
+![图1.3](../Figures/figure-1.3.png)
+
+__Figure 1.3 Spring Tool Suite integrates with Spring Initializr to create and directly import Spring Boot projects into the IDE.__
+
+![图1.4](../Figures/figure-1.4.png)
+
+__Figure 1.4 The second page of the Spring Starter Project dialog box offers you a chance to specify where the project is created.__
+
+Clicking the Finish button kicks off the project generation and import process. It’s important to understand that Spring Tool Suite’s Spring Starter Project dialog box delegates to the Spring Initializr at http://start.spring.io to produce the project. You must be connected to the internet in order for it to work.
+
+Once the project has been imported into your workspace, you’re ready to start developing your application. As you develop the application, you’ll find that Spring Tool Suite has a few more Spring Boot-specific tricks up its sleeves. For instance, you can run your application with an embedded server by selecting Run As > Spring Boot Application from the Run menu.
+
+It’s important to understand that Spring Tool Suite coordinates with the Initializr via a REST API. Therefore, it will only work if it can connect to the Initializr. If your development machine is offline or Initializr is blocked by a firewall, then using the Spring Start Project wizard in Spring Tool Suite will not work.
