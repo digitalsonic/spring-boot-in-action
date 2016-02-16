@@ -380,31 +380,118 @@ The nice thing about using SDKMAN to manage your Spring Boot CLI installation is
 使用SDKMAN来管理Spring Boot CLI有一个好处，它允许你方便地在Spring Boot的不同版本之间进行切换。这样你可以在正式发布前试用快照版本（snapshot）、里程碑版本（milestone）和候选版本（release candidate），试用后再切回稳定版本进行其他工作。
 
 #### INSTALLING WITH HOMEBREW
+#### 使用Homebrew进行安装
 
-If you’ll be developing on an OS X machine, you have the option of using Homebrew to install the Spring Boot CLI. Homebrew is a package manager for OS X that is used to install many different applications and tools. The easiest way to install Homebrew is by running the installation Ruby script:
+If you’ll be developing on an OS X machine, you have the option of using Homebrew to install the Spring Boot CLI. Homebrew is a package manager for OS X that is used to install many different applications and tools. The easiest way to install Homebrew is by running the installation Ruby script:  
+如果你要在OS X的机器上做开发，还可以用Homebrew来安装Spring Boot CLI。Homebrew是OS X的包管理器，用于安装多种不同应用程序和工具，要按照Homebrew，最简单的方法就是运行安装用的Ruby脚本：
 
 ```
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/ master/install)"
 ```
 
-You can read more about Homebrew (and find other installation options) at http:// brew.sh.
-In order to install the Spring Boot CLI using Homebrew, you’ll need to “tap” Piv- otal’s tap:<sup>[1][]</sup>
+You can read more about Homebrew (and find other installation options) at http://brew.sh.  
+你可以在[http://brew.sh](http://brew.sh)看到更多关于Homebrew的内容（还有安装方法）。
+
+In order to install the Spring Boot CLI using Homebrew, you’ll need to “tap” Pivotal’s tap:<sup>[1][]</sup>  
+要用Homebrew来安装Spring Boot CLI，你需要引入Pivotal的tap：<sup>[1][]</sup>
 
 ```
 $ brew tap pivotal/tap
 ```
 
-Now that Homebrew is tapping Pivotal’s tap, you can install the Spring Boot CLI like this:
+Now that Homebrew is tapping Pivotal’s tap, you can install the Spring Boot CLI like this:  
+在有了Pivotal的tap后，就可以像下面这样来安装Spring Boot CLI了：
 
 ```
 $ brew install springboot
 ```
-Homebrew will install the Spring Boot CLI to /usr/local/bin, and it’s ready to go. You can verify the installation by checking the version that was installed:
+
+Homebrew will install the Spring Boot CLI to /usr/local/bin, and it’s ready to go. You can verify the installation by checking the version that was installed:  
+Homebrew会把Spring Boot CLI安装到/usr/local/bin，直接就可以用了。你可以通过检查版本号来验证安装是否成功：
 
 ```
 $ spring --version
 ```
 
-It should respond by showing you the version of Spring Boot that was installed. You can also try running the code in listing 1.1.
+It should respond by showing you the version of Spring Boot that was installed. You can also try running the code in listing 1.1.  
+这条命令应该会返回刚才安装的Spring Boot的版本号，你也可以运行代码1.1看看。
 
-[1]: # "Tapping is a way to add additional repositories to those that Homebrew works from. Pivotal, the company behind Spring and Spring Boot, has made the Spring Boot CLI available through its tap."
+[1]: # "Tapping is a way to add additional repositories to those that Homebrew works from. Pivotal, the company behind Spring and Spring Boot, has made the Spring Boot CLI available through its tap. tap是向Homebrew添加额外仓库的一种途径。Pivotal是Spring及Spring Boot背后的公司，通过它的tap可以安装Spring Boot。"
+
+#### INSTALLING WITH MACPORTS
+#### 使用MacPorts进行安装
+
+Another Spring Boot CLI installation option for OS X users is to use MacPorts, another popular installer for Mac OS X. In order to use MacPorts to install the Spring Boot CLI, you must first install MacPorts, which itself requires that you have Xcode installed. Furthermore, the steps for installing MacPorts vary depending on which version of OS X you're using. Therefore, I refer you to https://www.macports.org/install.php for instructions on installing MacPorts.  
+OS X用户还有另一种安装Spring Boot CLI的方法，即MacPorts，这是Mac OS X上的另一个流行的安装工具。要使用MacPorts来安装Spring Boot CLI，你必须先安装MacPorts，而它自己还要求安装Xcode。此外，使用不同版本的OS X时，MacPorts的安装步骤也会有所不同。因此我建议你根据[https://www.macports.org/install.php](https://www.macports.org/install.php)的安装指南来安装MacPorts。
+
+Once you have MacPorts installed, you can install the Spring Boot CLI at the command line like this:  
+一旦安装好了MacPorts，就可以用以下命令来安装Spring Boot CLI了：
+
+```
+$ sudo port install spring-boot-cli
+```
+
+MacPorts will install the Spring Boot CLI to /opt/local/share/java/spring-boot-cli and put a symbolic link to the binary in /opt/local/bin, which should already be in your system path from installing MacPorts. You can verify the installation by checking the version that was installed:  
+MacPorts会把Spring Boot CLI安装到/opt/local/share/java/spring-boot-cli，并在/opt/local/bin里放一个指向其可执行文件的符号链接，在安装MacPorts后/opt/local/bin这个目录应该就在系统路径里了。你可以检查版本号来验证安装是否成功：
+
+```
+$ spring --version
+```
+
+It should respond by showing you the version of Spring Boot that was installed. You can also try running the code in listing 1.1.  
+这条命令应该会返回刚才安装的Spring Boot的版本号，你也可以运行代码1.1看看。
+
+#### ENABLING COMMAND-LINE COMPLETION
+#### 开启命令行补全
+
+Spring Boot's CLI offers a handful of commands for running, packaging, and testing your CLI-based application. Moreover, each of those commands has several options. It can be difficult to remember all that the CLI offers. Command-line completion can help you recall how to use the Spring Boot CLI.  
+Spring Boot CLI为基于CLI的应用程序的运行、打包和测试提供了一套好用的命令，然而每个命令都有好多选项，要记住这些东西实属不易，命令行补全能帮你记起怎么使用Spring Boot CLI。
+
+If you've installed the Spring Boot CLI with Homebrew, you already have commandline completion installed. But if you installed Spring Boot manually or with SDKMAN, you'll need to source the scripts or install the completion scripts manually. (Commandline completion isn't an option if you've installed the Spring Boot CLI via MacPorts.)  
+如果你是用Homebrew安装的Spring Boot CLI，那么就已经装好了命令行补全了。但如果是手工安装或者用SDKMAN装的，那就需要执行脚本或者手工安装了。（如果是通过MacPorts安装Spring Boot CLI的，命令行补全也不用你自己考虑。）
+
+The completion scripts are found in the Spring Boot CLI installation directory under the shell-completion subdirectory. There are two different scripts, one for BASH and one for zsh. To source the completion script for BASH, you can enter the following at the command line (assuming a SDKMAN installation):  
+你可以在Spring Boot CLI安装目录的shell-completion子目录里找到补全脚本，有两个不同的脚本，一个是针对BASH的，另一个是针对zsh的。要使用BASH的补全脚本，可以在命令行里键入以下命令（假设是用SDKMAN安装的）：
+
+```
+$ . ~/.sdkman/springboot/current/shell-completion/bash/spring
+```
+
+This will give you Spring Boot CLI completion for the current shell, but you'll have to source this script again each time you start a new shell to keep that feature. Optionally, you can copy the script to your personal or system script directory. The location of the script directory varies for different Unix installations, so consult your system documentation (or Google) for details.  
+这样在当前的Shell里就可以使用Spring Boot CLI的补全功能了，但每次开启一个新的Shell你都要重新执行一次上面的命令才行。你也可以把这个脚本复制到你的个人或系统脚本目录里，这个目录的位置在不同的Unix里也会有所不同，可以参考系统文档（或Google）了解细节。
+
+With command completion enabled, you should be able to type spring at the command line and then hit the Tab key to be offered options for what to type next. Once you've chosen a command, type -- (double-hyphen) and then hit Tab again to be shown a list of options for that command.  
+开启了命令行补全之后，在命令行里键入`spring`命令，然后按Tab键就能看到下一步该输什么的提示。选中一个命令后，键入--（两个连字符）后再按Tab，就会显示出该命令的选项列表。
+
+If you're developing on Windows or aren't using BASH or zsh, you can't use these command-line completion scripts. Even so, you can get command completion if you run the Spring Boot CLI shell:  
+如果你是在Windows上开发的，或者没有用BASH或zsh，那就无缘这些命令行补全脚本了。尽管如此，如果你用的是Spring Boot CLI的Shell，那一样也能有命令补全：
+
+```
+$ spring shell
+```
+
+Unlike the command-completion scripts for BASH and zsh (which operate within the BASH/zsh shell), the Spring Boot CLI shell opens a new Spring Boot–specific shell. From this shell, you can execute any of the CLI's commands and get command completion with the Tab key.  
+不像BASH和zsh的命令补全脚本（在BASH/zsh Shell里执行的），Spring Boot CLI Shell会新开一个特别针对Spring Boot的Shell，在里面可以执行各种CLI命令，Tab键也能有命令补全。
+
+The Spring Boot CLI offers an easy way to get started with Spring Boot and to prototype simple applications. As we'll discuss later in chapter 8, it can also be used for production-ready applications, given the right production runtime environment.  
+Spring Boot CLI为Spring Boot提供了快速上手和构建简单的原型应用程序的途径，就和稍后要在第8章里讨论的那样，它也能用于生产应用程序，提供正确的生产运行环境。
+
+Even so, Spring Boot CLI's process is rather unconventional in contrast to how most Java projects are developed. Typically, Java projects use tools like Gradle or Maven to build WAR files that are deployed to an application server. If the CLI model feels a little uncomfortable, you can still take advantage of most of the features of Spring Boot in the context of a traditionally built Java project.2 And the Spring Initializr can help you get started.  
+尽管如此，与大部分Java项目的开发相比，Spring Boot CLI的流程还是不太符合常规。通常情况下，Java项目用Gradle或Maven这样的工具构建出WAR文件，再把这些文件部署到应用服务器里。如果CLI模型让你感到不太舒服，你仍然可以在传统的方式下充分利用大部分Spring Boot特性。<sup>[2][]</sup>Spring Initializr可以成为你万里长征的第一步。
+
+[2]: # "You'll only be giving up features that require the flexibility of the Groovy language, such as automatic dependency and import resolution.只是让你放弃那些用到Groovy语言灵活性的特性，比如自动依赖和`import`解析。"
+
+### 1.2.2 Initializing a Spring Boot project with Spring Initializr
+
+Sometimes the hardest part of a project is getting started. You need to set up a directory structure for various project artifacts, create a build file, and populate the build file with dependencies. The Spring Boot CLI removes much of this setup work, but if you favor a more traditional Java project structure, you’ll want to look at the Spring Initializr.
+
+The Spring Initializr is ultimately a web application that can generate a Spring Boot project structure for you. It doesn’t generate any application code, but it will give you a basic project structure and either a Maven or a Gradle build specification to build your code with. All you need to do is write the application code.
+
+Spring Initializr can be used in several ways:
+
+* Through a web-based interface
+* Via Spring Tool Suite
+* Via IntelliJ IDEA
+* Using the Spring Boot CLI
+
+We’ll look at how to use each of these interfaces to the Initializr, starting with the webbased interface.
