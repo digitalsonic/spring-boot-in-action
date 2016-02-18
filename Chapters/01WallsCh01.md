@@ -186,7 +186,7 @@ For example, suppose that you’re going to build a REST API with Spring MVC tha
 * org.apache.tomcat.embed:tomcat-embed-logging-juli
 
 On the other hand, if you were to take advantage of Spring Boot starter dependencies, you could simply add the Spring Boot “web” starter (org.springframework.boot:spring-boot-starter-web) as a build dependency. This single dependency will transitively pull in all of those other dependencies so you don’t have to ask for them all.  
-但如果你打算利用Spring Boot的起步依赖，就只需添加Spring Boot “web”起步依赖（org.springframework.boot:spring-boot-starter-web），仅此一个。它会根据依赖传递把其他所需依赖引入项目里，你都不用考虑它们。
+但如果你打算利用Spring Boot的起步依赖，就只需添加Spring Boot “web”起步依赖（org.springframework.boot:spring-boot-starter-web）<sup>[译注1][Y1]</sup>，仅此一个。它会根据依赖传递把其他所需依赖引入项目里，你都不用考虑它们。
 
 But there’s something more subtle about starter dependencies than simply reducing build dependency count. Notice that by adding the “web” starter to your build, you’re specifying a type of functionality that your application needs. Your app is a web application, so you add the “web” starter. Likewise, if your application will use JPA persistence, then you can add the “jpa” starter. If it needs security, you can add the “security” starter. In short, you no longer need to think about what libraries you’ll need to support certain functionality; you simply ask for that functionality by way of the pertinent starter dependency.  
 比起减少依赖数量，起步依赖还引入了一些微妙的变化。向项目中添加了“web”起步依赖后，你实际是指定了应用程序所需的一类功能。因为你的应用是个Web应用程序，所以你加入了“web”。类似的，如果你的应用程序要用到JPA持久化，那么久可以加入“jpa”起步依赖。如果需要安全功能，那就加入“security”。简而言之，你不再需要考虑支持某种功能要用什么库了，只要引入相关起步依赖就行了。
@@ -196,6 +196,8 @@ Also note that Spring Boot’s starter dependencies free you from worrying about
 
 Along with auto-configuration, we’ll begin using starter dependencies right away, starting in chapter 2.  
 和自动配置一样，我们马上会在第2章里用到起步依赖。
+
+[Y1]: # "Spring Boot的起步依赖基本都用spring-boot-starter打头，随后是直接代表其功能的名字，比如web、test，下文出现起步依赖的名字时，可能就直接用其前缀后的单词来表示了。"
 
 #### THE COMMAND-LINE INTERFACE (CLI)
 #### 命令行界面（CLI）
@@ -658,69 +660,87 @@ __Figure 1.8 The final screen in IntelliJ IDEA's Spring Boot initialization wiza
 __图1.8 IntelliJ IDEA的Spring Boot初始化向导的最后一屏__
 
 #### USING THE INITIALIZR FROM THE SPRING BOOT CLI
+#### 在Spring Boot CLI里使用Initializr
 
-As you saw earlier, the Spring Boot CLI is a great way to develop Spring applications by just writing code. However, the Spring Boot CLI also has a few commands that can help you use the Initializr to kick-start development on a more traditional Java project.
+As you saw earlier, the Spring Boot CLI is a great way to develop Spring applications by just writing code. However, the Spring Boot CLI also has a few commands that can help you use the Initializr to kick-start development on a more traditional Java project.  
+如上文所述，如果你想只写代码就能完成Spring应用程序的开发，那么Spring Boot CLI是个不错的选择。然而，Spring Boot CLI的功能还不仅局限于此，它有一些命令可以帮你使用Initializr，通过它在一个传统的Java项目中上手开发。
 
-The Spring Boot CLI includes an init command that acts as a client interface to the Initializr. The simplest use of the init command is to create a baseline Spring Boot project:
+The Spring Boot CLI includes an init command that acts as a client interface to the Initializr. The simplest use of the init command is to create a baseline Spring Boot project:  
+Spring Boot CLI包含了一个`init`命令，可以作为Initializr的客户端界面。`init`命令最简单的用法就是创建Spring Boot项目的基线：
 
 ```
 $ spring init
 ```
 
-After contacting the Initializr web application, the init command will conclude by downloading a demo.zip file. If you unzip this project, you'll find a typical project structure with a Maven pom.xml build specification. The Maven build specification is minimal, with only baseline starter dependencies for Spring Boot and testing. You'll probably want a little more than that.
+After contacting the Initializr web application, the init command will conclude by downloading a demo.zip file. If you unzip this project, you'll find a typical project structure with a Maven pom.xml build specification. The Maven build specification is minimal, with only baseline starter dependencies for Spring Boot and testing. You'll probably want a little more than that.  
+在和Initializr的Web应用程序通信后，`init`命令会下载一个demo.zip文件，解压后你会看到一个典型的项目结构，包含一个Maven的pom.xml构建描述文件。Maven的构建说明只包含最基本的内容，即只有Spring Boot基线和测试起步依赖。你可能会想要更多的东西。
 
-Let's say you want to start out by building a web application that uses JPA for data persistence and that's secured with Spring Security. You can specify those initial dependencies with either --dependencies or -d:
+Let's say you want to start out by building a web application that uses JPA for data persistence and that's secured with Spring Security. You can specify those initial dependencies with either --dependencies or -d:  
+假设你想要构建一个Web应用程序，其中使用JPA实现数据持久化，使用Spring Security进行安全加固，可以用`--dependencies`或`-d`来指定那些初始依赖：
 
 ```
 $ spring init -dweb,jpa,security
 ```
 
-This will give you a demo.zip containing the same project structure as before, but with Spring Boot's web, JPA, and security starters expressed as dependencies in pom.xml. Note that it's important to not type a space between -d and the dependencies. Failing to do so will result in the ZIP file being downloaded with the name web,jpa,security.
+This will give you a demo.zip containing the same project structure as before, but with Spring Boot's web, JPA, and security starters expressed as dependencies in pom.xml. Note that it's important to not type a space between -d and the dependencies. Failing to do so will result in the ZIP file being downloaded with the name web,jpa,security.  
+这条命令会下载一个demo.zip文件，包含与之前一样的项目结构，但在pom.xml里增加了Spring Boot的web、jpa和security起步依赖。请注意，在`-d`和依赖之间不能加空格，否则就变成了下载一个ZIP文件，文件名是web,jpa,security。
 
-Now let's say that you'd rather build this project with Gradle. No problem. Just specify Gradle as the build type with the --build parameter:
+Now let's say that you'd rather build this project with Gradle. No problem. Just specify Gradle as the build type with the --build parameter:  
+现在，假设你想用Gradle来构建项目，没问题，用`--build`参数将Gradle指定为构建类型：
 
 ```
 $ spring init -dweb,jpa,security --build gradle
 ```
 
-By default, the build specification for both Maven and Gradle builds will produce an executable JAR file. If you'd rather produce a WAR file, you can specify so with the --packaging or -p parameter:
+By default, the build specification for both Maven and Gradle builds will produce an executable JAR file. If you'd rather produce a WAR file, you can specify so with the --packaging or -p parameter:  
+默认情况下，无论Maven还是Gradle的构建说明都会产生一个可执行JAR文件。但如果你想要一个WAR文件，那么可以通过`--packaging`或者`-p`参数进行说明：
 
 ```
 $ spring init -dweb,jpa,security --build gradle -p war
 ```
 
-So far, the ways we've used the init command have resulted in a zip file being downloaded. If you'd like for the CLI to crack open that zip file for you, you can specify a directory for the project to be extracted to:
+So far, the ways we've used the init command have resulted in a zip file being downloaded. If you'd like for the CLI to crack open that zip file for you, you can specify a directory for the project to be extracted to:  
+到目前为止，我们用`init`命令都只是下载一个ZIP文件，如果你想让CLI帮你解开那个ZIP文件，可以指定一个用于解压的目录：
 
 ```
 $ spring init -dweb,jpa,security --build gradle -p war myapp
 ```
 
-The last parameter given here indicates that you want the project to be extracted to the myapp directory.
+The last parameter given here indicates that you want the project to be extracted to the myapp directory.  
+此处的最后一个参数说明你希望把项目解压到myapp目录里去。
 
-Optionally, if you want the CLI to extract the generated project into the current directory, you can use either the --extract or the -x parameter:
+Optionally, if you want the CLI to extract the generated project into the current directory, you can use either the --extract or the -x parameter:  
+此外，如果你希望CLI把生成的项目解压到当前目录，可以使用`--extract`或者`-x`参数：
 
 ```
 $ spring init -dweb,jpa,security --build gradle -p jar -x
 ```
 
 The init command has several other parameters, including parameters for building a Groovy-based project, specifying the Java version to compile with, and selecting a version of Spring Boot to build against. You can discover all of the parameters by using the help command:
+`init`命令还有不少其他参数，包括构建基于Groovy项目的、指定编译用Java版本的，还有选择构建依赖的Spring Boot版本的。可以通过`help`命令了解所有参数的情况：
 
 ```
 $ spring help init
 ```
 
-You can also find out what choices are available for those parameters by using the --list or -l parameter with the init command:
+You can also find out what choices are available for those parameters by using the --list or -l parameter with the init command:  
+你也可以查看那些参数都有那些可选项，为`init`命令带上`--list`或`-l`参数就可以了：
 
 ```
 $ spring init -l
 ```
 
-You'll notice that although spring init -l lists several parameters that are supported by the Initializr, not all of those parameters are directly supported by the Spring Boot CLI's init command. For instance, you can't specify the root package name when initializing a project with the CLI; it will default to “demo”. spring help init can help you discover what parameters are supported by the CLI's init command.
+You'll notice that although spring init -l lists several parameters that are supported by the Initializr, not all of those parameters are directly supported by the Spring Boot CLI's init command. For instance, you can't specify the root package name when initializing a project with the CLI; it will default to “demo”. spring help init can help you discover what parameters are supported by the CLI's init command.  
+你一定注意到了，尽管`spring init -l`列出的一些Initializr支持的参数，但并非所有参数都能直接被Spring Boot CLI的`init`命令所支持。举例来说，在用CLI初始化项目时你不能指定根包的名字，它默认为“demo”。`spring help init`会告诉你CLI的`init`命令都支持哪些参数。
 
-Whether you use Initializr's web-based interface, create your projects from Spring Tool Suite, or use the Spring Boot CLI to initialize a project, projects created using the Spring Boot Initializr have a familiar project layout, not unlike other Java projects you may have developed before.
+Whether you use Initializr's web-based interface, create your projects from Spring Tool Suite, or use the Spring Boot CLI to initialize a project, projects created using the Spring Boot Initializr have a familiar project layout, not unlike other Java projects you may have developed before.  
+无论你是用Initializr的Web界面，在Spring Tool Suite里创建项目，还是用Spring Boot CLI来初始化项目，Spring Boot Initializr创建出来的项目都有相似的项目布局，和你之前开发过的Java项目没什么不同。
 
 ## 1.3 Summary
+## 1.3 小结
 
-Spring Boot is an exciting new way to develop Spring applications with minimal friction from the framework itself. Auto-configuration eliminates much of the boilerplate configuration that infests traditional Spring applications. Spring Boot starters enable you to specify build dependencies by what they offer rather than use explicit library names and version. The Spring Boot CLI takes Spring Boot's frictionless development model to a whole new level by enabling quick and easy development with Groovy from the command line. And the Actuator lets you look inside your running application to see what and how Spring Boot has done.
+Spring Boot is an exciting new way to develop Spring applications with minimal friction from the framework itself. Auto-configuration eliminates much of the boilerplate configuration that infests traditional Spring applications. Spring Boot starters enable you to specify build dependencies by what they offer rather than use explicit library names and version. The Spring Boot CLI takes Spring Boot's frictionless development model to a whole new level by enabling quick and easy development with Groovy from the command line. And the Actuator lets you look inside your running application to see what and how Spring Boot has done.  
+Spring Boot是一种激动人心的Spring应用程序开发新方式，框架本身带来的阻力很小。自动配置消除了传统Spring应用程序里的很多样板配置；Spring Boot起步依赖让你能通过库所提供的功能而非名称与版本号来指定构建依赖；Spring Boot CLI将Spring Boot的无阻碍开发模型提升到了一个崭新的高度，在命令行里就能简单快速地用Groovy进行开发了；Actuator让你能深入运行中的应用程序，了解Spring Boot做了什么，是怎么做的。
 
-This chapter has given you a quick overview of what Spring Boot has to offer. You're probably itching to get started on writing a real application with Spring Boot. That's exactly what we'll do in the next chapter. With all that Spring Boot does for you, the hardest part will be turning this page to chapter 2.
+This chapter has given you a quick overview of what Spring Boot has to offer. You're probably itching to get started on writing a real application with Spring Boot. That's exactly what we'll do in the next chapter. With all that Spring Boot does for you, the hardest part will be turning this page to chapter 2.  
+本章大致概括了Spring Boot提供了什么功能。你大概已经跃跃欲试，想用Spring Boot来写个真实的应用程序了吧。这正是我们在下一章里要做的事情，有了Spring Boot提供的诸多功能，最困难的应该就是把书反到第2章了。
