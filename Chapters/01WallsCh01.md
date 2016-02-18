@@ -585,22 +585,142 @@ As you can see, this dialog box asks for the same information as the web-based S
 If you’d like to specify where in the filesystem to create the project or whether to add it to a specific working set within the IDE, click the Next button. You’ll be presented with a second dialog box like the one shown in figure 1.4.  
 如果你想在文件系统上指定项目创建的位置，或者把它加入IDE里的特定工作集，就点击Next按钮。你会看到第二个对话框，类似于图1.4。
 
-The Location field specifies where the project will reside on the filesystem. If you take advantage of Eclipse’s working sets to organize your projects, you can have the project added to a specific working set by checking the Add Project to Working Sets check box and selecting a working set.
+The Location field specifies where the project will reside on the filesystem. If you take advantage of Eclipse’s working sets to organize your projects, you can have the project added to a specific working set by checking the Add Project to Working Sets check box and selecting a working set.  
+Location指定了文件系统上项目安放的位置，如果你是使用Eclipse的工作集来组织项目的，那么也可以勾上Add Project to Working Sets这个复选框，选择一个工作集，这样就能把项目加入指定的工作集了。
 
-The Site Info section simply describes the URL that will be used to contact the Initializr. For the most part, you can ignore this section. If, however, you were to deploy your own Initializr server (by cloning the code at https://github.com/spring-io/initializr), you could plug in the base URL of your Initializr here.
+The Site Info section simply describes the URL that will be used to contact the Initializr. For the most part, you can ignore this section. If, however, you were to deploy your own Initializr server (by cloning the code at https://github.com/spring-io/initializr), you could plug in the base URL of your Initializr here.  
+Site Info部分简单描述了将要用来访问Initializr的URL，大多数情况下你都可以忽略这部分内容。然而，如果你要部署自己的Initializr服务器（从[https://github.com/spring-io/initializr](https://github.com/spring-io/initializr)把代码克隆下来就行了），可以在这里设置你的Initializr基础URL。
 
-[3]: # "Spring Tool Suite is a distribution of the Eclipse IDE that is outfitted with several features to aid with Spring development. You can download Spring Tool Suite from http://spring.io/tools/sts."
+[3]: # "Spring Tool Suite is a distribution of the Eclipse IDE that is outfitted with several features to aid with Spring development. You can download Spring Tool Suite from http://spring.io/tools/sts. Spring Tool Suite是Eclipse IDE的一个发行版，增加了诸多能辅助Spring开发的特性，你可以从[http://spring.io/tools/sts](http://spring.io/tools/sts)下载到Spring Tool Suite。"
 
 ![图1.3](../Figures/figure-1.3.png)
 
-__Figure 1.3 Spring Tool Suite integrates with Spring Initializr to create and directly import Spring Boot projects into the IDE.__
+__Figure 1.3 Spring Tool Suite integrates with Spring Initializr to create and directly import Spring Boot projects into the IDE.__  
+__图1.3 Spring Tool Suite集成了Spring Initializr，可以在IDE里创建并导入Spring Boot项目。__
 
 ![图1.4](../Figures/figure-1.4.png)
 
-__Figure 1.4 The second page of the Spring Starter Project dialog box offers you a chance to specify where the project is created.__
+__Figure 1.4 The second page of the Spring Starter Project dialog box offers you a chance to specify where the project is created.__  
+__图1.4 Spring Starter Project对话框的第二页可以让你指定在哪里创建项目。__
 
-Clicking the Finish button kicks off the project generation and import process. It’s important to understand that Spring Tool Suite’s Spring Starter Project dialog box delegates to the Spring Initializr at http://start.spring.io to produce the project. You must be connected to the internet in order for it to work.
+Clicking the Finish button kicks off the project generation and import process. It's important to understand that Spring Tool Suite's Spring Starter Project dialog box delegates to the Spring Initializr at http://start.spring.io to produce the project. You must be connected to the internet in order for it to work.  
+点击Finish按钮后项目的生成和导入过程就开始了。你必须认识到一点，Spring Tool Suite的Spring Starter Project对话框其实是把项目生成的工作委托给[http://start.spring.io](http://start.spring.io)上的Spring Initializr来做的，因此必须联网才能使用这一功能。
 
-Once the project has been imported into your workspace, you’re ready to start developing your application. As you develop the application, you’ll find that Spring Tool Suite has a few more Spring Boot-specific tricks up its sleeves. For instance, you can run your application with an embedded server by selecting Run As > Spring Boot Application from the Run menu.
+Once the project has been imported into your workspace, you're ready to start developing your application. As you develop the application, you'll find that Spring Tool Suite has a few more Spring Boot-specific tricks up its sleeves. For instance, you can run your application with an embedded server by selecting Run As > Spring Boot Application from the Run menu.  
+一旦把项目导入到工作空间之后，就可以开发应用程序了。随着开发的进行，你会发现Spring Tool Suite针对Spring Boot还有一些锦上添花的功能，比如，可以在Run菜单里选中Run As > Spring Boot Application在嵌入式服务器里运行你的应用程序。
 
-It’s important to understand that Spring Tool Suite coordinates with the Initializr via a REST API. Therefore, it will only work if it can connect to the Initializr. If your development machine is offline or Initializr is blocked by a firewall, then using the Spring Start Project wizard in Spring Tool Suite will not work.
+It's important to understand that Spring Tool Suite coordinates with the Initializr via a REST API. Therefore, it will only work if it can connect to the Initializr. If your development machine is offline or Initializr is blocked by a firewall, then using the Spring Start Project wizard in Spring Tool Suite will not work.  
+Spring Tool Suite是通过REST API与Initializr交互的，因此只有当它能连上Initializr时才能正常工作。如果你的开发机是离线的，或者Initializr被防火墙阻断了，那么Spring Tool Suite的Spring Starter Project向导是无法使用的。
+
+#### CREATING SPRING BOOT PROJECTS IN INTELLIJ IDEA
+#### 在IntelliJ IDEA里创建Spring Boot项目
+
+IntelliJ IDEA is a very popular IDE and, as of IntelliJ IDEA 14.1, it now supports Spring Boot!4  
+IntelliJ IDEA是一个非常流行的IDE，在IntelliJ IDEA 14.1里已经支持Spring Boot了！<sup>[4][]</sup>
+
+To get started on a new Spring Boot application in IntelliJ IDEA, select New > Project from the File menu. You'll be presented with the first of a handful of screens (shown in figure 1.5) that ask questions similar to those asked by the Initializr web application and Spring Tool Suite.  
+要在IntelliJ IDEA里创建新的Spring Boot应用程序，在File菜单里选择New > Project。你会看到几屏内容（图1.5是第一屏），问的问题和Initializr的Web应用程序以及Spring Tool Suite很类似。
+
+![图1.5](../Figures/figure-1.5.png)
+
+__Figure 1.5 The first screen in IntelliJ IDEA's Spring Boot initialization wizard__  
+__图1.5 IntelliJ IDEA里Spring Boot初始化向导的第一屏__
+
+[4]: # "You can get IntelliJ IDEA at https://www.jetbrains.com/idea/. IntelliJ IDEA is a commercial IDE, meaning
+that you may have to pay for it. You can, however, download a trial of it, and it's freely available for use on
+open source projects. 你可以从[https://www.jetbrains.com/idea/](https://www.jetbrains.com/idea/)获取到IntelliJ IDEA。它是一款商业IDE，意味着需要付费使用。但是你尅呀下载试用，而且对于开源项目它是免费的。"
+
+![图1.6](../Figures/figure-1.6.png)
+
+__Figure 1.6 Specifying project information in IntelliJ IDEA's Spring Boot initialization wizard__  
+__图1.6 在IntelliJ IDEA的Spring Boot初始化向导里指定项目信息__
+
+On the initial screen, select Spring Initializr from the project choices on the left. You'll then be prompted to select a Project SDK (essentially, which Java SDK you want to use for the project) and the location of the Initializr web service. Unless you're running your own instance of the Initializr, you'll probably just click the Next button here without making any changes. That will take you to the screen shown in figure 1.6.  
+在首屏中，左侧项目选择里选中Spring Initializr，随后会提示你选择一个Project SDK（基本上就是这个项目要用的Java SDK），同时选择Initializr Web服务的位置。除非你在使用自己的Initializr，否则应该不做任何修改直接点Next按钮，之后就会把你引导到图1.6了。
+
+The second screen in IntelliJ IDEA's Spring Boot initialization wizard asks some basic questions about the project, such as the project's name, Maven group and artifact, Java version, and whether you want to build it with Maven or Gradle. Once you've described your project, clicking the Next button takes you to the third screen, shown in figure 1.7.  
+Spring Boot初始化向导的第二屏要求你提供一些项目的基本信息，比如项目名称、Maven Group和Artifact、Java版本，以及你是想用Maven还是Gradle来构建项目。描述好项目信息之后，点击Next按钮就能看到第三屏了，如图1.7所示。
+
+![图1.7](../Figures/figure-1.7.png)
+
+__Figure 1.7 Selecting project dependencies in IntelliJ IDEA's Spring Boot initialization wizard__  
+__图1.7 在IntelliJ IDEA的Spring Boot初始化向导里选择项目依赖__
+
+Where the second screen asked you about general project information, the third screen starts by asking you what kind of dependencies you'll need in the project. As before, the check boxes shown on this screen correspond to Spring Boot starter dependencies. After you've made your selections, click Next to be taken to the final screen in the wizard, shown in figure 1.8.  
+第二屏里向你询问了项目的基本信息，第三屏就开始问你要往项目里添加什么依赖了。和之前一样，屏幕里的复选框和Spring Boot起步依赖是相互对应的。选完之后点击Next就到了向导的最后一屏，如图1.8所示。
+
+This last screen simply wants you to name the project and tell IntelliJ IDEA where to create it. When you're ready, click the Finish button and you'll have a bare-bones Spring Boot project ready for you in the IDE.  
+最后一屏问你项目叫什么名字，还有要在哪里创建项目。一切准备就绪之后，点击Finish按钮后就能在IDE里得到一个空的Spring Boot项目了。
+
+![图1.8](../Figures/figure-1.8.png)
+
+__Figure 1.8 The final screen in IntelliJ IDEA's Spring Boot initialization wizard__  
+__图1.8 IntelliJ IDEA的Spring Boot初始化向导的最后一屏__
+
+#### USING THE INITIALIZR FROM THE SPRING BOOT CLI
+
+As you saw earlier, the Spring Boot CLI is a great way to develop Spring applications by just writing code. However, the Spring Boot CLI also has a few commands that can help you use the Initializr to kick-start development on a more traditional Java project.
+
+The Spring Boot CLI includes an init command that acts as a client interface to the Initializr. The simplest use of the init command is to create a baseline Spring Boot project:
+
+```
+$ spring init
+```
+
+After contacting the Initializr web application, the init command will conclude by downloading a demo.zip file. If you unzip this project, you'll find a typical project structure with a Maven pom.xml build specification. The Maven build specification is minimal, with only baseline starter dependencies for Spring Boot and testing. You'll probably want a little more than that.
+
+Let's say you want to start out by building a web application that uses JPA for data persistence and that's secured with Spring Security. You can specify those initial dependencies with either --dependencies or -d:
+
+```
+$ spring init -dweb,jpa,security
+```
+
+This will give you a demo.zip containing the same project structure as before, but with Spring Boot's web, JPA, and security starters expressed as dependencies in pom.xml. Note that it's important to not type a space between -d and the dependencies. Failing to do so will result in the ZIP file being downloaded with the name web,jpa,security.
+
+Now let's say that you'd rather build this project with Gradle. No problem. Just specify Gradle as the build type with the --build parameter:
+
+```
+$ spring init -dweb,jpa,security --build gradle
+```
+
+By default, the build specification for both Maven and Gradle builds will produce an executable JAR file. If you'd rather produce a WAR file, you can specify so with the --packaging or -p parameter:
+
+```
+$ spring init -dweb,jpa,security --build gradle -p war
+```
+
+So far, the ways we've used the init command have resulted in a zip file being downloaded. If you'd like for the CLI to crack open that zip file for you, you can specify a directory for the project to be extracted to:
+
+```
+$ spring init -dweb,jpa,security --build gradle -p war myapp
+```
+
+The last parameter given here indicates that you want the project to be extracted to the myapp directory.
+
+Optionally, if you want the CLI to extract the generated project into the current directory, you can use either the --extract or the -x parameter:
+
+```
+$ spring init -dweb,jpa,security --build gradle -p jar -x
+```
+
+The init command has several other parameters, including parameters for building a Groovy-based project, specifying the Java version to compile with, and selecting a version of Spring Boot to build against. You can discover all of the parameters by using the help command:
+
+```
+$ spring help init
+```
+
+You can also find out what choices are available for those parameters by using the --list or -l parameter with the init command:
+
+```
+$ spring init -l
+```
+
+You'll notice that although spring init -l lists several parameters that are supported by the Initializr, not all of those parameters are directly supported by the Spring Boot CLI's init command. For instance, you can't specify the root package name when initializing a project with the CLI; it will default to “demo”. spring help init can help you discover what parameters are supported by the CLI's init command.
+
+Whether you use Initializr's web-based interface, create your projects from Spring Tool Suite, or use the Spring Boot CLI to initialize a project, projects created using the Spring Boot Initializr have a familiar project layout, not unlike other Java projects you may have developed before.
+
+## 1.3 Summary
+
+Spring Boot is an exciting new way to develop Spring applications with minimal friction from the framework itself. Auto-configuration eliminates much of the boilerplate configuration that infests traditional Spring applications. Spring Boot starters enable you to specify build dependencies by what they offer rather than use explicit library names and version. The Spring Boot CLI takes Spring Boot's frictionless development model to a whole new level by enabling quick and easy development with Groovy from the command line. And the Actuator lets you look inside your running application to see what and how Spring Boot has done.
+
+This chapter has given you a quick overview of what Spring Boot has to offer. You're probably itching to get started on writing a real application with Spring Boot. That's exactly what we'll do in the next chapter. With all that Spring Boot does for you, the hardest part will be turning this page to chapter 2.
