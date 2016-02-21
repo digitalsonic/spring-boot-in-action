@@ -248,11 +248,14 @@ one last artifact to look at. Let’s see how a Spring Boot application is built
 ### 2.1.2 Dissecting a Spring Boot project build
 ### 2.1.2 Spring Boot项目构建过程解析
 
-For the most part, a Spring Boot application isn’t much different from any Spring application, which isn’t much different from any Java application. Therefore, building a Spring Boot application is much like building any Java application. You have your choice of Gradle or Maven as the build tool, and you express build specifics much the same as you would in an application that doesn’t employ Spring Boot. But there are a few small details about working with Spring Boot that benefit from a little extra help in the build.
+For the most part, a Spring Boot application isn’t much different from any Spring application, which isn’t much different from any Java application. Therefore, building a Spring Boot application is much like building any Java application. You have your choice of Gradle or Maven as the build tool, and you express build specifics much the same as you would in an application that doesn’t employ Spring Boot. But there are a few small details about working with Spring Boot that benefit from a little extra help in the build.  
+Spring Boot应用程序大部分内容都与其他Spring应用程序没有什么区别，其实和其他Java应用程序也没什么两样，构建一个Spring Boot应用程序和构建其他Java应用程序的过程是类似的。你可以选择Gradle或Maven作为构建工具，描述构建说明文件的方法和你描述非Spring Boot应用程序时相同。但是，Spring Boot在构建过程中耍了些小把戏，在此需要做个小小的说明。
 
-Spring Boot provides build plugins for both Gradle and Maven to assist in building Spring Boot projects. Listing 2.3 shows the build.gradle file created by Initializr, which applies the Spring Boot Gradle plugin.
+Spring Boot provides build plugins for both Gradle and Maven to assist in building Spring Boot projects. Listing 2.3 shows the build.gradle file created by Initializr, which applies the Spring Boot Gradle plugin.  
+Spring Boot为Gradle和Maven提供了构建插件，以便辅助构建Spring Boot项目。代码2.3是Initializr创建的build.gradle文件，其中应用了Spring Boot的Gradle插件。
 
-__Listing 2.3 Using the Spring Boot Gradle plugin__
+__Listing 2.3 Using the Spring Boot Gradle plugin__  
+__代码2.3 使用Spring Boot的Gradle插件__
 
 ```
 buildscript {
@@ -303,15 +306,20 @@ task wrapper(type: Wrapper) {
 }
 ```
 
-Depend on Spring Boot plugin
+Depend on Spring Boot plugin  
+依赖Spring Boot插件
 
-Apply Spring Boot plugin
+Apply Spring Boot plugin  
+运用Spring Boot插件
 
-Starter dependencies
+Starter dependencies  
+起步依赖
 
-On the other hand, had you chosen to build your project with Maven, the Initializr would have given you a pom.xml file that employs Spring Boot’s Maven plugin, as shown in listing 2.4.
+On the other hand, had you chosen to build your project with Maven, the Initializr would have given you a pom.xml file that employs Spring Boot’s Maven plugin, as shown in listing 2.4.  
+另一方面，要是你选择用Maven来构建你的应用程序，Initializr会替你生成一个pom.xml文件，其中使用了Spring Boot的Maven插件，如代码2.4所示。
 
-__Listing 2.4 Using the Spring Boot Maven plugin and parent starter__
+__Listing 2.4 Using the Spring Boot Maven plugin and parent starter__  
+__代码2.4 使用Spring Boot的Maven插件及父起步依赖__
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -333,7 +341,7 @@ __Listing 2.4 Using the Spring Boot Maven plugin and parent starter__
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>{springBootVersion}</version>
-    <relativePath/> <!-- lookup parent from repository -->
+    <relativePath/> <!-- lookup parent from repository 在仓库里查找上一级 -->
   </parent>
 
   <dependencies>
@@ -380,18 +388,100 @@ __Listing 2.4 Using the Spring Boot Maven plugin and parent starter__
 </project>
 ```
 
-Inherit versions from starter parent
+Inherit versions from starter parent  
+从spring-boot-starter-parent里继承版本号
 
-Starter dependencies
+Starter dependencies  
+起步依赖
 
-Apply Spring Boot plugin
+Apply Spring Boot plugin  
+运用Spring Boot插件
 
-Whether you choose Gradle or Maven, Spring Boot’s build plugins contribute to the build in two ways. First, you’ve already seen how you can use the bootRun task to run the application with Gradle. Similarly, the Spring Boot Maven plugin provides a spring-boot:run goal that achieves the same thing if you’re using a Maven build.
+Whether you choose Gradle or Maven, Spring Boot’s build plugins contribute to the build in two ways. First, you’ve already seen how you can use the bootRun task to run the application with Gradle. Similarly, the Spring Boot Maven plugin provides a spring-boot:run goal that achieves the same thing if you’re using a Maven build.  
+无论你选择Gradle还是Maven，Spring Boot的构建插件都能对构建过程有所帮助。你已经看到过如何用Gradle的`bootRun`任务来运行应用程序了，Spring Boot的Maven插件与之类似地提供了一个`spring-boot:run`目标，如果你使用Maven，它能实现相同的功能。
 
-The main feature of the build plugins is that they’re able to package the project as an executable uber-JAR. This includes packing all of the application’s dependencies within the JAR and adding a manifest to the JAR with entries that make it possible to run the application with java -jar.
+The main feature of the build plugins is that they’re able to package the project as an executable uber-JAR. This includes packing all of the application’s dependencies within the JAR and adding a manifest to the JAR with entries that make it possible to run the application with java -jar.  
+构建插件的主要功能是把项目打包成一个可执行的超级JAR（uber-JAR），包括把应用程序的所有依赖打入JAR文件内，并为JAR添加一个描述文件，其中的内容让你能用`java -jar`来运行应用程序。
 
-In addition to the build plugins, notice that the Maven build in listing 2.4 has “spring-boot-starter-parent” as a parent. By rooting the project in the parent starter, the build can take advantage of Maven dependency management to inherit dependency versions for several commonly used libraries so that you don’t have to explicitly specify the versions when declaring dependencies. Notice that none of the <dependency> entries in this pom.xml file specify any versions.
+In addition to the build plugins, notice that the Maven build in listing 2.4 has “spring-boot-starter-parent” as a parent. By rooting the project in the parent starter, the build can take advantage of Maven dependency management to inherit dependency versions for several commonly used libraries so that you don’t have to explicitly specify the versions when declaring dependencies. Notice that none of the <dependency> entries in this pom.xml file specify any versions.  
+除了构建插件，代码2.4里的Maven构建说明中还将“spring-boot-starter-parent”作为上一级，这样一来就能利用Maven的依赖管理功能，继承很多常用库的依赖版本，在你声明依赖时就不用再去指定版本号了。请注意，这个pom.xml里的`<dependency>`都没有指定版本。
 
-Unfortunately, Gradle doesn’t provide the same kind of dependency management as Maven. That’s why the Spring Boot Gradle plugin offers a third feature; it simulates dependency management for several common Spring and Spring-related dependencies. Consequently, the build.gradle file in listing 2.3 doesn’t specify any versions for any of its dependencies.
+Unfortunately, Gradle doesn’t provide the same kind of dependency management as Maven. That’s why the Spring Boot Gradle plugin offers a third feature; it simulates dependency management for several common Spring and Spring-related dependencies. Consequently, the build.gradle file in listing 2.3 doesn’t specify any versions for any of its dependencies.  
+不幸的是Gradle并没有Maven这样的依赖管理功能，为此Spring Boot Gradle插件提供了第三个特性，它为很多常用的Spring机器相关依赖模拟了依赖管理功能。其结果就是代码2.3的build.gradle里也没有为各项依赖指定版本。
 
-Speaking of those dependencies, there are only five dependencies expressed in either build specification. And, with the exception of the H2 dependency you added manually, they all have artifact IDs that are curiously prefixed with “spring-boot-starter-”. These are Spring Boot starter dependencies, and they offer a bit of build-time magic for Spring Boot applications. Let’s see what benefit they provide.
+Speaking of those dependencies, there are only five dependencies expressed in either build specification. And, with the exception of the H2 dependency you added manually, they all have artifact IDs that are curiously prefixed with “spring-boot-starter-”. These are Spring Boot starter dependencies, and they offer a bit of build-time magic for Spring Boot applications. Let’s see what benefit they provide.  
+说起那些依赖，无论哪个构建说明文件里都只有五个依赖，除了你手工添加的H2之外，其他的Artifact ID都有“spring-boot-starter-”前缀。这些都是Spring Boot起步依赖，它们都有助于Spring Boot应用程序的构建。让我们来看看它们究竟都有哪些好处。
+
+## 2.2 Using starter dependencies
+
+To understand the benefit of Spring Boot starter dependencies, let’s pretend for a moment that they don’t exist. What kind of dependencies would you add to your build without Spring Boot? Which Spring dependencies do you need to support Spring MVC? Do you remember the group and artifact IDs for Thymeleaf? Which version of Spring Data JPA should you use? Are all of these compatible?
+
+Uh-oh. Without Spring Boot starter dependencies, you’ve got some homework to do. All you want to do is develop a Spring web application with Thymeleaf views that persists its data via JPA. But before you can even write your first line of code, you have to go figure out what needs to be put into the build specification to support your plan.
+
+After much consideration (and probably a lot of copy and paste from some other application’s build that has similar dependencies) you arrive at the following dependencies block in your Gradle build specification:
+
+```
+compile("org.springframework:spring-web:4.1.6.RELEASE") compile("org.thymeleaf:thymeleaf-spring4:2.1.4.RELEASE") compile("org.springframework.data:spring-data-jpa:1.8.0.RELEASE") compile("org.hibernate:hibernate-entitymanager:jar:4.3.8.Final") compile("com.h2database:h2:1.4.187")
+```
+
+This dependency list is fine and might even work. But how do you know? What kind of assurance do you have that the versions you chose for those dependencies are even compatible with each other? They might be, but you won’t know until you build the application and run it. And how do you know that the list of dependencies is complete? With not a single line of code having been written, you’re still a long way from kicking the tires on your build.
+
+Let’s take a step back and recall what it is we want to do. We’re looking to build an application with these traits:
+
+* It’s a web application
+* It uses Thymeleaf
+* It persists data to a relational database via Spring Data JPA
+
+Wouldn’t it be simpler if we could just specify those facts in the build and let the build
+sort out what we need? That’s exactly what Spring Boot starter dependencies do.
+
+### 2.2.1 Specifying facet-based dependencies
+
+Spring Boot addresses project dependency complexity by providing several dozen “starter” dependencies. A starter dependency is essentially a Maven POM that defines transitive dependencies on other libraries that together provide support for some functionality. Many of these starter dependencies are named to indicate the facet or kind of functionality they provide.
+
+For example, the reading-list application is going to be a web application. Rather than add several individually chosen library dependencies to the project build, it’s much easier to simply declare that this is a web application. You can do that by adding Spring Boot’s web starter to the build.
+
+We also want to use Thymeleaf for web views and persist data with JPA. Therefore, we need the Thymeleaf and Spring Data JPA starter dependencies in the build.
+
+For testing purposes, we also want libraries that will enable us to run integration tests in the context of Spring Boot. Therefore, we also want a test-time dependency on Spring Boot’s test starter.
+
+Taken altogether, we have the following five dependencies that the Initializr provided in the Gradle build:
+
+```
+dependencies {
+  compile "org.springframework.boot:spring-boot-starter-web"
+  compile "org.springframework.boot:spring-boot-starter-thymeleaf"
+  compile "org.springframework.boot:spring-boot-starter-data-jpa"
+  compile "com.h2database:h2"
+  testCompile("org.springframework.boot:spring-boot-starter-test")
+}
+```
+
+As you saw earlier, the easiest way to get these dependencies into your application’s build is to select the Web, Thymeleaf, and JPA check boxes in the Initializr. But if you didn’t do that when initializing the project, you can certainly go back and add them later by editing the generated build.gradle or pom.xml.
+
+Via transitive dependencies, adding these four dependencies is the equivalent of adding several dozen individual libraries to the build. Some of those transitive dependencies include such things as Spring MVC, Spring Data JPA, Thymeleaf, as well as any transitive dependencies that those dependencies declare.
+
+The most important thing to notice about the four starter dependencies is that they were only as specific as they needed to be. We didn’t say that we wanted Spring MVC; we simply said we wanted to build a web application. We didn’t specify JUnit or any other testing tools; we just said we wanted to test our code. The Thymeleaf and Spring Data JPA starters are a bit more specific, but only because there’s no less-specific way to declare that you want Thymeleaf and Spring Data JPA.
+
+The four starters in this build are only a few of the many starter dependencies that Spring Boot offers. Appendix B lists all of the starters with some detail on what each one transitively brings to a project build.
+
+In no case did we need to specify the version. The versions of the starter dependencies themselves are determined by the version of Spring Boot you’re using. The starter dependencies themselves determine the versions of the various transitive dependencies that they pull in.
+
+Not knowing what versions of the various libraries are used may be a little unsettling to you. Be encouraged to know that Spring Boot has been tested to ensure that all of the dependencies pulled in are compatible with each other. It’s actually very liberating to just specify a starter dependency and not have to worry about which libraries and which versions of those libraries you need to maintain.
+
+But if you really must know what it is that you’re getting, you can always get that from the build tool. In the case of Gradle, the dependencies task will give you a dependency tree that includes every library your project is using and their versions:
+
+```
+$ gradle dependencies
+```
+
+You can get a similar dependency tree from a Maven build with the tree goal of the
+dependency plugin:
+
+```
+$ mvn dependency:tree
+```
+
+For the most part, you should never concern yourself with the specifics of what each Spring Boot starter dependency provides. Generally, it’s enough to know that the web starter enables you to build a web application, the Thymeleaf starter enables you to use Thymeleaf templates, and the Spring Data JPA starter enables data persistence to a database using Spring Data JPA.
+
+But what if, in spite of the testing performed by the Spring Boot team, there’s a problem with a starter dependency’s choice of libraries? How can you override the starter?
