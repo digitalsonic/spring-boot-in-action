@@ -151,13 +151,15 @@ As I said, ReadingListApplication is also a bootstrap class. There are several w
 
 [译注1]: # "abracadabra的意思是咒语。"
 
-In fact, even though you haven’t written any application code, you can still build the application at this point and try it out. The easiest way to build and run the application is to use the bootRun task with Gradle:
+In fact, even though you haven’t written any application code, you can still build the application at this point and try it out. The easiest way to build and run the application is to use the bootRun task with Gradle:  
+实际上，就算一行代码也没写，此时你仍然可以构建应用程序尝尝鲜，要构建并运行应用程序，最简单的方法就是用Gradle的`bootRun`任务：
 
 ```
 $ gradle bootRun
 ```
 
-The bootRun task comes from Spring Boot’s Gradle plugin, which we’ll discuss more in section 2.12. Alternatively, you can build the project with Gradle and run it with java at the command line:
+The bootRun task comes from Spring Boot’s Gradle plugin, which we’ll discuss more in section 2.12. Alternatively, you can build the project with Gradle and run it with java at the command line:  
+`bootRun`任务来自于Spring Boot的Gradle插件，我们会在2.12节里详细讨论。此外，你也可以用Gradle构建项目，然后在命令行里用`java`来运行它：
 
 ```
 $ gradle build
@@ -165,60 +167,231 @@ $ gradle build
 $ java -jar build/libs/readinglist-0.0.1-SNAPSHOT.jar
 ```
 
-The application should start up fine and enable a Tomcat server listening on port 8080. You can point your browser at http://localhost:8080 if you want, but because you haven’t written a controller class yet, you’ll be met with an HTTP 404 (Not Found) error and an error page. Before this chapter is finished, though, that URL will serve your reading-list application.
+The application should start up fine and enable a Tomcat server listening on port 8080. You can point your browser at http://localhost:8080 if you want, but because you haven’t written a controller class yet, you’ll be met with an HTTP 404 (Not Found) error and an error page. Before this chapter is finished, though, that URL will serve your reading-list application.  
+应用程序应该能正常运行，启动了一个监听8080端口的Tomcat服务器。要是愿意，你可以用浏览器访问[http://localhost:8080](http://localhost:8080)，但由于你还没写控制器类，你只会收到一个HTTP 404 (Not Found)错误，看到错误页。在本章结束前，这个URL将会提供一个阅读列表应用程序。
 
-You’ll almost never need to change ReadingListApplication.java. If your application requires any additional Spring configuration beyond what Spring Boot auto-configuration provides, it’s usually best to write it into separate @Configuration- configured classes. (They’ll be picked up and used by component-scanning.) In exceptionally simple cases, though, you could add custom configuration to ReadingListApplication.java.
+You’ll almost never need to change ReadingListApplication.java. If your application requires any additional Spring configuration beyond what Spring Boot auto-configuration provides, it’s usually best to write it into separate @Configuration- configured classes. (They’ll be picked up and used by component-scanning.) In exceptionally simple cases, though, you could add custom configuration to ReadingListApplication.java.  
+你几乎不需要修改ReadingListApplication.java，如果你的应用程序需要Spring Boot自动配置以外的其他Spring配置，一般最好把它写到一个单独的`@Configuration`标注的类里。（组件扫描会发现这些类的。）在一些极度简单的情况下，可以把自定义配置加入ReadingListApplication.java里。
 
 #### TESTING SPRING BOOT APPLICATIONS
+#### 测试Spring Boot应用程序
 
-The Initializr also gave you a skeleton test class to help you get started with writing tests for your application. But ReadingListApplicationTests (listing 2.2) is more than just a placeholder for tests—it also serves as an example of how to write tests for Spring Boot applications.
+The Initializr also gave you a skeleton test class to help you get started with writing tests for your application. But ReadingListApplicationTests (listing 2.2) is more than just a placeholder for tests—it also serves as an example of how to write tests for Spring Boot applications.  
+Initializr还提供了一个测试类的骨架，可以基于它为你的应用程序编写测试。但`ReadingListApplicationTests`（代码2.2）不止是个测试的占位符，它还是一个例子，告诉你如何为Spring Boot应用程序编写测试。
 
 ___Listing 2.2 @SpringApplicationConfigurationloadsaSpringapplicationcontext___
 
 ```
 package readinglist;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import readinglist.ReadingListApplication;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(
          classes = ReadingListApplication.class)
 @WebAppConfiguration
 public class ReadingListApplicationTests {
+
   @Test
   public void contextLoads() {
   }
+
 }
 ```
 
-Load context via Spring Boot
+Load context via Spring Boot  
+通过Spring Boot加载上下文
 
-Test that the context loads
+Test that the context loads  
+测试加载的上下文
 
-In a typical Spring integration test, you’d annotate the test class with @Context- Configuration to specify how the test should load the Spring application context. But in order to take full advantage of Spring Boot magic, the @SpringApplication- Configuration annotation should be used instead. As you can see from listing 2.2, ReadingListApplicationTests is annotated with @SpringApplicationConfiguration to load the Spring application context from the ReadingListApplication configuration class.
+In a typical Spring integration test, you’d annotate the test class with @ContextConfiguration to specify how the test should load the Spring application context. But in order to take full advantage of Spring Boot magic, the @SpringApplicationConfiguration annotation should be used instead. As you can see from listing 2.2, ReadingListApplicationTests is annotated with @SpringApplicationConfiguration to load the Spring application context from the ReadingListApplication configuration class.  
+在一个典型的Spring集成测试里，会用`@ContextConfiguration`注解标识这个测试该如何加载Spring的应用程序上下文。但是，为了充分发挥Spring Boot的魔力，这里应该用`@SpringApplicationConfiguration`注解。正如你在代码2.2里看到的那样，`ReadingListApplicationTests`使用了`@SpringApplicationConfiguration`注解从`ReadingListApplication`配置类里加载Spring应用程序上下文。
 
-ReadingListApplicationTests also includes one simple test method, context- Loads(). It’s so simple, in fact, that it’s an empty method. But it’s sufficient for the purpose of verifying that the application context loads without any problems. If the configuration defined in ReadingListApplication is good, the test will pass. If there are any problems, the test will fail.
+ReadingListApplicationTests also includes one simple test method, contextLoads(). It’s so simple, in fact, that it’s an empty method. But it’s sufficient for the purpose of verifying that the application context loads without any problems. If the configuration defined in ReadingListApplication is good, the test will pass. If there are any problems, the test will fail.  
+`ReadingListApplicationTests`里还有一个简单的测试方法，即`contextLoads()`。这个方法很简单，实际上它就是个空方法。但就这个空方法足以验证应用程序上下文的加载没有任何问题。如果`ReadingListApplication`里定义的配置是好的，就能通过测试。如果有问题，测试就会失败。
 
-Of course, you’ll add some of your own tests as we flesh out the application. But the contextLoads() method is a fine start and verifies every bit of functionality provided by the application at this point. We’ll look more at how to test Spring Boot applications in chapter 4.
+Of course, you’ll add some of your own tests as we flesh out the application. But the contextLoads() method is a fine start and verifies every bit of functionality provided by the application at this point. We’ll look more at how to test Spring Boot applications in chapter 4.  
+当然，现在只是一个新的应用程序，你还会添加自己的测试。但`contextLoads()`方法是个良好的开端，此刻可以验证应用程序提供的各种功能。第4章里我们会更详细地讨论如何测试Spring Boot应用程序。
 
 #### CONFIGURING APPLICATION PROPERTIES
+#### 配置应用程序属性
 
-The application.properties file given to you by the Initializr is initially empty. In fact, this file is completely optional, so you could remove it completely without impacting the application. But there’s also no harm in leaving it in place.
+The application.properties file given to you by the Initializr is initially empty. In fact, this file is completely optional, so you could remove it completely without impacting the application. But there’s also no harm in leaving it in place.  
+Initializr为你生成的application.properties文件是一个空文件。实际上，这个文件完全是可选的，你大可以删掉它，不会对应用程序有任何影响，但留着也没什么问题。
 
-We’ll definitely find opportunity to add entries to application.properties later. For now, however, if you want to poke around with application.properties, try adding the following line:
+We’ll definitely find opportunity to add entries to application.properties later. For now, however, if you want to poke around with application.properties, try adding the following line:  
+稍后，我们肯定会有机会向application.properties里添加几个条目的。但现在，如果你想小试牛刀，可以加一行看看：
 
 ```
 server.port=8000
 ```
 
-With this line, you’re configuring the embedded Tomcat server to listen on port 8000 instead of the default port 8080. You can confirm this by running the application again.
+With this line, you’re configuring the embedded Tomcat server to listen on port 8000 instead of the default port 8080. You can confirm this by running the application again.  
+加上这一行，嵌入式Tomcat的监听端口就变成了8000，而不是默认的8080。你可以重新运行应用程序看看是不是这样。
 
-This demonstrates that the application.properties file comes in handy for fine- grained configuration of the stuff that Spring Boot automatically configures. But you can also use it to specify properties used by application code. We’ll look at several examples of both uses of application.properties in chapter 3.
+This demonstrates that the application.properties file comes in handy for fine-grained configuration of the stuff that Spring Boot automatically configures. But you can also use it to specify properties used by application code. We’ll look at several examples of both uses of application.properties in chapter 3.  
+这说明application.properties文件可以很方便地帮你细粒度地调整Spring Boot自动配置的东西。你还可以用它来指定应用程序代码所需的配置项。在第3章里我们会看到好几个例子，演示application.properties的这两种用法。
 
-The main thing to notice is that at no point do you explicitly ask Spring Boot to load application.properties for you. By virtue of the fact that application.properties exists, it will be loaded and its properties made available for configuring both Spring and application code.
+The main thing to notice is that at no point do you explicitly ask Spring Boot to load application.properties for you. By virtue of the fact that application.properties exists, it will be loaded and its properties made available for configuring both Spring and application code.  
+要注意的是，你完全不用告诉Spring Boot为你加载application.properties，只要它存在就会被加载，Spring和应用程序代码都能获取到其中的属性。
 
 We’re almost finished reviewing the contents of the initialized project. But we have
-one last artifact to look at. Let’s see how a Spring Boot application is built.
+one last artifact to look at. Let’s see how a Spring Boot application is built.  
+我们差不多已经把初始化的项目介绍完了，还剩最后一样东西，让我们来看看Spring Boot应用程序是如何构建的。
+
+### 2.1.2 Dissecting a Spring Boot project build
+### 2.1.2 Spring Boot项目构建过程解析
+
+For the most part, a Spring Boot application isn’t much different from any Spring application, which isn’t much different from any Java application. Therefore, building a Spring Boot application is much like building any Java application. You have your choice of Gradle or Maven as the build tool, and you express build specifics much the same as you would in an application that doesn’t employ Spring Boot. But there are a few small details about working with Spring Boot that benefit from a little extra help in the build.
+
+Spring Boot provides build plugins for both Gradle and Maven to assist in building Spring Boot projects. Listing 2.3 shows the build.gradle file created by Initializr, which applies the Spring Boot Gradle plugin.
+
+__Listing 2.3 Using the Spring Boot Gradle plugin__
+
+```
+buildscript {
+  ext {
+    springBootVersion = `1.3.0.RELEASE`
+  }
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+  }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+
+jar {
+  baseName = 'readinglist'
+  version = '0.0.1-SNAPSHOT'
+}
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile("org.springframework.boot:spring-boot-starter-web")
+  compile("org.springframework.boot:spring-boot-starter-data-jpa")
+  compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+  runtime("com.h2database:h2")
+  testCompile("org.springframework.boot:spring-boot-starter-test")
+}
+
+eclipse {
+  classpath {
+    containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+    containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.
+              ➥ debug.ui.launcher.StandardVMType/JavaSE-1.7'
+  }
+}
+task wrapper(type: Wrapper) {
+  gradleVersion = '1.12'
+}
+```
+
+Depend on Spring Boot plugin
+
+Apply Spring Boot plugin
+
+Starter dependencies
+
+On the other hand, had you chosen to build your project with Maven, the Initializr would have given you a pom.xml file that employs Spring Boot’s Maven plugin, as shown in listing 2.4.
+
+__Listing 2.4 Using the Spring Boot Maven plugin and parent starter__
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+      http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.manning</groupId>
+  <artifactId>readinglist</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>ReadingList</name>
+  <description>Reading List Demo</description>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>{springBootVersion}</version>
+    <relativePath/> <!-- lookup parent from repository -->
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <properties>
+    <project.build.sourceEncoding>
+    UTF-8
+    </project.build.sourceEncoding>
+    <start-class>readinglist.Application</start-class>
+    <java.version>1.7</java.version>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
+```
+
+Inherit versions from starter parent
+
+Starter dependencies
+
+Apply Spring Boot plugin
+
+Whether you choose Gradle or Maven, Spring Boot’s build plugins contribute to the build in two ways. First, you’ve already seen how you can use the bootRun task to run the application with Gradle. Similarly, the Spring Boot Maven plugin provides a spring-boot:run goal that achieves the same thing if you’re using a Maven build.
+
+The main feature of the build plugins is that they’re able to package the project as an executable uber-JAR. This includes packing all of the application’s dependencies within the JAR and adding a manifest to the JAR with entries that make it possible to run the application with java -jar.
+
+In addition to the build plugins, notice that the Maven build in listing 2.4 has “spring-boot-starter-parent” as a parent. By rooting the project in the parent starter, the build can take advantage of Maven dependency management to inherit dependency versions for several commonly used libraries so that you don’t have to explicitly specify the versions when declaring dependencies. Notice that none of the <dependency> entries in this pom.xml file specify any versions.
+
+Unfortunately, Gradle doesn’t provide the same kind of dependency management as Maven. That’s why the Spring Boot Gradle plugin offers a third feature; it simulates dependency management for several common Spring and Spring-related dependencies. Consequently, the build.gradle file in listing 2.3 doesn’t specify any versions for any of its dependencies.
+
+Speaking of those dependencies, there are only five dependencies expressed in either build specification. And, with the exception of the H2 dependency you added manually, they all have artifact IDs that are curiously prefixed with “spring-boot-starter-”. These are Spring Boot starter dependencies, and they offer a bit of build-time magic for Spring Boot applications. Let’s see what benefit they provide.
