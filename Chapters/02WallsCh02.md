@@ -454,13 +454,17 @@ Wouldn’t it be simpler if we could just specify those facts in the build and l
 Spring Boot addresses project dependency complexity by providing several dozen “starter” dependencies. A starter dependency is essentially a Maven POM that defines transitive dependencies on other libraries that together provide support for some functionality. Many of these starter dependencies are named to indicate the facet or kind of functionality they provide.  
 Spring Boot通过提供众多“起步”依赖来降低项目依赖的复杂度。起步依赖本质上来说是一个Maven POM，定义了对其他库的传递依赖，这些东西加在一起即能支持某项功能。很多起步依赖的命名都暗示了它们提供的某种或某类功能。
 
-For example, the reading-list application is going to be a web application. Rather than add several individually chosen library dependencies to the project build, it’s much easier to simply declare that this is a web application. You can do that by adding Spring Boot’s web starter to the build.
+For example, the reading-list application is going to be a web application. Rather than add several individually chosen library dependencies to the project build, it’s much easier to simply declare that this is a web application. You can do that by adding Spring Boot’s web starter to the build.  
+举例来说，你打算把这个阅读列表应用程序做成一个Web应用程序，与其向项目的构建文件里添加一堆单独的库依赖，还不如声明这是一个Web应用程序来得简单。你只要添加Spring Boot的web起步依赖就好了。
 
-We also want to use Thymeleaf for web views and persist data with JPA. Therefore, we need the Thymeleaf and Spring Data JPA starter dependencies in the build.
+We also want to use Thymeleaf for web views and persist data with JPA. Therefore, we need the Thymeleaf and Spring Data JPA starter dependencies in the build.  
+我们还想用Thymeleaf来当Web视图，用JPA来实现数据持久化，因此在构建文件里还需要Thymeleaf和Spring Data JPA的起步依赖。
 
-For testing purposes, we also want libraries that will enable us to run integration tests in the context of Spring Boot. Therefore, we also want a test-time dependency on Spring Boot’s test starter.
+For testing purposes, we also want libraries that will enable us to run integration tests in the context of Spring Boot. Therefore, we also want a test-time dependency on Spring Boot’s test starter.  
+为了能进行测试，我们还需要能在Spring Boot上下文里运行集成测试的库，因此要添加Spring Boot的test起步依赖，这时一个测试时依赖。
 
-Taken altogether, we have the following five dependencies that the Initializr provided in the Gradle build:
+Taken altogether, we have the following five dependencies that the Initializr provided in the Gradle build:  
+统统放在一起，我们就有了这五个依赖，也就是Initializr在Gradle的构建文件里提供的：
 
 ```
 dependencies {
@@ -472,31 +476,112 @@ dependencies {
 }
 ```
 
-As you saw earlier, the easiest way to get these dependencies into your application’s build is to select the Web, Thymeleaf, and JPA check boxes in the Initializr. But if you didn’t do that when initializing the project, you can certainly go back and add them later by editing the generated build.gradle or pom.xml.
+As you saw earlier, the easiest way to get these dependencies into your application’s build is to select the Web, Thymeleaf, and JPA check boxes in the Initializr. But if you didn’t do that when initializing the project, you can certainly go back and add them later by editing the generated build.gradle or pom.xml.  
+正如先前所见，添加这些依赖的最快方法就是在Initializr里选中Web、Thymeleaf和JPA复选框。但如果在初始化项目时没有这么做，当然也可以稍后再编辑生产的build.gradle或pom.xml。
 
-Via transitive dependencies, adding these four dependencies is the equivalent of adding several dozen individual libraries to the build. Some of those transitive dependencies include such things as Spring MVC, Spring Data JPA, Thymeleaf, as well as any transitive dependencies that those dependencies declare.
+Via transitive dependencies, adding these four dependencies is the equivalent of adding several dozen individual libraries to the build. Some of those transitive dependencies include such things as Spring MVC, Spring Data JPA, Thymeleaf, as well as any transitive dependencies that those dependencies declare.  
+通过传递依赖，添加这四个依赖就等价于加了一大把独立的库，其中包含的东西有Spring MVC、Spring Data JPA、Thymeleaf等等，还有它们声明的依赖也会被传递依赖进来。
 
-The most important thing to notice about the four starter dependencies is that they were only as specific as they needed to be. We didn’t say that we wanted Spring MVC; we simply said we wanted to build a web application. We didn’t specify JUnit or any other testing tools; we just said we wanted to test our code. The Thymeleaf and Spring Data JPA starters are a bit more specific, but only because there’s no less-specific way to declare that you want Thymeleaf and Spring Data JPA.
+The most important thing to notice about the four starter dependencies is that they were only as specific as they needed to be. We didn’t say that we wanted Spring MVC; we simply said we wanted to build a web application. We didn’t specify JUnit or any other testing tools; we just said we wanted to test our code. The Thymeleaf and Spring Data JPA starters are a bit more specific, but only because there’s no less-specific way to declare that you want Thymeleaf and Spring Data JPA.  
+最值得注意的是这四个起步依赖的具体程度恰到好处，我们并没有说我们想要Spring MVC，只是说我们想要构建一个Web应用程序。我们并没有指定JUnit或其他测试工具，只是说我们想要测试自己的代码。Thymeleaf和Spring Data JPA的起步依赖稍微具体一点，但这也只是因为没有更模糊的方法来声明这个需要了。
 
-The four starters in this build are only a few of the many starter dependencies that Spring Boot offers. Appendix B lists all of the starters with some detail on what each one transitively brings to a project build.
+The four starters in this build are only a few of the many starter dependencies that Spring Boot offers. Appendix B lists all of the starters with some detail on what each one transitively brings to a project build.  
+这四个起步依赖只是Spring Boot众多起步依赖中的沧海一粟。附录B罗列出了全部起步依赖，并稍微描述了一下它们传递依赖进了什么东西。
 
-In no case did we need to specify the version. The versions of the starter dependencies themselves are determined by the version of Spring Boot you’re using. The starter dependencies themselves determine the versions of the various transitive dependencies that they pull in.
+In no case did we need to specify the version. The versions of the starter dependencies themselves are determined by the version of Spring Boot you’re using. The starter dependencies themselves determine the versions of the various transitive dependencies that they pull in.  
+我们并不需要指定版本号，起步依赖本身的版本是由正在使用的Spring Boot的版本来决定的，而起步依赖则会决定它们引入的传递依赖的版本。
 
-Not knowing what versions of the various libraries are used may be a little unsettling to you. Be encouraged to know that Spring Boot has been tested to ensure that all of the dependencies pulled in are compatible with each other. It’s actually very liberating to just specify a starter dependency and not have to worry about which libraries and which versions of those libraries you need to maintain.
+Not knowing what versions of the various libraries are used may be a little unsettling to you. Be encouraged to know that Spring Boot has been tested to ensure that all of the dependencies pulled in are compatible with each other. It’s actually very liberating to just specify a starter dependency and not have to worry about which libraries and which versions of those libraries you need to maintain.  
+不知道自己所用依赖的版本多少会让你有些不安，你要有信心，相信Spring Boot经过了足够的测试以确保引入的全部依赖都能相互兼容。这是一种解脱，只需指定起步依赖，不用担心自己需要维护哪些库以及它们的版本。
 
-But if you really must know what it is that you’re getting, you can always get that from the build tool. In the case of Gradle, the dependencies task will give you a dependency tree that includes every library your project is using and their versions:
+But if you really must know what it is that you’re getting, you can always get that from the build tool. In the case of Gradle, the dependencies task will give you a dependency tree that includes every library your project is using and their versions:  
+但如果你真想知道自己在用的东西，构建工具里总能找到你要的答案。在Gradle里，`dependencies`任务会显示一个依赖树，其中包含了项目所用的每一个库以及它们的版本：
 
 ```
 $ gradle dependencies
 ```
 
 You can get a similar dependency tree from a Maven build with the tree goal of the
-dependency plugin:
+dependency plugin:  
+在Maven里使用`dependency`插件的`tree`目标也能获得相似的依赖树。
 
 ```
 $ mvn dependency:tree
 ```
 
-For the most part, you should never concern yourself with the specifics of what each Spring Boot starter dependency provides. Generally, it’s enough to know that the web starter enables you to build a web application, the Thymeleaf starter enables you to use Thymeleaf templates, and the Spring Data JPA starter enables data persistence to a database using Spring Data JPA.
+For the most part, you should never concern yourself with the specifics of what each Spring Boot starter dependency provides. Generally, it’s enough to know that the web starter enables you to build a web application, the Thymeleaf starter enables you to use Thymeleaf templates, and the Spring Data JPA starter enables data persistence to a database using Spring Data JPA.  
+大部分情况下，你都无需关心每个Spring Boot起步依赖都声明了些什么东西。web起步依赖让你能构建Web应用程序，Thymeleaf起步依赖让你能用Thymeleaf模板，Spring Data JPA起步依赖让你能用Spring Data JPA将数据持久化到数据库里，通常只要知道这些就足够了。
 
-But what if, in spite of the testing performed by the Spring Boot team, there’s a problem with a starter dependency’s choice of libraries? How can you override the starter?
+But what if, in spite of the testing performed by the Spring Boot team, there’s a problem with a starter dependency’s choice of libraries? How can you override the starter?  
+但是，即使经过了Spring Boot团队的测试，起步依赖里所选的库仍有问题该怎么办？如何覆盖起步依赖呢？
+
+### 2.2.2 Overriding starter transitive dependencies
+### 2.2.2 覆盖起步依赖引入的传递依赖
+
+Ultimately, starter dependencies are just dependencies like any other dependency in your build. That means you can use the facilities of the build tool to selectively override transitive dependency versions, exclude transitive dependencies, and certainly specify dependencies for libraries not covered by Spring Boot starters.  
+说到底，起步依赖和你项目里的其他依赖没什么区别。也就是说，你可以通过构建工具中的功能，选择性地覆盖它们引入的传递依赖的版本号，排除传递依赖，当然还可以指定那些Spring Boot起步依赖没有涵盖到的库。
+
+For example, consider Spring Boot’s web starter. Among other things, the web starter transitively depends on the Jackson JSON library. This library is handy if you’re building a REST service that consumes or produces JSON resource representations. But if you’re using Spring Boot to build a more traditional human-facing web application, you may not need Jackson. Even though it shouldn’t hurt anything to include it, you can trim the fat off of your build by excluding Jackson as a transitive dependency.  
+以Spring Boot的web起步依赖为例，它传递依赖了Jackson JSON库，如果你正在构建一个生产或消费JSON资源表述的REST服务，那它会很有用的。但要是你正在构建的是一个传统的面向人类用户的Web应用程序，你可能就用不上Jackson了。就算把它加进来也不会有什么坏处，但排除掉它可以为你的项目瘦身。
+
+If you’re using Gradle, you can exclude transitive dependencies like this:  
+如果你在用Gradle，可以像这样来排除传递依赖：
+
+```
+compile("org.springframework.boot:spring-boot-starter-web") {
+  exclude group: 'com.fasterxml.jackson.core'
+}
+```
+
+In Maven, you can exclude transitive dependencies with the <exclusions> element. The following <dependency> for the Spring Boot web starter has <exclusions> to keep Jackson out of the build:  
+在Maven里，可以用`<exclusions>`元素来排除传递依赖，下面这个引入Spring Boot的web起步依赖的`<dependency>`增加了`<exclusions>`元素来去除Jackson：
+
+```
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-web</artifactId>
+  <exclusions>
+    <exclusion>
+      <groupId>com.fasterxml.jackson.core</groupId>
+    </exclusion>
+  </exclusions>
+</dependency>
+```
+
+On the other hand, maybe having Jackson in the build is fine, but you want to build against a different version of Jackson than what the web starter references. Suppose that the web starter references Jackson version 2.3.4, but you’d rather user version 2.4.3.2 Using Maven, you can express the desired dependency directly in your project’s pom.xml file like this:  
+另一方面，也许项目里需要Jackson，但你需要用另一个版本的Jackson来进行构建，而不是web起步依赖里的那个。假设web起步依赖引用了Jackson 2.3.4，但你需要使用2.4.3<sup>[2][]</sup>。在Maven里，你可以直接在项目的pom.xml里表达你的诉求，就像这样：
+
+```
+<dependency>
+  <groupId>com.fasterxml.jackson.core</groupId>
+  <artifactId>jackson-databind</artifactId>
+  <version>2.4.3</version>
+</dependency>
+```
+
+Maven always favors the closest dependency, meaning that because you’ve expressed this dependency in your project’s build, it will be favored over the one that’s transitively referred to by another dependency.  
+Maven总是会用最近的依赖，也就是说你在项目的构建说明文件里增加了这个依赖，它会覆盖传递依赖引入的另一个依赖。
+
+Similarly, if you’re building with Gradle, you can specify the newer version of Jackson in your build.gradle file like this:  
+类似的，如果你用的是Gradle，可以在build.gradle文件里指明你要的Jackson的版本：
+
+```
+compile("com.fasterxml.jackson.core:jackson-databind:2.4.3")
+```
+
+This dependency works in Gradle because it’s newer than the version transitively referred to by Spring Boot’s web starter. But suppose that instead of using a newer version of Jackson, you’d like to use an older version. Unlike Maven, Gradle favors the newest version of a dependency. Therefore, if you want to use an older version of Jackson, you’ll have to express the older version as a dependency in your build and exclude it from being transitively resolved by the web starter dependency:
+
+
+[2]: # "The versions mentioned here are for illustration purposes only. The actual version of Jackson referenced by Spring Boot’s web starter will be determined by which version of Spring Boot you are using."
+
+
+```
+compile("org.springframework.boot:spring-boot-starter-web") {
+  exclude group: 'com.fasterxml.jackson.core'
+}
+compile("com.fasterxml.jackson.core:jackson-databind:2.3.1")
+```
+
+In any case, take caution when overriding the dependencies that are pulled in transitively by Spring Boot starter dependencies. Although different versions may work fine, there’s a great amount of comfort that can be taken knowing that the versions chosen by the starters have been tested to play well together. You should only override these transitive dependencies under special circumstances (such as a bug fix in a newer version).
+
+Now that we have an empty project structure and build specification ready, it’s time to start developing the application itself. As we do, we’ll let Spring Boot handle the configuration details while we focus on writing the code that provides the reading-list functionality.
