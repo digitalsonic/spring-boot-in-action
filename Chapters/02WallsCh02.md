@@ -413,31 +413,46 @@ Speaking of those dependencies, there are only five dependencies expressed in ei
 说起那些依赖，无论哪个构建说明文件里都只有五个依赖，除了你手工添加的H2之外，其他的Artifact ID都有“spring-boot-starter-”前缀。这些都是Spring Boot起步依赖，它们都有助于Spring Boot应用程序的构建。让我们来看看它们究竟都有哪些好处。
 
 ## 2.2 Using starter dependencies
+## 2.2 使用起步依赖
 
-To understand the benefit of Spring Boot starter dependencies, let’s pretend for a moment that they don’t exist. What kind of dependencies would you add to your build without Spring Boot? Which Spring dependencies do you need to support Spring MVC? Do you remember the group and artifact IDs for Thymeleaf? Which version of Spring Data JPA should you use? Are all of these compatible?
+To understand the benefit of Spring Boot starter dependencies, let’s pretend for a moment that they don’t exist. What kind of dependencies would you add to your build without Spring Boot? Which Spring dependencies do you need to support Spring MVC? Do you remember the group and artifact IDs for Thymeleaf? Which version of Spring Data JPA should you use? Are all of these compatible?  
+要理解Spring Boot起步依赖带来的好处，就先让我们假设它们尚不存在。如果没用Spring Boot的话，你会向项目里添加哪些依赖呢？要用Spring MVC的话，你需要哪个Spring依赖？你还记得Thymeleaf的Group和Artifact ID么？你应该用哪个版本的Spring Data JPA呢？它们放在一起兼容么？
 
-Uh-oh. Without Spring Boot starter dependencies, you’ve got some homework to do. All you want to do is develop a Spring web application with Thymeleaf views that persists its data via JPA. But before you can even write your first line of code, you have to go figure out what needs to be put into the build specification to support your plan.
+Uh-oh. Without Spring Boot starter dependencies, you’ve got some homework to do. All you want to do is develop a Spring web application with Thymeleaf views that persists its data via JPA. But before you can even write your first line of code, you have to go figure out what needs to be put into the build specification to support your plan.  
+额，看起来如果没有Spring Boot起步依赖，你有不少作业要做。而你想要的只不过是开发一个Spring Web应用程序，使用Thymeleaf视图，通过JPA进行数据持久化。但在开始编写第一行代码之前，你要搞明白要支持你的计划，需要往构建说明里加入哪些东西。
 
-After much consideration (and probably a lot of copy and paste from some other application’s build that has similar dependencies) you arrive at the following dependencies block in your Gradle build specification:
+After much consideration (and probably a lot of copy and paste from some other application’s build that has similar dependencies) you arrive at the following dependencies block in your Gradle build specification:  
+考虑再三之后（也许你还从其他有相似依赖的应用程序构建说明中复制粘贴了不少内容），你的Gradle构建说明里大概会有下面这些东西：
 
 ```
-compile("org.springframework:spring-web:4.1.6.RELEASE") compile("org.thymeleaf:thymeleaf-spring4:2.1.4.RELEASE") compile("org.springframework.data:spring-data-jpa:1.8.0.RELEASE") compile("org.hibernate:hibernate-entitymanager:jar:4.3.8.Final") compile("com.h2database:h2:1.4.187")
+compile("org.springframework:spring-web:4.1.6.RELEASE")
+compile("org.thymeleaf:thymeleaf-spring4:2.1.4.RELEASE")
+compile("org.springframework.data:spring-data-jpa:1.8.0.RELEASE")
+compile("org.hibernate:hibernate-entitymanager:jar:4.3.8.Final")
+compile("com.h2database:h2:1.4.187")
 ```
 
-This dependency list is fine and might even work. But how do you know? What kind of assurance do you have that the versions you chose for those dependencies are even compatible with each other? They might be, but you won’t know until you build the application and run it. And how do you know that the list of dependencies is complete? With not a single line of code having been written, you’re still a long way from kicking the tires on your build.
+This dependency list is fine and might even work. But how do you know? What kind of assurance do you have that the versions you chose for those dependencies are even compatible with each other? They might be, but you won’t know until you build the application and run it. And how do you know that the list of dependencies is complete? With not a single line of code having been written, you’re still a long way from kicking the tires on your build.  
+这段依赖列表是好的，而且应该也能正常工作，但你是怎么知道的？你怎么保证你选的这些版本能和其他东西兼容？也许可以，但在你构建并运行应用程序之前你是不知道的。再说了，你怎么知道这个列表是完整的？在还没写一行代码的情况下，你离开始构建还有很长的路要走呢。
 
-Let’s take a step back and recall what it is we want to do. We’re looking to build an application with these traits:
+Let’s take a step back and recall what it is we want to do. We’re looking to build an application with these traits:  
+让我们退一步再想想，我们要做什么。我们要构建一个拥有如下功能的应用程序：
 
-* It’s a web application
-* It uses Thymeleaf
-* It persists data to a relational database via Spring Data JPA
+* It’s a web application  
+这是一个Web应用程序
+* It uses Thymeleaf  
+它用了Thymeleaf
+* It persists data to a relational database via Spring Data JPA  
+它通过Spring Data JPA在关系型数据库里持久化数据
 
-Wouldn’t it be simpler if we could just specify those facts in the build and let the build
-sort out what we need? That’s exactly what Spring Boot starter dependencies do.
+Wouldn’t it be simpler if we could just specify those facts in the build and let the build sort out what we need? That’s exactly what Spring Boot starter dependencies do.  
+如果我们只在构建文件里指定这些功能，让构建过程自己搞明白我们要什么东西岂不是好？这正是Spring Boot起步依赖的功能。
 
 ### 2.2.1 Specifying facet-based dependencies
+### 2.2.1 指定基于功能的依赖
 
-Spring Boot addresses project dependency complexity by providing several dozen “starter” dependencies. A starter dependency is essentially a Maven POM that defines transitive dependencies on other libraries that together provide support for some functionality. Many of these starter dependencies are named to indicate the facet or kind of functionality they provide.
+Spring Boot addresses project dependency complexity by providing several dozen “starter” dependencies. A starter dependency is essentially a Maven POM that defines transitive dependencies on other libraries that together provide support for some functionality. Many of these starter dependencies are named to indicate the facet or kind of functionality they provide.  
+Spring Boot通过提供众多“起步”依赖来降低项目依赖的复杂度。起步依赖本质上来说是一个Maven POM，定义了对其他库的传递依赖，这些东西加在一起即能支持某项功能。很多起步依赖的命名都暗示了它们提供的某种或某类功能。
 
 For example, the reading-list application is going to be a web application. Rather than add several individually chosen library dependencies to the project build, it’s much easier to simply declare that this is a web application. You can do that by adding Spring Boot’s web starter to the build.
 
