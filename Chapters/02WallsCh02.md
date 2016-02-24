@@ -569,11 +569,10 @@ Similarly, if you’re building with Gradle, you can specify the newer version o
 compile("com.fasterxml.jackson.core:jackson-databind:2.4.3")
 ```
 
-This dependency works in Gradle because it’s newer than the version transitively referred to by Spring Boot’s web starter. But suppose that instead of using a newer version of Jackson, you’d like to use an older version. Unlike Maven, Gradle favors the newest version of a dependency. Therefore, if you want to use an older version of Jackson, you’ll have to express the older version as a dependency in your build and exclude it from being transitively resolved by the web starter dependency:
+This dependency works in Gradle because it’s newer than the version transitively referred to by Spring Boot’s web starter. But suppose that instead of using a newer version of Jackson, you’d like to use an older version. Unlike Maven, Gradle favors the newest version of a dependency. Therefore, if you want to use an older version of Jackson, you’ll have to express the older version as a dependency in your build and exclude it from being transitively resolved by the web starter dependency:  
+这个依赖的版本比Spring Boot的web起步依赖引入的要新，所以在Gradle里是生效的。但假如你要的不是新版本的Jackson，而是一个较早的版本呢？Gradle和Maven不太一样，Gradle偏向于使用库的最新版本。因此，你不得不把老版本的依赖加入构建，并把web起步依赖传递依赖的那个版本排除掉：
 
-
-[2]: # "The versions mentioned here are for illustration purposes only. The actual version of Jackson referenced by Spring Boot’s web starter will be determined by which version of Spring Boot you are using."
-
+[2]: # "The versions mentioned here are for illustration purposes only. The actual version of Jackson referenced by Spring Boot’s web starter will be determined by which version of Spring Boot you are using. 此处提到的版本仅作演示之用，Spring Boot的web起步依赖所引用的实际Jackson版本由你使用的Spring Boot版本决定。"
 
 ```
 compile("org.springframework.boot:spring-boot-starter-web") {
@@ -582,6 +581,111 @@ compile("org.springframework.boot:spring-boot-starter-web") {
 compile("com.fasterxml.jackson.core:jackson-databind:2.3.1")
 ```
 
-In any case, take caution when overriding the dependencies that are pulled in transitively by Spring Boot starter dependencies. Although different versions may work fine, there’s a great amount of comfort that can be taken knowing that the versions chosen by the starters have been tested to play well together. You should only override these transitive dependencies under special circumstances (such as a bug fix in a newer version).
+In any case, take caution when overriding the dependencies that are pulled in transitively by Spring Boot starter dependencies. Although different versions may work fine, there’s a great amount of comfort that can be taken knowing that the versions chosen by the starters have been tested to play well together. You should only override these transitive dependencies under special circumstances (such as a bug fix in a newer version).  
+不管什么情况，在覆盖Spring Boot起步依赖依引入的传递依赖时都要多加小心。虽然不同的版本放在一起也许没什么问题，但你要知道起步依赖中各个依赖版本之间的兼容性都是花了很多精力去测试的。只有在特殊的情况下才应该去覆盖这些传递依赖（比如新版本中修复了一个Bug）。
 
-Now that we have an empty project structure and build specification ready, it’s time to start developing the application itself. As we do, we’ll let Spring Boot handle the configuration details while we focus on writing the code that provides the reading-list functionality.
+Now that we have an empty project structure and build specification ready, it’s time to start developing the application itself. As we do, we’ll let Spring Boot handle the configuration details while we focus on writing the code that provides the reading-list functionality.  
+现在我们有了一个空的项目结构，构建说明文件也准备好了，是时候开发应用程序了。我们会让Spring Boot来处理配置细节，而我们自己则专注于编写阅读列表功能相关的代码。
+
+## 2.3 Using automatic configuration
+## 2.3 使用自动配置
+
+In a nutshell, Spring Boot auto-configuration is a runtime (more accurately, application startup-time) process that considers several factors to decide what Spring configuration should and should not be applied. To illustrate, here are a few examples of the kinds of things that Spring Boot auto-configuration might consider:  
+简而言之，Spring Boot的自动配置是一个运行时（更准确地说，是应用程序启动时）的过程，它考虑了众多因素，决定Spring配置应该用哪个，不该用哪个。举些例子，下买呢这些情况都是Spring Boot的自动配置会考虑的：
+
+* Is Spring’s JdbcTemplate available on the classpath? If so and if there is a DataSource bean, then auto-configure a JdbcTemplate bean.  
+Spring的`JdbcTemplate`是不是在Classpath里？如果在的话，又有没有`DataSource`的Bean呢，有的话就自动配置一个`JdbcTemplate`的Bean。
+* Is Thymeleaf on the classpath? If so, then configure a Thymeleaf template resolver, view resolver, and template engine.  
+Thymeleaf是不是在Classpath里？如果在的话，配置Thymeleaf的模板解析器、视图解析器以及模板引擎。
+* Is Spring Security on the classpath? If so, then configure a very basic web security setup.  
+Spring Security是不是在Classpath里？如果在的话，做一个非常简单的Web安全设置。
+
+There are nearly 200 such decisions that Spring Boot makes with regard to auto-configuration every time an application starts up, covering such areas as security, integration, persistence, and web development. All of this auto-configuration serves to keep you from having to explicitly write configuration unless absolutely necessary.  
+每当应用程序启动的时候，Spring Boot的自动配置就要做将近200个这样的决定，涵盖安全、集成、持久化、Web开发等诸多方面。所有这些自动配置就是为了让你不用去写那些不必要的配置。
+
+The funny thing about auto-configuration is that it’s difficult to show in the pages of this book. If there’s no configuration to write, then what is there to point to and discuss?  
+有意思的是，自动配置的东西很难写在书本里，如果没有要写的配置，那又该怎么描述并讨论它们呢？
+
+### 2.3.1 Focusing on application functionality
+
+One way to gain an appreciation of Spring Boot auto-configuration would be for me to spend the next several pages showing you the configuration that’s required in the absence of Spring Boot. But there are already several great books on Spring that show you that, and showing it again wouldn’t help us get the reading-list application written any quicker.
+
+Instead of wasting time talking about Spring configuration, knowing that Spring Boot is going to take care of that for us, let’s see how taking advantage of Spring Boot auto-configuration keeps us focused on writing application code. I can think of no better way to do that than to start writing the application code for the reading-list application.
+
+#### DEFINING THE DOMAIN
+
+The central domain concept in our application is a book that’s on a reader’s reading list. Therefore, we’ll need to define an entity class that represents a book. Listing 2.5 shows how the Book type is defined.
+
+__Listing 2.5 The Book class represents a book in the reading list__
+
+```
+package readinglist;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
+public class Book {
+
+  @Id
+  @GeneratedValue(strategy=GenerationType.AUTO)
+  private Long id;
+  private String reader;
+  private String isbn;
+  private String title;
+  private String author;
+  private String description;
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public String getReader() {
+    return reader;
+  }
+
+  public void setReader(String reader) {
+    this.reader = reader;
+  }
+
+  public String getIsbn() {
+    return isbn;
+  }
+
+  public void setIsbn(String isbn) {
+    this.isbn = isbn;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public String getAuthor() {
+    return author;
+  }
+
+  public void setAuthor(String author) {
+    this.author = author;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+}
+```
+
+As you can see, the Book class is a simple Java object with a handful of properties describing a book and the necessary accessor methods. It’s annotated with @Entity designating it as a JPA entity. The id property is annotated with @Id and @GeneratedValue to indicate that this field is the entity’s identity and that its value will be automatically provided.
