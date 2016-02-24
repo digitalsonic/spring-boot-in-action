@@ -607,16 +607,22 @@ The funny thing about auto-configuration is that it’s difficult to show in the
 有意思的是，自动配置的东西很难写在书本里，如果没有要写的配置，那又该怎么描述并讨论它们呢？
 
 ### 2.3.1 Focusing on application functionality
+### 2.3.1 专注于应用程序功能
 
-One way to gain an appreciation of Spring Boot auto-configuration would be for me to spend the next several pages showing you the configuration that’s required in the absence of Spring Boot. But there are already several great books on Spring that show you that, and showing it again wouldn’t help us get the reading-list application written any quicker.
+One way to gain an appreciation of Spring Boot auto-configuration would be for me to spend the next several pages showing you the configuration that’s required in the absence of Spring Boot. But there are already several great books on Spring that show you that, and showing it again wouldn’t help us get the reading-list application written any quicker.  
+想要为Spring Boot的自动配置博得好感，我可以在接下来的几页里向你演示没有Spring Boot的情况下需要写哪些配置。但眼下已经有不少好书写过这些东西了，再写一次并不能让我们更快地写好阅读列表应用程序。
 
-Instead of wasting time talking about Spring configuration, knowing that Spring Boot is going to take care of that for us, let’s see how taking advantage of Spring Boot auto-configuration keeps us focused on writing application code. I can think of no better way to do that than to start writing the application code for the reading-list application.
+Instead of wasting time talking about Spring configuration, knowing that Spring Boot is going to take care of that for us, let’s see how taking advantage of Spring Boot auto-configuration keeps us focused on writing application code. I can think of no better way to do that than to start writing the application code for the reading-list application.  
+既然知道Spring Boot会替我们料理这些事情，那么与其浪费时间讨论这些Spring配置，还不如看看如何利用Spring Boot的自动配置，让我们能专注于应用程序代码。除了开始写代码，我想不到更好的办法了。
 
 #### DEFINING THE DOMAIN
+#### 定义领域模型
 
-The central domain concept in our application is a book that’s on a reader’s reading list. Therefore, we’ll need to define an entity class that represents a book. Listing 2.5 shows how the Book type is defined.
+The central domain concept in our application is a book that’s on a reader’s reading list. Therefore, we’ll need to define an entity class that represents a book. Listing 2.5 shows how the Book type is defined.  
+我们应用程序里的核心领域概念是读者阅读列表上的书。因此我们需要定义一个实体类来表示这个概念，代码2.5演示了如何定义一本书。
 
-__Listing 2.5 The Book class represents a book in the reading list__
+__Listing 2.5 The Book class represents a book in the reading list__  
+__代码2.5 表示列表里的书的`Book`类__
 
 ```
 package readinglist;
@@ -688,4 +694,175 @@ public class Book {
 }
 ```
 
-As you can see, the Book class is a simple Java object with a handful of properties describing a book and the necessary accessor methods. It’s annotated with @Entity designating it as a JPA entity. The id property is annotated with @Id and @GeneratedValue to indicate that this field is the entity’s identity and that its value will be automatically provided.
+As you can see, the Book class is a simple Java object with a handful of properties describing a book and the necessary accessor methods. It’s annotated with @Entity designating it as a JPA entity. The id property is annotated with @Id and @GeneratedValue to indicate that this field is the entity’s identity and that its value will be automatically provided.  
+如你所见，`Book`类就是简单的Java对象，其中有些描述书的属性，还有必要的访问方法。`@Entity`注解表明它是一个JPA实体，`id`属性加了`@Id`和`@GeneratedValue`注解，说明这个字段是实体的唯一标识，并且这个字段的值是自动生成的。
+
+#### DEFINING THE REPOSITORY INTERFACE
+#### 定义仓库接口
+
+Next up, we need to define the repository through which the ReadingList objects will be persisted to the database. Because we’re using Spring Data JPA, that task is a simple matter of creating an interface that extends Spring Data JPA’s JpaRepository interface:  
+接下来，我们就要定义用于把`Book`对象持久化到数据库的仓库了。<sup>[译注2][]</sup>因为用了Spring Data JPA，我们要做的就是简单地定义一个接口，扩展一下Spring Data JPA的`JpaRepository`接口：
+
+```
+package readinglist;
+
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ReadingListRepository extends JpaRepository<Book, Long> {
+  List<Book> findByReader(String reader);
+}
+```
+
+[译注2]: # "原文这里写的是`ReadingList`对象，但文中并没有定义这个对象，看代码应该是`Book`对象。"
+
+By extending JpaRepository, ReadingListRepository inherits 18 methods for performing common persistence operations. The JpaRepository interface is parameterized with two parameters: the domain type that the repository will work with, and the type of its ID property. In addition, I’ve added a findByReader() method through which a reading list can be looked up given a reader’s username.  
+通过扩展`JpaRepository`，`ReadingListRepository`直接继承了18个执行常用持久化操作的方法。`JpaRepository`是个泛型接口，有两个参数：仓库操作的领域对象类型，及其ID属性的类型。此外，我还增加了一个`findByReader()`方法，可以根据读者的用户名来查找阅读列表。
+
+If you’re wondering about who will implement ReadingListRepository and the 18 methods it inherits, don’t worry too much about it. Spring Data provides a special magic of its own, making it possible to define a repository with just an interface. The interface will be implemented automatically at runtime when the application is started.  
+如果你很好奇，谁来实现这个`ReadingListRepository`及其集成的18个方法。请不用担心，Spring Data提供了很神奇的魔法，只需定义仓库接口，在应用程序启动后，该接口在运行时会被自动实现。
+
+#### CREATING THE WEB INTERFACE
+#### 创建Web界面
+
+Now that we have the application’s domain defined and a repository for persisting objects from that domain to the database, all that’s left is to create the web front-end. A Spring MVC controller like the one in listing 2.6 will handle HTTP requests for the application.  
+现在，我们定义好了应用程序的领域模型，还有把领域对象持久化到数据库里的仓库接口，剩下的就是创建Web前端了。一个类似代码2.6的Spring MVC控制器就能为应用程序处理HTTP请求了。
+
+__Listing 2.6 A Spring MVC controller that fronts the reading list application__  
+__代码2.6 作为阅读列表应用程序前端的Spring MVC控制器__
+
+```
+package readinglist;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.List;
+
+@Controller
+@RequestMapping("/")
+public class ReadingListController {
+  private ReadingListRepository readingListRepository;
+
+  @Autowired
+  public ReadingListController(
+             ReadingListRepository readingListRepository) {
+    this.readingListRepository = readingListRepository;
+  }
+
+  @RequestMapping(value="/{reader}", method=RequestMethod.GET)
+  public String readersBooks(
+      @PathVariable("reader") String reader,
+      Model model) {
+    List<Book> readingList =
+        readingListRepository.findByReader(reader);
+    if (readingList != null) {
+      model.addAttribute("books", readingList);
+    }
+    return "readingList";
+  }
+
+  @RequestMapping(value="/{reader}", method=RequestMethod.POST)
+  public String addToReadingList(
+            @PathVariable("reader") String reader, Book book) {
+    book.setReader(reader);
+    readingListRepository.save(book);
+    return "redirect:/{reader}";
+  }
+}
+```
+
+ReadingListController is annotated with @Controller in order to be picked up by component-scanning and automatically be registered as a bean in the Spring application context. It’s also annotated with @RequestMapping to map all of its handler methods to a base URL path of “/”.  
+`ReadingListController`使用了`@Controller`注解，这样组件扫描会自动将其注册为Spring应用程序上下文里的一个Bean，它还用了`@RequestMapping`注解将其中所有的处理器方法都映射到了“/”这个URL路径上。
+
+The controller has two methods:  
+该控制器有两个方法：
+
+* readersBooks()—Handles HTTP GET requests for /{reader} by retrieving a Book list from the repository (which was injected into the controller’s constructor) for the reader specified in the path. It puts the list of Book into the model under the key “books” and returns “readingList” as the logical name of the view to render the model.  
+`readersBooks()`——处理/{reader}上的HTTP GET请求，根据路径里指定的读者，从仓库（通过控制器的构造器注入的）中获取`Book`列表。随后将这个列表塞入模型里，用的键是“books”，最后返回“readingList”作为呈现模型的视图逻辑名称。
+* addToReadingList()—Handles HTTP POST requests for /{reader}, binding the data in the body of the request to a Book object. This method sets the Book object’s reader property to the reader’s name, and then saves the modified Book via the repository’s save() method. Finally, it returns by specifying a redirect to /{reader} (which will be handled by the other controller method).  
+`addToReadingList()`——处理/{reader}上的HTTP POST请求，将请求正文里的数据绑定到了一个`Book`对象上，该方法把`Book`对象的`reader`属性设置为读者的姓名，随后通过仓库的`save()`方法保存修改后的`Book`对象，最后重定向到/{reader}（控制器中的另一个方法会处理该请求）。
+
+The readersBooks() method concludes by returning “readingList” as the logical view name. Therefore, we must also create that view. I decided at the outset of this project that we’d be using Thymeleaf to define the application views, so the next step is to create a file named readingList.html in src/main/resources/templates with the following content.  
+`readersBooks()`方法最后返回“readingList”作为逻辑视图名，为此必须创建该视图。在项目开始之初我就决定要用Thymeleaf来定义应用程序的视图，所以接下来就在src/main/resources/templates里创建一个名为readingList.html的文件，内容如下。
+
+__Listing 2.7 The Thymeleaf template that presents a reading list__  
+__代码2.7 呈现阅读列表的Thymeleaf模板__
+
+```
+<html>
+  <head>
+    <title>Reading List</title>
+    <link rel="stylesheet" th:href="@{/style.css}"></link>
+  </head>
+  <body>
+    <h2>Your Reading List</h2>
+    <div th:unless="${#lists.isEmpty(books)}">
+      <dl th:each="book : ${books}">
+        <dt class="bookHeadline">
+          <span th:text="${book.title}">Title</span> by
+          <span th:text="${book.author}">Author</span>
+          (ISBN: <span th:text="${book.isbn}">ISBN</span>)
+        </dt>
+        <dd class="bookDescription">
+          <span th:if="${book.description}"
+                th:text="${book.description}">Description</span>
+          <span th:if="${book.description eq null}">
+                No description available</span>
+        </dd>
+      </dl>
+    </div>
+    <div th:if="${#lists.isEmpty(books)}">
+      <p>You have no books in your book list</p>
+    </div>
+
+    <hr/>
+
+    <h3>Add a book</h3>
+    <form method="POST">
+      <label for="title">Title:</label>
+        <input type="text" name="title" size="50"></input><br/>
+      <label for="author">Author:</label>
+        <input type="text" name="author" size="50"></input><br/>
+      <label for="isbn">ISBN:</label>
+        <input type="text" name="isbn" size="15"></input><br/>
+      <label for="description">Description:</label><br/>
+        <textarea name="description" cols="80" rows="5">
+        </textarea><br/>
+      <input type="submit"></input>
+    </form>
+
+  </body>
+</html>
+```
+
+This template defines an HTML page that is conceptually divided into two parts. At the top of the page is a list of books that are in the reader’s reading list. At the bottom is a form the reader can use to add a new book to the reading list.
+
+For aesthetic purposes, the Thymeleaf template references a stylesheet named style.css. That file should be created in src/main/resources/static and look like this:
+
+```
+body {
+    background-color: #cccccc;
+    font-family: arial,helvetica,sans-serif;
+}
+.bookHeadline {
+    font-size: 12pt;
+    font-weight: bold;
+}
+.bookDescription {
+    font-size: 10pt;
+}
+label {
+    font-weight: bold;
+}
+```
+
+This stylesheet is simple and doesn’t go overboard to make the application look nice. But it serves our purposes and, as you’ll soon see, serves to demonstrate a piece of Spring Boot’s auto-configuration.
+
+Believe it or not, that’s a complete application. Every single line has been presented to you in this chapter. Take a moment, flip back through the previous pages, and see if you can find any configuration. In fact, aside from the three lines of configuration in listing 2.1 (which essentially turn on auto-configuration), you didn’t have to write any Spring configuration.
+
+Despite the lack of Spring configuration, this complete Spring application is ready to run. Let’s fire it up and see how it looks.
