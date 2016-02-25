@@ -253,7 +253,7 @@ Similarly, Spring Boot doesn’t implement any enterprise Java specifications su
 类似的，Spring Boot也没有实现诸如JPA或JMS之类的企业级Java规范。它的确支持不少企业级Java规范，但是通过在Spring里自动配置Bean来支持那些特性的。例如，Spring Boot没有实现JPA，不过它自动配置了某个JPA实现（比如Hibernate）的Bean。
 
 Finally, Spring Boot doesn’t employ any form of code generation to accomplish its magic. Instead, it leverages conditional configuration features from Spring 4, along with transitive dependency resolution offered by Maven and Gradle, to automatically configure beans in the Spring application context.  
-最后，Spring Boot没有引入任何形式的代码生成，而是利用了Spring 4的条件配置特性，以及Maven和Gradle提供的传递依赖解析，以此实现Spring应用程序上下文里的自动配置。
+最后，Spring Boot没有引入任何形式的代码生成，而是利用了Spring 4的条件化配置特性，以及Maven和Gradle提供的传递依赖解析，以此实现Spring应用程序上下文里的自动配置。
 
 In short, at its heart, Spring Boot is just Spring. Inside, Spring Boot is doing the same kind of bean configuration in Spring that you might do on your own if Spring Boot didn’t exist. Thankfully, because Spring Boot does exist, you’re freed from dealing with explicit boilerplate configuration and are able to focus on the logic that makes your application unique.  
 简而言之，从本质上来说，Spring Boot就是Spring，它做了那些没有它你自己也会去做的Spring Bean配置。谢天谢地，幸好有Spring，你不用在写这些样板配置了，可以专注于应用程序的逻辑，这些才是让你的应用程序变得独一无二的东西。

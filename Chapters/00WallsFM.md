@@ -61,7 +61,7 @@ Spring 2.5让我们有了更优雅的面向注解的依赖注入模型（即`@Co
 * Then with Spring 3.0 we were given a new Java-based configuration alternative to XML that was improved further in Spring 3.1 with a variety of @Enable-prefixed annotations. For the first time, it become realistic to write a complete Spring application with no XML configuration whatsoever. It couldn’t get any better.  
 然后就到了Spring 3.0，我们有了一套全新的基于Java的配置，它能够取代XML。在Spring 3.1里，一系列以`@Enable`为前缀的注解进一步完善了这一特性。终于，第一次我们可以写出一个没有任何XML配置的Spring应用程序了。这玩意儿不能更好了。
 * Spring 4.0 unleashed support for conditional configuration, where runtime decisions would determine which configuration would be used and which would be ignored based on the application’s classpath, environment, and other factors. We no longer needed to write scripts to make those decisions at build time and pick which configuration should be included in the deployment. How could it possibly get any better?  
-Spring 4.0对条件配置（conditional configuration）提供了支持，根据应用程序的Classpath、环境和其他因素，运行时决策将决定使用哪些配置，忽略哪些配置。那些决策不再需要在构建时通过编写脚本确定了，以前会把选好的配置放在部署的包里，现在情况不同了。这玩意儿不能更好了。
+Spring 4.0对条件化配置（conditional configuration）提供了支持，根据应用程序的Classpath、环境和其他因素，运行时决策将决定使用哪些配置，忽略哪些配置。那些决策不再需要在构建时通过编写脚本确定了，以前会把选好的配置放在部署的包里，现在情况不同了。这玩意儿不能更好了。
 
 And then came Spring Boot. Even though with each release of Spring we thought it couldn’t possibly get any better, Spring Boot proved that there’s still a lot of magic left in Spring. In fact, I believe Spring Boot is the most significant and exciting thing to happen in Java development in a long time.  
 现在轮到Spring Boot了。虽然Spring的每个版本都让我们觉得一切都不能更好了，但Spring Boot还是向我们证明了Spring的魅力仍然势不可挡。事实上，我相信Spring Boot是长久以来Java开发历程里最意味深长和激动人心的东西。
