@@ -34,7 +34,7 @@ The fact that you’re reading this tells me that you are a reader. Maybe you’
 你正在阅读本书，说明你是一位读书人。也许你就是一个书虫，博览群书；也可能你只读自己需要的东西，拿起本书只是为了知道怎么用Spring开发应用程序。
 
 Whatever the case may be, you’re a reader. And readers tend to maintain a reading list of books that they want (or need) to read. Even if it’s not a physical list, you probably have a mental list of things you’d like to read.1  
-无论何种情况，你始终是一位读书人，读书人就想要维护一个阅读列表，里面是自己想读（或者需要读）的书。就算不是一个物理上的列表，至少在你心里会有这么一个列表。<sup>[1][]</sup>
+无论何种情况，你始终是一位读书人，读书人就想要维护一个阅读列表，里面是自己想读（或者需要读）的书。就算不是一个物理上的列表，至少在你心里会有这么一个列表。<sup>[^1][]</sup>
 
 Throughout this book, we’re going to build a simple reading-list application. With it, users can enter information about books they want to read, view the list, and remove books once they’ve been read. We’ll use Spring Boot to help us develop it quickly and with as little ceremony as possible.  
 在本书中，我们会构建一个简单的阅读列表应用程序，在这个程序里，用户可以输入想读的图书信息，查看列表，删除已经读过的书。我们将使用Spring Boot来辅助快速开发，各种繁文缛节越少越好。
@@ -898,17 +898,117 @@ __Figure 2.5 The reading list after a few books have been added__
 __图2.5 添加了一些图书后的阅读列表__
 
 Feel free to take a moment to play around with the application. When you’re ready, move on and we’ll see how Spring Boot made it possible to write an entire Spring application with no Spring configuration code.  
-在多用用这个应用程序吧，当你准备好之后，我们就来看一下Spring Boot是如何做到不写Spring配置代码就能开发整个Spring应用程序的。
+再多用用这个应用程序吧，当你准备好之后，我们就来看一下Spring Boot是如何做到不写Spring配置代码就能开发整个Spring应用程序的。
 
 ### 2.3.3 What just happened?
+### 2.3.3 刚刚发生了什么？
 
-As I said, it’s hard to describe auto-configuration when there’s no configuration to point at. So instead of spending time discussing what you don’t have to do, this section has focused on what you do need to do—namely, write the application code.
+As I said, it’s hard to describe auto-configuration when there’s no configuration to point at. So instead of spending time discussing what you don’t have to do, this section has focused on what you do need to do—namely, write the application code.  
+如我所说，在没有配置代码的情况下，很难描述自动配置。与其花时间讨论那些你不用做的事情，不如在这一小节里关注一下你要做的事——也就是写代码。
 
-But certainly there is some configuration somewhere, right? Configuration is a central element of the Spring Framework, and there must be something that tells
-Spring how to run your application.
+But certainly there is some configuration somewhere, right? Configuration is a central element of the Spring Framework, and there must be something that tells Spring how to run your application.  
+当然，某处肯定是有些配置的。配置是Spring Framework的核心元素，必须要有东西告诉Spring如何运行应用程序。
 
-When you add Spring Boot to your application, there’s a JAR file named springboot-autoconfigure that contains several configuration classes. Every one of these configuration classes is available on the application’s classpath and has the opportunity to contribute to the configuration of your application. There’s configuration for Thymeleaf, configuration for Spring Data JPA, configuration for Spring MVC, and configuration for dozens of other things you might or might not want to take advantage of in your Spring application.
+When you add Spring Boot to your application, there’s a JAR file named spring-boot-autoconfigure that contains several configuration classes. Every one of these configuration classes is available on the application’s classpath and has the opportunity to contribute to the configuration of your application. There’s configuration for Thymeleaf, configuration for Spring Data JPA, configuration for Spring MVC, and configuration for dozens of other things you might or might not want to take advantage of in your Spring application.  
+在向应用程序里加入Spring Boot时，有个名为spring-boot-autoconfigure的JAR文件，其中包含了很多配置类。每个配置类都在应用程序的Classpath里，都有机会为应用程序的配置添砖加瓦。这些配置类里有用于Thymeleaf的配置，有用于Spring Data JPA的配置，有用于Spiring MVC的配置，还有很多其他东西的配置，它们都能被用于你的Spring应用程序里。
 
-What makes all of this configuration special, however, is that it leverages Spring’s support for conditional configuration, which was introduced in Spring 4.0. Conditional configuration allows for configuration to be available in an application, but to be ignored unless certain conditions are met.
+What makes all of this configuration special, however, is that it leverages Spring’s support for conditional configuration, which was introduced in Spring 4.0. Conditional configuration allows for configuration to be available in an application, but to be ignored unless certain conditions are met.  
+让所有这些配置如此与众不同的是它们利用了Spring的条件化配置，这是Spring 4.0引入的新特性。条件化配置允许配置存在于应用程序中，但在满足某些特定条件之前都忽略这个配置。
 
-It’s easy enough to write your own conditions in Spring. All you have to do is implement the Condition interface and override its matches() method. For example, the following simple condition class will only pass if JdbcTemplate is available on the classpath:
+It’s easy enough to write your own conditions in Spring. All you have to do is implement the Condition interface and override its matches() method. For example, the following simple condition class will only pass if JdbcTemplate is available on the classpath:  
+在Spring里可以很方便地编写你自己的条件，你所要做的就是实现`Condition`接口，覆盖它的`matches()`方法。举例来说，下面这个简单的条件类只有在Classpath里存在`JdbcTemplate`时才会生效：
+
+```java
+package readinglist;
+import org.springframework.context.annotation.Condition;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.core.type.AnnotatedTypeMetadata;
+
+public class JdbcTemplateCondition implements Condition {
+  @Override
+  public boolean matches(ConditionContext context,
+                         AnnotatedTypeMetadata metadata) {
+    try {
+      context.getClassLoader().loadClass(
+             "org.springframework.jdbc.core.JdbcTemplate");
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+}
+```
+
+You can use this custom condition class when you declare beans in Java:  
+当你用Java来声明Bean的时候，可以使用这个自定义条件类：
+
+```java
+@Conditional(JdbcTemplateCondition.class)
+public MyService myService() {
+    ...
+}
+```
+
+In this case, the MyService bean will only be created if the JdbcTemplateCondition passes. That is to say that the MyService bean will only be created if JdbcTemplate is available on the classpath. Otherwise, the bean declaration will be ignored.  
+在这个例子里，只有当`JdbcTemplateCondition`类的条件成立时才会创建`MyService`这个Bean。也就是说`MyService` Bean创建的条件是Classpath里有`JdbcTemplate`。否则，这个Bean的声明就会被忽略掉。
+
+Although the condition shown here is rather simple, Spring Boot defines several more interesting conditions and applies them to the configuration classes that make up Spring Boot auto-configuration. Spring Boot applies conditional configuration by defining several special conditional annotations and using them in its configuration classes. Table 2.1 lists the conditional annotations that Spring Boot provides.  
+虽然本例中的条件相当简单，但Spring Boot定义了很多更有趣的条件，并把它们运用到了配置类上，这些配置类构成了Spring Boot的自动配置。Spring Boot运用条件化配置的方法是定义多个特殊的条件化注解，并将它们用到配置类上。表2.1列出了Spring Boot提供的条件化注解。
+
+__Table 2.1 Conditional annotations used in auto-configuration__
+
+| Conditional annotation          | Configuration applied if...? |
+|—---------—----------------------|------------------------------|
+| @ConditionalOnBean              | ...the specified bean has been configured |
+| @ConditionalOnMissingBean       | ...the specified bean has not already been configured |
+| @ConditionalOnClass             | ...the specified class is available on the classpath |
+| @ConditionalOnMissingClass      | ...the specified class is not available on the classpath |
+| @ConditionalOnExpression        | ...the given Spring Expression Language (SpEL) expression evaluates to true |
+| @ConditionalOnJava              | ...the version of Java matches a specific value or range of versions |
+| @ConditionalOnJndi              | ...there is a JNDI InitialContext available and optionally given JNDI locations exist |
+| @ConditionalOnProperty          | ...the specified configuration property has a specific value |
+| @ConditionalOnResource          | ...the specified resource is available on the classpath |
+| @ConditionalOnWebApplication    | ...the application is a web application |
+| @ConditionalOnNotWebApplication | ...the application is not a web application |
+
+Generally, you shouldn’t ever need to look at the source code for Spring Boot’s auto- configuration classes. But as an illustration of how the annotations in table 2.1 are used, consider this excerpt from DataSourceAutoConfiguration (provided as part of Spring Boot’s auto-configuration library):
+
+```
+@Configuration
+@ConditionalOnClass({ DataSource.class, EmbeddedDatabaseType.class })
+@EnableConfigurationProperties(DataSourceProperties.class)
+
+@Import({ Registrar.class, DataSourcePoolMetadataProvidersConfiguration.class })
+public class DataSourceAutoConfiguration {
+...
+}
+```
+
+As you can see, DataSourceAutoConfiguration is a @Configuration-annotated class that (among other things) imports some additional configuration from other configuration classes and defines a few beans of its own. What’s most important to notice here is that DataSourceAutoConfiguration is annotated with @ConditionalOnClass to require that both DataSource and EmbeddedDatabaseType be available on the class- path. If they aren’t available, then the condition fails and any configuration provided by DataSourceAutoConfiguration will be ignored.
+
+Within DataSourceAutoConfiguration there’s a nested JdbcTemplateConfiguration class that provides auto-configuration of a JdbcTemplate bean:
+
+```
+@Configuration
+@Conditional(DataSourceAutoConfiguration.DataSourceAvailableCondition.class)
+protected static class JdbcTemplateConfiguration {
+
+  @Autowired(required = false)
+  private DataSource dataSource;
+
+  @Bean
+  @ConditionalOnMissingBean(JdbcOperations.class)
+  public JdbcTemplate jdbcTemplate() {
+    return new JdbcTemplate(this.dataSource);
+  }
+
+...
+
+}
+```
+
+JdbcTemplateConfiguration is an annotation with the low-level @Conditional to require that the DataSourceAvailableCondition pass—essentially requiring that a DataSource bean be available or that one will be created by auto-configuration. Assum- ing that a DataSource bean will be available, the @Bean-annotated jdbcTemplate() method configures a JdbcTemplate bean. But jdbcTemplate() is annotated with @ConditionalOnMissingBean so that the bean will be configured only if there is not already a bean of type JdbcOperations (the interface that JdbcTemplate implements).
+
+There’s a lot more to DataSourceAutoConfiguration and to the other auto-configuration classes provided by Spring Boot than is shown here. But this should give you a taste of how Spring Boot leverages conditional configuration to implement auto-configuration.
+
+As it directly pertains to our example, the following configuration decisions are made by the conditionals in auto-configuration:
