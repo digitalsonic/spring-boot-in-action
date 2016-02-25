@@ -840,9 +840,11 @@ __代码2.7 呈现阅读列表的Thymeleaf模板__
 </html>
 ```
 
-This template defines an HTML page that is conceptually divided into two parts. At the top of the page is a list of books that are in the reader’s reading list. At the bottom is a form the reader can use to add a new book to the reading list.
+This template defines an HTML page that is conceptually divided into two parts. At the top of the page is a list of books that are in the reader’s reading list. At the bottom is a form the reader can use to add a new book to the reading list.  
+这个模板定义了一个HTML页面，该页面概念上分为两个部分；页面上方是读者的阅读列表中的图书清单，下方是是一个表单，读者可以添加新书。
 
-For aesthetic purposes, the Thymeleaf template references a stylesheet named style.css. That file should be created in src/main/resources/static and look like this:
+For aesthetic purposes, the Thymeleaf template references a stylesheet named style.css. That file should be created in src/main/resources/static and look like this:  
+为了美观，Thymeleaf模板引用了一个名为style.css的样式文件，该文件位于src/main/resources/static目录中，看起来是这样的：
 
 ```
 body {
@@ -861,8 +863,52 @@ label {
 }
 ```
 
-This stylesheet is simple and doesn’t go overboard to make the application look nice. But it serves our purposes and, as you’ll soon see, serves to demonstrate a piece of Spring Boot’s auto-configuration.
+This stylesheet is simple and doesn’t go overboard to make the application look nice. But it serves our purposes and, as you’ll soon see, serves to demonstrate a piece of Spring Boot’s auto-configuration.  
+这个样式表并不复杂，也没有过分追求让应用程序变漂亮，但已经能满足我们的需求了，很快你就会看到它能用来演示Spring Boot的自动配置功能。
 
-Believe it or not, that’s a complete application. Every single line has been presented to you in this chapter. Take a moment, flip back through the previous pages, and see if you can find any configuration. In fact, aside from the three lines of configuration in listing 2.1 (which essentially turn on auto-configuration), you didn’t have to write any Spring configuration.
+Believe it or not, that’s a complete application. Every single line has been presented to you in this chapter. Take a moment, flip back through the previous pages, and see if you can find any configuration. In fact, aside from the three lines of configuration in listing 2.1 (which essentially turn on auto-configuration), you didn’t have to write any Spring configuration.  
+不管你相不相信，以上就是一个完整的应用程序了，就是你看到的这几行内容。等一下，回顾一下前几页的内容，你有看到什么配置么？实际上，除了代码2.1里的三行配置（这是开启自动配置所必须的），你再也不用写任何Spring配置了。
 
-Despite the lack of Spring configuration, this complete Spring application is ready to run. Let’s fire it up and see how it looks.
+Despite the lack of Spring configuration, this complete Spring application is ready to run. Let’s fire it up and see how it looks.  
+虽然没什么Spring配置，但是这已经是一个可以运行的完整Spring应用程序了。让我们把它跑起来，看看是怎么样的。
+
+### 2.3.2 Running the application
+### 2.3.2 运行应用程序
+
+There are several ways to run a Spring Boot application. Earlier, in section 2.5, we discussed how to run the application via Maven and Gradle, as well as how to build and run an executable JAR. Later, in chapter 8 you’ll also see how to build a WAR file that can be deployed in a traditional manner to a Java web application server such as Tomcat.  
+运行Spring Boot应用程序有几种方法。先前在2.5节里，我们讨论了如何通过Maven和Gradle来运行应用程序，以及如何构建并运行可执行JAR。稍后，在第8章里你将看到如何构建WAR文件，并用传统的方式部署到Java Web应用服务器里，比如Tomcat。
+
+If you’re developing your application with Spring Tool Suite, you also have the option of running the application within your IDE by selecting the project and choosing Run As > Spring Boot App from the Run menu, as shown in figure 2.3.  
+如果你正使用Spring Tool Suite来开发应用程序，可以在IDE里选中项目，在Run菜单里选择Run As > Spring Boot App，通过这种方式来运行应用程序，如图2.3所示。
+
+![图2.3](../Figures/figures-2.3.png)
+
+__Figure 2.3 Running a Spring Boot application from Spring Tool Suite__  
+__图2.3 在Spring Tool Suite里运行Spring Boot应用程序__
+
+![图2.4](../Figures/figures-2.4.png)
+__Figure 2.4 An initially empty reading list__  
+__图2.4 初始状态下的空阅读列表__
+
+Assuming everything works, your browser should show you an empty reading list along with a form for adding a new book to the list. Figure 2.4 shows what it might look like. Now go ahead and use the form to add a few books to your reading list. After you do, your list might look something like figure 2.5.  
+假设一切正常，你的浏览器应该会展现一个空白的阅读列表，下方有一个用于向列表添加新书的表单，如图2.4所示。接下来，通过表单添加一些图书吧，随后你的阅读列表看起来就会像图2.5这样。
+
+![图2.5](../Figures/figures-2.5.png)
+__Figure 2.5 The reading list after a few books have been added__  
+__图2.5 添加了一些图书后的阅读列表__
+
+Feel free to take a moment to play around with the application. When you’re ready, move on and we’ll see how Spring Boot made it possible to write an entire Spring application with no Spring configuration code.  
+在多用用这个应用程序吧，当你准备好之后，我们就来看一下Spring Boot是如何做到不写Spring配置代码就能开发整个Spring应用程序的。
+
+### 2.3.3 What just happened?
+
+As I said, it’s hard to describe auto-configuration when there’s no configuration to point at. So instead of spending time discussing what you don’t have to do, this section has focused on what you do need to do—namely, write the application code.
+
+But certainly there is some configuration somewhere, right? Configuration is a central element of the Spring Framework, and there must be something that tells
+Spring how to run your application.
+
+When you add Spring Boot to your application, there’s a JAR file named springboot-autoconfigure that contains several configuration classes. Every one of these configuration classes is available on the application’s classpath and has the opportunity to contribute to the configuration of your application. There’s configuration for Thymeleaf, configuration for Spring Data JPA, configuration for Spring MVC, and configuration for dozens of other things you might or might not want to take advantage of in your Spring application.
+
+What makes all of this configuration special, however, is that it leverages Spring’s support for conditional configuration, which was introduced in Spring 4.0. Conditional configuration allows for configuration to be available in an application, but to be ignored unless certain conditions are met.
+
+It’s easy enough to write your own conditions in Spring. All you have to do is implement the Condition interface and override its matches() method. For example, the following simple condition class will only pass if JdbcTemplate is available on the classpath:
