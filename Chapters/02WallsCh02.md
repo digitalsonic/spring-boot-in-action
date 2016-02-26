@@ -955,29 +955,45 @@ In this case, the MyService bean will only be created if the JdbcTemplateConditi
 Although the condition shown here is rather simple, Spring Boot defines several more interesting conditions and applies them to the configuration classes that make up Spring Boot auto-configuration. Spring Boot applies conditional configuration by defining several special conditional annotations and using them in its configuration classes. Table 2.1 lists the conditional annotations that Spring Boot provides.  
 虽然本例中的条件相当简单，但Spring Boot定义了很多更有趣的条件，并把它们运用到了配置类上，这些配置类构成了Spring Boot的自动配置。Spring Boot运用条件化配置的方法是定义多个特殊的条件化注解，并将它们用到配置类上。表2.1列出了Spring Boot提供的条件化注解。
 
-__Table 2.1 Conditional annotations used in auto-configuration__
+__Table 2.1 Conditional annotations used in auto-configuration__  
+__表2.1 自动配置中使用的条件化注解__
 
-| Conditional annotation          | Configuration applied if...? |
-|—---------—----------------------|------------------------------|
-| @ConditionalOnBean              | ...the specified bean has been configured |
-| @ConditionalOnMissingBean       | ...the specified bean has not already been configured |
-| @ConditionalOnClass             | ...the specified class is available on the classpath |
-| @ConditionalOnMissingClass      | ...the specified class is not available on the classpath |
-| @ConditionalOnExpression        | ...the given Spring Expression Language (SpEL) expression evaluates to true |
-| @ConditionalOnJava              | ...the version of Java matches a specific value or range of versions |
+| Conditional annotation          | Configuration applied if...?                                                          |
+|---------------------------------|---------------------------------------------------------------------------------------|
+| @ConditionalOnBean              | ...the specified bean has been configured                                             |
+| @ConditionalOnMissingBean       | ...the specified bean has not already been configured                                 |
+| @ConditionalOnClass             | ...the specified class is available on the classpath                                  |
+| @ConditionalOnMissingClass      | ...the specified class is not available on the classpath                              |
+| @ConditionalOnExpression        | ...the given Spring Expression Language (SpEL) expression evaluates to true           |
+| @ConditionalOnJava              | ...the version of Java matches a specific value or range of versions                  |
 | @ConditionalOnJndi              | ...there is a JNDI InitialContext available and optionally given JNDI locations exist |
-| @ConditionalOnProperty          | ...the specified configuration property has a specific value |
-| @ConditionalOnResource          | ...the specified resource is available on the classpath |
-| @ConditionalOnWebApplication    | ...the application is a web application |
-| @ConditionalOnNotWebApplication | ...the application is not a web application |
+| @ConditionalOnProperty          | ...the specified configuration property has a specific value                          |
+| @ConditionalOnResource          | ...the specified resource is available on the classpath                               |
+| @ConditionalOnWebApplication    | ...the application is a web application                                               |
+| @ConditionalOnNotWebApplication | ...the application is not a web application                                           |
 
-Generally, you shouldn’t ever need to look at the source code for Spring Boot’s auto- configuration classes. But as an illustration of how the annotations in table 2.1 are used, consider this excerpt from DataSourceAutoConfiguration (provided as part of Spring Boot’s auto-configuration library):
+
+| 条件化注解                       | 配置生效情况                                                            |
+|---------------------------------|-------------------------------------------------------------------------|
+| @ConditionalOnBean              | 配置了某个特定Bean                                                       |
+| @ConditionalOnMissingBean       | 没有配置特定的Bean                                                       |
+| @ConditionalOnClass             | Classpath里有指定的类                                                    |
+| @ConditionalOnMissingClass      | Classpath里缺少指定的类                                                  |
+| @ConditionalOnExpression        | 给定的Spring Expression Language（SpEL）表达式计算结果为`true`             |
+| @ConditionalOnJava              | Java的版本匹配特定值或者一个范围值                                         |
+| @ConditionalOnJndi              | 参数中给定的JNDI位置必须存在一个，如果没有给参数，则要有JNDI `InitialContext` |
+| @ConditionalOnProperty          | 指定的配置属性要有一个明确的值                                             |
+| @ConditionalOnResource          | Classpath里有指定的资源                                                   |
+| @ConditionalOnWebApplication    | 这是一个Web应用程序                                                       |
+| @ConditionalOnNotWebApplication | 这不是一个Web应用程序                                                     |
+
+Generally, you shouldn’t ever need to look at the source code for Spring Boot’s auto-configuration classes. But as an illustration of how the annotations in table 2.1 are used, consider this excerpt from DataSourceAutoConfiguration (provided as part of Spring Boot’s auto-configuration library):  
+一般你都无需查看Spring Boot自动配置类的源代码，但为了演示表2.1里的注解是如何使用的，我们可以看下`DataSourceAutoConfiguration`里的这个片段（这是Spring Boot自动配置库的一部分）：
 
 ```
 @Configuration
 @ConditionalOnClass({ DataSource.class, EmbeddedDatabaseType.class })
 @EnableConfigurationProperties(DataSourceProperties.class)
-
 @Import({ Registrar.class, DataSourcePoolMetadataProvidersConfiguration.class })
 public class DataSourceAutoConfiguration {
 ...
