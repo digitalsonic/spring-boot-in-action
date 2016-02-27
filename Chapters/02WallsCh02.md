@@ -1000,9 +1000,11 @@ public class DataSourceAutoConfiguration {
 }
 ```
 
-As you can see, DataSourceAutoConfiguration is a @Configuration-annotated class that (among other things) imports some additional configuration from other configuration classes and defines a few beans of its own. What’s most important to notice here is that DataSourceAutoConfiguration is annotated with @ConditionalOnClass to require that both DataSource and EmbeddedDatabaseType be available on the class- path. If they aren’t available, then the condition fails and any configuration provided by DataSourceAutoConfiguration will be ignored.
+As you can see, DataSourceAutoConfiguration is a @Configuration-annotated class that (among other things) imports some additional configuration from other configuration classes and defines a few beans of its own. What’s most important to notice here is that DataSourceAutoConfiguration is annotated with @ConditionalOnClass to require that both DataSource and EmbeddedDatabaseType be available on the classpath. If they aren’t available, then the condition fails and any configuration provided by DataSourceAutoConfiguration will be ignored.  
+如你所见，`DataSourceAutoConfiguration`添加了`@Configuration`注解，它从其他配置类里导入了一些额外配置，还自己定义了一些Bean。最重要的是`DataSourceAutoConfiguration`上添加了`@ConditionalOnClass`注解，要求Classpath里必须要有`DataSource`和`EmbeddedDatabaseType`。如果它们不存在，条件就不成立，`DataSourceAutoConfiguration`提供的配置都会被忽略掉。
 
-Within DataSourceAutoConfiguration there’s a nested JdbcTemplateConfiguration class that provides auto-configuration of a JdbcTemplate bean:
+Within DataSourceAutoConfiguration there’s a nested JdbcTemplateConfiguration class that provides auto-configuration of a JdbcTemplate bean:  
+在`DataSourceAutoConfiguration`里嵌入了一个`JdbcTemplateConfiguration`类，自动配置了一个`JdbcTemplate` Bean：
 
 ```
 @Configuration
@@ -1023,8 +1025,39 @@ protected static class JdbcTemplateConfiguration {
 }
 ```
 
-JdbcTemplateConfiguration is an annotation with the low-level @Conditional to require that the DataSourceAvailableCondition pass—essentially requiring that a DataSource bean be available or that one will be created by auto-configuration. Assum- ing that a DataSource bean will be available, the @Bean-annotated jdbcTemplate() method configures a JdbcTemplate bean. But jdbcTemplate() is annotated with @ConditionalOnMissingBean so that the bean will be configured only if there is not already a bean of type JdbcOperations (the interface that JdbcTemplate implements).
+JdbcTemplateConfiguration is an annotation with the low-level @Conditional to require that the DataSourceAvailableCondition pass—essentially requiring that a DataSource bean be available or that one will be created by auto-configuration. Assum- ing that a DataSource bean will be available, the @Bean-annotated jdbcTemplate() method configures a JdbcTemplate bean. But jdbcTemplate() is annotated with @ConditionalOnMissingBean so that the bean will be configured only if there is not already a bean of type JdbcOperations (the interface that JdbcTemplate implements).  
+`JdbcTemplateConfiguration`使用了`@Conditional`注解，判断`DataSourceAvailableCondition`条件是否成立——基本上就是要有一个`DataSource` Bean或者自动配置会创建一个。假设有`DataSource` Bean，使用了`@Bean`注解的`jdbcTemplate()`方法会配置一个`JdbcTemplate` Bean。这个方法上还加了`@ConditionalOnMissingBean`注解，因此只有在不存在`JdbcOperations`类型（即`JdbcTemplate`实现的接口）的Bean时才会创建`JdbcTemplate` Bean。
 
-There’s a lot more to DataSourceAutoConfiguration and to the other auto-configuration classes provided by Spring Boot than is shown here. But this should give you a taste of how Spring Boot leverages conditional configuration to implement auto-configuration.
+There’s a lot more to DataSourceAutoConfiguration and to the other auto-configuration classes provided by Spring Boot than is shown here. But this should give you a taste of how Spring Boot leverages conditional configuration to implement auto-configuration.  
+此处看到的只是`DataSourceAutoConfiguration`的冰山一角，对Spring Boot提供的其他自动配置类来说亦是如此。但这已经足以说明Spring Boot是如何利用条件化配置来实现自动配置的了。
 
-As it directly pertains to our example, the following configuration decisions are made by the conditionals in auto-configuration:
+As it directly pertains to our example, the following configuration decisions are made by the conditionals in auto-configuration:  
+自动配置会做出以下配置决策，它们和之前的例子息息相关：
+
+* Because H2 is on the classpath, an embedded H2 database bean will be created. This bean is of type javax.sql.DataSource, which the JPA implementation (Hibernate) will need to access the database.  
+因为Classpath里有H2，所以会创建一个嵌入式的H2数据库Bean，它的类型是`javax.sql.DataSource`，JPA实现（Hibernate）需要它来访问数据库。
+* Because Hibernate Entity Manager is on the classpath (transitively via Spring Data JPA), auto-configuration will configure beans needed to support working with Hibernate, including Spring’s LocalContainerEntityManagerFactory-
+Bean and JpaVendorAdapter.  
+因为Classpath里有Hibernate的实体管理器（Spring Data JPA传递引入的），自动配置会配置与Hibernate相关的Bean，包括Spring的`LocalContainerEntityManagerFactoryBean`和`JpaVendorAdapter`。
+* Because Spring Data JPA is on the classpath, Spring Data JPA will be configured to automatically create repository implementations from repository interfaces.  
+因为Classpath里有Spring Data JPA，所以会自动根据仓库的接口创建仓库实现。
+* Because Thymeleaf is on the classpath, Thymeleaf will be configured as a view option for Spring MVC, including a Thymeleaf template resolver, template engine, and view resolver. The template resolver is configured to resolve templates from /templates relative to the root of the classpath.  
+因为Classpath里有Thymeleaf，所以会把Thymeleaf配置为Spring MVC的视图，包括一个Thymeleaf的模板解析器、模板引擎及视图解析器。视图解析器会解析/templates里的模板，该目录相对于Classpath的根目录。
+* Because Spring MVC is on the classpath (thanks to the web starter dependency), Spring’s DispatcherServlet will be configured and Spring MVC will be enabled.  
+因为Classpath里有Spring MVC（归功于web起步依赖），所以会配置Spring的`DispatcherServlet`并启用Spring MVC。
+* Because this is a Spring MVC web application, a resource handler will be registered to serve static content from /static relative to the root of the classpath. (The resource handler will also serve static content from /public, /resources, and /META-INF/resources).  
+因为这是一个Spring MVC Web应用程序，所以会注册一个资源处理器，把相对于Classpath根目录的/static目录里的静态内容提供出来。（这个资源处理器还能处理/public、/resources和/META-INF/resources）。
+* Because Tomcat is on the classpath (transitively referred to by the web starter dependency), an embedded Tomcat container will be started to listen on port 8080.  
+因为Classpath里有Tomcat（web起步依赖传递引用的），所以会启动一个嵌入式的Tomcat容器，监听8080端口。
+
+The main takeaway here, though, is that Spring Boot auto-configuration takes on the burden of configuring Spring so that you can focus on writing your application.  
+由此可见，Spring Boot自动配置承担起了配置Spring的重任，因此你才能专注于编写自己的应用程序。
+
+## 2.4 Summary
+## 2.4 小结
+
+By taking advantage of Spring Boot starter dependencies and auto-configuration, you can more quickly and easily develop Spring applications. Starter dependencies help you focus on the type of functionality your application needs rather than on the specific libraries and versions that provide that functionality. Meanwhile, auto-configuration frees you from the boilerplate configuration that is common among Spring applications without Spring Boot.  
+通过Spring Boot的起步依赖和自动配置，可以更加快速、便捷地开发Spring应用程序。起步依赖帮助你专注于应用程序需要的功能类型，而非提供该功能的具体库和版本。与此同时，自动配置把你从样板式的配置中解放了出来，这些配置在没有Spring Boot的Spring应用程序里非常常见。
+
+Although auto-configuration is a convenient way to work with Spring, it also represents an opinionated approach to Spring development. What if you want or need to configure Spring differently? In the next chapter, we’ll look at how you can override Spring Boot auto-configuration as needed to achieve the goals of your application. You’ll also see how to apply some of the same techniques to configure your own application components.
+虽然自动配置很方便，但在开发Spring应用程序时其中的一些用法也有点武断。要是你在配置Spring时希望或者需要有所不同该怎么办？下一章里我们将会看到如何覆盖Spring Boot自动配置，藉此达成应用程序的一些目标，还有如何运用类似的技术来配置自己的应用程序组件。
