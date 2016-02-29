@@ -98,13 +98,13 @@ package readinglist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.
-                                                                         builders.AuthenticationManagerBuilder;
+                                    builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.
-                                                                                                            HttpSecurity;
+                                                        HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.
-                                                                                                EnableWebSecurity;
+                                                        EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.
-                                                                                            WebSecurityConfigurerAdapter;
+                                            WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -184,9 +184,11 @@ Speaking of Reader entities, the Reader class (shown in listing 3.3) is the fina
 说到`Reader`实体，`Reader`类（如代码3.3所示）就是最后一块拼图了，它就是一个简单的JPA实体，其中有几个字段用来存储用户名、密码和用户全名。
 
 __Listing 3.3 A JPA entity that defines a Reader__
+__代码3.3 定义Reader的JPA实体__
 
 ```
 package readinglist;
+
 import java.util.Arrays;
 import java.util.Collection;
 import javax.persistence.Entity;
@@ -204,7 +206,7 @@ public class Reader implements UserDetails {
   private String username;
   private String fullname;
   private String password;
-  
+
   public String getUsername() {
     return username;
   }
@@ -257,10 +259,141 @@ public class Reader implements UserDetails {
 }
 ```
 
-Reader fields
+Reader fields  
+Reader字段
 
-Grant READER privilege
+Grant READER privilege  
+授予READER权限
 
-Do not expire, lock, or disable
+Do not expire, lock, or disable  
+不过期，不加锁，不禁用
 
-As you can see, Reader is annotated with @Entity to make it a JPA entity. In addition, its username field is annotated with @Id to designate it as the entity’s ID. This seemed like a natural choice, as the username should uniquely identify the Reader.
+As you can see, Reader is annotated with @Entity to make it a JPA entity. In addition, its username field is annotated with @Id to designate it as the entity’s ID. This seemed like a natural choice, as the username should uniquely identify the Reader.  
+如你所见，`Reader`用了`@Entity`注解，所以这是一个JPA实体。此外，它的`username`字段上有`@Id`注解，表明这是实体的ID。这个选择无可厚非，因为`username`应该能唯一标识一个`Reader`。
+
+You’ll also notice that Reader implements the UserDetails interface and several of its methods. This makes it possible to use a Reader object to represent a user in Spring Security. The getAuthorities() method is overridden to always grant users READER authority. The isAccountNonExpired(), isAccountNonLocked(), isCredentialsNonExpired(), and isEnabled() methods are all implemented to return true so that the reader account is never expired, locked, or revoked.  
+你应该还注意到`Reader`实现了`UserDetails`接口中的方法，这样`Reader`就能代表Spring Security里的用户了。`getAuthorities()`方法被覆盖过了，始终会为用户授予READER权限。`isAccountNonExpired()`、 `isAccountNonLocked()`、`isCredentialsNonExpired()`和`isEnabled()`方法都返回`true`
+，这样读者账户就不会过期，不会被锁定，也不会被撤销。
+
+Rebuild and restart the application and you should be able to log in to the application as one of the readers.  
+重新构建并重启应用程序后，你应该就能以读者身份登录应用程序了。
+
+> KEEPING IT SIMPLE In a larger application, the authorities granted to a user might themselves be entities and be maintained in a separate database table. Likewise, the boolean values indicating whether an account is non-expired, non-locked, and enabled might be fields drawn from the database. For our purposes, however, I’ve decided to keep these details simple so as not to distract from what it is we’re really discussing ... namely, overriding Spring Boot auto-configuration.  
+__保持简单__ 在一个大型应用程序里，赋予用户的授权本身也可能是实体，它们被维护在独立的数据表里。同样的，表示一个账户是否是非过期、非锁定且可用的`boolean`值也是数据库里的字段。但是，出于演示考虑，我决定让这些细节保持简单，不至于转移注意力——我说的是覆盖Spring Boot自动配置。
+
+There’s a lot more we could do with regard to security configuration,1 but this is all we need here, and it does demonstrate how to override the security auto-configuration provided by Spring Boot.  
+在安全配置方面，我们还能做更多事情，<sup>[1][]</sup>但此刻这样就足够了，上面的例子足以演示如何覆盖Spring Boot提供的安全自动配置了。
+
+Again, all you need to do to override Spring Boot auto-configuration is to write explicit configuration. Spring Boot will see your configuration, step back, and let your configuration take precedence. To understand how this works, let’s take a look under the covers of Spring Boot auto-configuration to see how it works and how it allows itself to be overridden.  
+再重申一次，想要覆盖Spring Boot的自动配置，你所要做的就是编写一个显式的配置而已。Spring Boot会发现你的配置，随后降低自动配置的优先级，以你的配置为准。想弄明白这是如何实现的，让我们揭开Spring Boot自动配置的神秘面纱，看看它是如何运作的，它是怎么允许自己被覆盖的。
+
+[1]: # "For a deeper dive into Spring Security, have a look at chapters 9 and 14 of my Spring in Action, Fourth Edition (Manning, 2014).想要深入了解Spring Security，可以参考《Spring in Action》第四版（Manning，2014）中的第9章和第14章。"
+
+### 3.1.3 Taking another peek under the covers of auto-configuration
+### 3.1.3 掀开自动配置的神秘面纱
+
+As we discussed in section 2.3.3, Spring Boot auto-configuration comes with several configuration classes, any of which can be applied in your application. All of this configuration uses Spring 4.0’s conditional configuration support to make runtime decisions as to whether or not Spring Boot’s configuration should be used or ignored.  
+正如我们在2.3.3节里讨论的那样，Spring Boot自动配置自带了很多配置类，每一个都能运用在你的应用程序里。它们都使用了Spring 4.0的条件化配置，可以在运行时判断这个配置是该被运用，还是该被忽略。
+
+For the most part, the @ConditionalOnMissingBean annotation described in table 2.1 is what makes it possible to override auto-configuration. The JdbcTemplate bean defined in Spring Boot’s DataSourceAutoConfiguration is a very simple example of how @ConditionalOnMissingBean works:  
+大部分情况下，表2.1里的`@ConditionalOnMissingBean`注解是覆盖自动配置的关键。Spring Boot的`DataSourceAutoConfiguration`中定义的`JdbcTemplate` Bean就是一个非常简单的例子，演示了`@ConditionalOnMissingBean`是如何工作的：
+
+```
+@Bean
+@ConditionalOnMissingBean(JdbcOperations.class)
+public JdbcTemplate jdbcTemplate() {
+  return new JdbcTemplate(this.dataSource);
+}
+```
+
+The jdbcTemplate() method is annotated with @Bean and is ready to configure a JdbcTemplate bean if needed. But it’s also annotated with @ConditionalOnMissingBean, which requires that there not already be a bean of type JdbcOperations (the interface that JdbcTemplate implements). If there’s already a JdbcOperations bean, then the condition will fail and the jdbcTemplate() bean method will not be used.  
+`jdbcTemplate()`方法上添加了`@Bean`注解，在需要时可以配置出一个`JdbcTemplate` Bean。但它上面还加了`@ConditionalOnMissingBean`注解，要求当前不存在`JdbcOperations`类型（`JdbcTemplate`实现了该接口）的Bean时才生效。如果当前已经有一个`JdbcOperations` Bean了，条件即不满足，不会执行`jdbcTemplate()`方法。
+
+What circumstances would result in there already being a JdbcOperation bean? Spring Boot is designed to load application-level configuration before considering its auto-configuration classes. Therefore, if you’ve already configured a JdbcTemplate bean, then there will be a bean of type JdbcOperations by the time that auto-configuration takes place, and the auto-configured JdbcTemplate bean will be ignored.  
+什么情况下会存在一个`JdbcOperations` Bean呢？Spring Boot的设计是加载应用级配置在线，随后再考虑自动配置类。因此，如果你已经配置了一个`JdbcTemplate` Bean，那么在执行自动配置时就已经存在一个`JdbcOperations`类型的Bean了，于是忽略自动配置的`JdbcTemplate` Bean。
+
+As it pertains to Spring Security, there are several configuration classes considered during auto-configuration. It would be impractical to go over each of them in detail here, but the one that’s most significant in allowing us to override Spring Boot’s auto- configured security configuration is SpringBootWebSecurityConfiguration. Here’s an excerpt from that configuration class:  
+关于Spring Security，自动配置时会考虑几个配置类。在这里讨论每个配置类的细节是不切实际的，但覆盖Spring Boot自动配置的安全配置时最重要的一个类是`SpringBootWebSecurityConfiguration`。以下是其中的一个代码片段：
+
+```
+@Configuration
+@EnableConfigurationProperties
+@ConditionalOnClass({ EnableWebSecurity.class })
+@ConditionalOnMissingBean(WebSecurityConfiguration.class)
+@ConditionalOnWebApplication
+public class SpringBootWebSecurityConfiguration {
+
+  ...
+
+}
+```
+
+As you can see, SpringBootWebSecurityConfiguration is annotated with a few conditional annotations. Per the @ConditionalOnClass annotation, the @EnableWebSecurity annotation must be available on the classpath. And per @ConditionalOnWebApplication, the application must be a web application. But it’s the @ConditionalOnMissingBean annotation that makes it possible for our security configuration class to be used instead of SpringBootWebSecurityConfiguration.  
+如你所见，`SpringBootWebSecurityConfiguration`上加了好几个注解。看到`@ConditionalOnClass`注解后，你就应该知道Classpath里必须要有`@EnableWebSecurity`注解。`@ConditionalOnWebApplication`说明这必须是个Web应用程序。`@ConditionalOnMissingBean`注解才是我们的安全配置类代替`SpringBootWebSecurityConfiguration`的关键所在。
+
+The @ConditionalOnMissingBean requires that there not already be a bean of type WebSecurityConfiguration. Although it may not be apparent on the surface, by annotating our SecurityConfig class with @EnableWebSecurity, we’re indirectly creating a bean of type WebSecurityConfiguration. Therefore, by the time auto-configuration takes place, there will already be a bean of type WebSecurityConfiguration, the @ConditionalOnMissingBean condition will fail, and any configuration offered by SpringBootWebSecurityConfiguration will be skipped over.  
+`@ConditionalOnMissingBean`注解要求当下没有`WebSecurityConfiguration`类型的Bean。虽然表面上我们并没有这么一个Bean，但通过在`SecurityConfig`上添加`@EnableWebSecurity`注解，我们实际上间接创建了一个`WebSecurityConfiguration` Bean。所以在自动配置时，就已经存在这么一个Bean了，`@ConditionalOnMissingBean`条件不成立，`SpringBootWebSecurityConfiguration`提供的配置就被跳过了。
+
+Although Spring Boot’s auto-configuration and @ConditionalOnMissingBean make it possible for you to explicitly override any of the beans that would otherwise be auto-configured, it’s not always necessary to go to that extreme. Let’s see how you can set a few simple configuration properties to tweak the auto-configured components.  
+虽然Spring Boot的自动配置和`@ConditionalOnMissingBean`让你能显式地覆盖那些可以自动配置的Bean，但并不是每次都要做到这种程度的。让我们来看看怎么通过设置几个简单的配置就能调整自动配置组件吧。
+
+## 3.2 Externalizing configuration with properties
+
+When dealing with application security, you’ll almost certainly want to take full charge of the configuration. But it would be a shame to give up on auto-configuration just to tweak a small detail such as a server port number or a logging level. If you need to set a database URL, wouldn’t it be easier to set a property somewhere than to completely declare a data source bean?
+
+As it turns out, the beans that are automatically configured by Spring Boot offer well over 300 properties for fine-tuning. When you need to adjust the settings, you can specify these properties via environment variables, Java system properties, JNDI, command-line arguments, or property files.
+
+To get started with these properties, let’s look at a very simple example. You may have noticed that Spring Boot emits an ascii-art banner when you run the reading-list application from the command line. If you’d like to disable the banner, you can do so by setting a property named spring.main.show-banner to false. One way of doing that is to specify the property as a command-line parameter when you run the app:
+
+```
+$ java -jar readinglist-0.0.1-SNAPSHOT.jar --spring.main.show-banner=false
+```
+
+Another way is to create a file named application.properties that includes the follow- ing line:
+
+```
+spring.main.show-banner=false
+```
+
+Or, if you’d prefer, create a YAML file named application.yml that looks like this:
+
+```
+spring:
+  main:
+  show-banner: false
+```
+
+You could also set the property as an environment variable. For example, if you’re using the bash or zsh shell, you can set it with the export command:
+
+```
+$ export spring_main_show_banner=false
+```
+
+Note the use of underscores instead of periods and dashes, as required for environment variable names.
+
+There are, in fact, several ways to set properties for a Spring Boot application. Spring Boot will draw properties from several property sources, including the following:
+
+1. Command-line arguments
+2. JNDI attributes from java:comp/env
+3. JVM system properties
+4. Operating system environment variables
+5. Randomly generated values for properties prefixed with random.* (referenced when setting other properties, such as `${random.long})
+6. An application.properties or application.yml file outside of the application
+7. An application.properties or application.yml file packaged inside of the application
+8. Property sources specified by @PropertySource
+9. Default properties
+
+This list is in order of precedence. That is, any property set from a source higher in the list will override the same property set on a source lower in the list. Command-line arguments, for instance, override properties from any other property source.
+
+As for the application.properties and application.yml files, they can reside in any of four locations:
+
+1. Externally, in a /config subdirectory of the directory from which the applica- tion is run
+2. Externally, in the directory from which the application is run
+3. Internally, in a package named “config”
+4. Internally, at the root of the classpath
+
+Again, this list is in order of precedence. That is, an application.properties file in a /config subdirectory will override the same properties set in an application.properties file in the application’s classpath.
+
+Also, I’ve found that if you have both application.properties and application.yml side by side at the same level of precedence, properties in application.yml will over- ride those in application.properties.
+
+Disabling an ascii-art banner is just a small example of how to use properties. Let’s look at a few more common ways to tweak the auto-configured beans.
