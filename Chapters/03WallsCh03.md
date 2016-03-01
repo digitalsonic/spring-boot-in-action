@@ -338,24 +338,31 @@ Although Spring Boot’s auto-configuration and @ConditionalOnMissingBean make i
 虽然Spring Boot的自动配置和`@ConditionalOnMissingBean`让你能显式地覆盖那些可以自动配置的Bean，但并不是每次都要做到这种程度的。让我们来看看怎么通过设置几个简单的配置就能调整自动配置组件吧。
 
 ## 3.2 Externalizing configuration with properties
+## 3.2 通过属性文件外置配置
 
-When dealing with application security, you’ll almost certainly want to take full charge of the configuration. But it would be a shame to give up on auto-configuration just to tweak a small detail such as a server port number or a logging level. If you need to set a database URL, wouldn’t it be easier to set a property somewhere than to completely declare a data source bean?
+When dealing with application security, you’ll almost certainly want to take full charge of the configuration. But it would be a shame to give up on auto-configuration just to tweak a small detail such as a server port number or a logging level. If you need to set a database URL, wouldn’t it be easier to set a property somewhere than to completely declare a data source bean?  
+在处理应用安全时，你当然会希望完全掌控所有配置。但也不必放弃自动配置，只微调一些细节也不是什么害羞的事，比如改改端口号和日志级别。要设置数据库URL时，是在哪里配置一个属性
+简单，还是完整地声明一个数据源的Bean简单，答案不言而喻？
 
-As it turns out, the beans that are automatically configured by Spring Boot offer well over 300 properties for fine-tuning. When you need to adjust the settings, you can specify these properties via environment variables, Java system properties, JNDI, command-line arguments, or property files.
+As it turns out, the beans that are automatically configured by Spring Boot offer well over 300 properties for fine-tuning. When you need to adjust the settings, you can specify these properties via environment variables, Java system properties, JNDI, command-line arguments, or property files.  
+事实上，Spring Boot自动配置的Bean提供了超过300个用于微调的属性。当你要调整设置时，只要再环境变量、Java系统属性、JNDI、命令行参数或者属性文件里进行指定就好了。
 
-To get started with these properties, let’s look at a very simple example. You may have noticed that Spring Boot emits an ascii-art banner when you run the reading-list application from the command line. If you’d like to disable the banner, you can do so by setting a property named spring.main.show-banner to false. One way of doing that is to specify the property as a command-line parameter when you run the app:
+To get started with these properties, let’s look at a very simple example. You may have noticed that Spring Boot emits an ascii-art banner when you run the reading-list application from the command line. If you’d like to disable the banner, you can do so by setting a property named spring.main.show-banner to false. One way of doing that is to specify the property as a command-line parameter when you run the app:  
+要了解这些属性，让我们来看个非常简单的例子。你也许已经注意到了，在命令行里运行阅读列表应用程序时，Spring Boot有一个ascii-art Banner。如果你想禁用这个Banner，可以将`spring.main.show-banner`这个属性设置为`false`，有几种实现方式，其中之一就是在运行应用程序的命令行参数里指定：
 
 ```
 $ java -jar readinglist-0.0.1-SNAPSHOT.jar --spring.main.show-banner=false
 ```
 
-Another way is to create a file named application.properties that includes the follow- ing line:
+Another way is to create a file named application.properties that includes the following line:  
+另一种方式是创建一个名为application.properties的文件，包含如下内容：
 
 ```
 spring.main.show-banner=false
 ```
 
-Or, if you’d prefer, create a YAML file named application.yml that looks like this:
+Or, if you’d prefer, create a YAML file named application.yml that looks like this:  
+或者，如果你喜欢的话，也可以创建名为application.yml的YAML文件，内容如下：
 
 ```
 spring:
@@ -363,37 +370,95 @@ spring:
   show-banner: false
 ```
 
-You could also set the property as an environment variable. For example, if you’re using the bash or zsh shell, you can set it with the export command:
+You could also set the property as an environment variable. For example, if you’re using the bash or zsh shell, you can set it with the export command:  
+还可以将属性设置为环境变量。举例来说，如果你用的是bash或者zsh，可以用`export`命令：
 
 ```
 $ export spring_main_show_banner=false
 ```
 
-Note the use of underscores instead of periods and dashes, as required for environment variable names.
+Note the use of underscores instead of periods and dashes, as required for environment variable names.  
+请注意，这里用的还下划线而不是点和横杠，这是对环境变量名称的要求。
 
-There are, in fact, several ways to set properties for a Spring Boot application. Spring Boot will draw properties from several property sources, including the following:
+There are, in fact, several ways to set properties for a Spring Boot application. Spring Boot will draw properties from several property sources, including the following:  
+实际上有好几种设置Spring Boot应用程序的途径，Spring Boot能从多种属性源获得属性，包括：
 
-1. Command-line arguments
-2. JNDI attributes from java:comp/env
-3. JVM system properties
-4. Operating system environment variables
-5. Randomly generated values for properties prefixed with random.* (referenced when setting other properties, such as `${random.long})
-6. An application.properties or application.yml file outside of the application
-7. An application.properties or application.yml file packaged inside of the application
-8. Property sources specified by @PropertySource
-9. Default properties
+1. Command-line arguments  
+命令行参数
+2. JNDI attributes from java:comp/env  
+java:comp/env里的JNDI属性
+3. JVM system properties  
+JVM系统属性
+4. Operating system environment variables  
+操作系统环境变量
+5. Randomly generated values for properties prefixed with random.* (referenced when setting other properties, such as `${random.long}`)  
+随机生成的带random.* 前缀的属性（在设置其他属性时，可以引用它们，比如`${random.long}`）
+6. An application.properties or application.yml file outside of the application  
+应用程序以外的application.properties或者appliaction.yml文件
+7. An application.properties or application.yml file packaged inside of the application  
+打包在应用程序内的application.properties或者appliaction.yml文件
+8. Property sources specified by @PropertySource  
+通过`@PropertySource`标注的属性源
+9. Default properties  
+默认属性
 
-This list is in order of precedence. That is, any property set from a source higher in the list will override the same property set on a source lower in the list. Command-line arguments, for instance, override properties from any other property source.
+This list is in order of precedence. That is, any property set from a source higher in the list will override the same property set on a source lower in the list. Command-line arguments, for instance, override properties from any other property source.  
+这个列表的按照优先级排序，也就是说，任何在高优先级属性源里设置的属性都会覆盖低优先级的相同属性。例如，命令行参数会覆盖其他属性源。
 
-As for the application.properties and application.yml files, they can reside in any of four locations:
+As for the application.properties and application.yml files, they can reside in any of four locations:  
+对application.properties和application.yml文件而言，它们能放在以下四个位置：
 
-1. Externally, in a /config subdirectory of the directory from which the applica- tion is run
-2. Externally, in the directory from which the application is run
-3. Internally, in a package named “config”
-4. Internally, at the root of the classpath
+1. Externally, in a /config subdirectory of the directory from which the application is run  
+外置，在/config子目录，相对于应用程序运行的目录
+2. Externally, in the directory from which the application is run  
+外置，在应用程序运行的目录里
+3. Internally, in a package named “config”  
+内置，在“config”包内
+4. Internally, at the root of the classpath  
+内置，在Classpath根目录
 
-Again, this list is in order of precedence. That is, an application.properties file in a /config subdirectory will override the same properties set in an application.properties file in the application’s classpath.
+Again, this list is in order of precedence. That is, an application.properties file in a /config subdirectory will override the same properties set in an application.properties file in the application’s classpath.  
+同样的，这个列表按照优先级排序。也就是说/config子目录里的application.properties会覆盖应用程序Classpath里的application.properties中的相同属性。
 
-Also, I’ve found that if you have both application.properties and application.yml side by side at the same level of precedence, properties in application.yml will over- ride those in application.properties.
+Also, I’ve found that if you have both application.properties and application.yml side by side at the same level of precedence, properties in application.yml will override those in application.properties.  
+此外，如果你在同一优先级位置同时有application.properties和application.yml，那么application.yml里的属性会覆盖application.properties里的。
 
-Disabling an ascii-art banner is just a small example of how to use properties. Let’s look at a few more common ways to tweak the auto-configured beans.
+Disabling an ascii-art banner is just a small example of how to use properties. Let’s look at a few more common ways to tweak the auto-configured beans.  
+禁用ascii-art Banner只是个小例子，再让我们看几个例子，如何通过常用途径微调自动配置的Bean。
+
+### 3.2.1 Fine-tuning auto-configuration
+
+As I said, there are well over 300 properties that you can set to tweak and adjust the beans in a Spring Boot application. Appendix C gives an exhaustive list of these properties, but it’d be impossible to go over each and every one of them here. Instead, let’s examine a few of the more commonly useful properties exposed by Spring Boot.
+
+#### DISABLING TEMPLATE CACHING
+If you’ve been tinkering around much with the reading-list application, you may have noticed that changes to any of the Thymeleaf templates aren’t applied unless you restart the application. That’s because Thymeleaf templates are cached by default. This improves application performance because you only compile the templates once, but it’s difficult to make changes on the fly during development.
+
+You can disable Thymeleaf template caching by setting spring.thymeleaf.cache to false. You can do this when you run the application from the command line by setting it as a command-line argument:
+
+```
+$ java -jar readinglist-0.0.1-SNAPSHOT.jar --spring.thymeleaf.cache=false
+```
+
+Or, if you’d rather have caching turned off every time you run the application, you might create an application.yml file with the following lines:
+
+```
+spring:
+  thymeleaf:
+    cache: false
+```
+
+You’ll want to make sure that this application.yml file doesn’t follow the application into production, or else your production application won’t realize the performance benefits of template caching.
+
+As a developer, you may find it convenient to have template caching turned off all of the time while you make changes to the templates. In that case, you can turn off Thymeleaf caching via an environment variable:
+
+```
+$ export spring_thymeleaf_cache=false
+```
+
+Even though we’re using Thymeleaf for our application’s views, template caching can be turned off for Spring Boot’s other supported template options by setting these properties:
+
+* spring.freemarker.cache (Freemarker)
+* spring.groovy.template.cache (Groovy templates)
+* spring.velocity.cache (Velocity)
+
+By default, all of these properties are true, meaning that the templates are cached. Setting them to false disables caching.
