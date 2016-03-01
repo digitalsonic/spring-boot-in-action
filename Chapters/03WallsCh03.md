@@ -427,19 +427,26 @@ Disabling an ascii-art banner is just a small example of how to use properties. 
 禁用ascii-art Banner只是个小例子，再让我们看几个例子，如何通过常用途径微调自动配置的Bean。
 
 ### 3.2.1 Fine-tuning auto-configuration
+### 3.2.1 自动配置微调
 
-As I said, there are well over 300 properties that you can set to tweak and adjust the beans in a Spring Boot application. Appendix C gives an exhaustive list of these properties, but it’d be impossible to go over each and every one of them here. Instead, let’s examine a few of the more commonly useful properties exposed by Spring Boot.
+As I said, there are well over 300 properties that you can set to tweak and adjust the beans in a Spring Boot application. Appendix C gives an exhaustive list of these properties, but it’d be impossible to go over each and every one of them here. Instead, let’s examine a few of the more commonly useful properties exposed by Spring Boot.  
+如我所说，有超过300个属性可以用来微调Spring Boot应用程序里的Bean。附录C有一个详尽的列表，此处无法逐一描述它们的细节，因此我们就通过几个例子来了解一些Spring Boot暴露的有用的属性。
 
 #### DISABLING TEMPLATE CACHING
-If you’ve been tinkering around much with the reading-list application, you may have noticed that changes to any of the Thymeleaf templates aren’t applied unless you restart the application. That’s because Thymeleaf templates are cached by default. This improves application performance because you only compile the templates once, but it’s difficult to make changes on the fly during development.
+#### 禁用模板缓存
 
-You can disable Thymeleaf template caching by setting spring.thymeleaf.cache to false. You can do this when you run the application from the command line by setting it as a command-line argument:
+If you’ve been tinkering around much with the reading-list application, you may have noticed that changes to any of the Thymeleaf templates aren’t applied unless you restart the application. That’s because Thymeleaf templates are cached by default. This improves application performance because you only compile the templates once, but it’s difficult to make changes on the fly during development.  
+如果你的阅读列表应用程序已经经过几番修改，一定已经注意到了，除非重启应用程序，否则对Thymeleaf模板的变更是不会生效的。这是因为Thymeleaf模板默认是被缓存的。这有助于改善应用程序的性能，因为模板只需编译一次，但在开发过程中就不能实时看到变更的效果。
+
+You can disable Thymeleaf template caching by setting spring.thymeleaf.cache to false. You can do this when you run the application from the command line by setting it as a command-line argument:  
+将`spring.thymeleaf.cache`设置为`false`就能禁用Thymeleaf模板缓存。在命令行里运行应用程序时，将其设置为命令行参数即可：
 
 ```
 $ java -jar readinglist-0.0.1-SNAPSHOT.jar --spring.thymeleaf.cache=false
 ```
 
-Or, if you’d rather have caching turned off every time you run the application, you might create an application.yml file with the following lines:
+Or, if you’d rather have caching turned off every time you run the application, you might create an application.yml file with the following lines:  
+或者，如果你希望每次运行时都禁用缓存，可以创建一个application.yml，包含以下内容：
 
 ```
 spring:
@@ -447,18 +454,201 @@ spring:
     cache: false
 ```
 
-You’ll want to make sure that this application.yml file doesn’t follow the application into production, or else your production application won’t realize the performance benefits of template caching.
+You’ll want to make sure that this application.yml file doesn’t follow the application into production, or else your production application won’t realize the performance benefits of template caching.  
+你一定要确保这个文件不会被发布到生产环境，否则生产环境里的应用程序就无法享受模板缓存带来的福利了。
 
-As a developer, you may find it convenient to have template caching turned off all of the time while you make changes to the templates. In that case, you can turn off Thymeleaf caching via an environment variable:
+As a developer, you may find it convenient to have template caching turned off all of the time while you make changes to the templates. In that case, you can turn off Thymeleaf caching via an environment variable:  
+作为开发者，在修改模板时始终关闭缓存实在太方便了。为此，可以通过环境变量来禁用Thymeleaf缓存：
 
 ```
 $ export spring_thymeleaf_cache=false
 ```
 
-Even though we’re using Thymeleaf for our application’s views, template caching can be turned off for Spring Boot’s other supported template options by setting these properties:
+Even though we’re using Thymeleaf for our application’s views, template caching can be turned off for Spring Boot’s other supported template options by setting these properties:  
+我们使用Thymeleaf作为应用程序的视图，Spring Boot支持的其他模板也能关闭模板缓存，设置这些属性就好了：
 
 * spring.freemarker.cache (Freemarker)
 * spring.groovy.template.cache (Groovy templates)
 * spring.velocity.cache (Velocity)
 
-By default, all of these properties are true, meaning that the templates are cached. Setting them to false disables caching.
+* spring.freemarker.cache（Freemarker）
+* spring.groovy.template.cache（Groovy模板）
+* spring.velocity.cache（Velocity）
+
+By default, all of these properties are true, meaning that the templates are cached. Setting them to false disables caching.  
+默认情况下，这些属性都为`true`，也就是开启缓存，将它们设置为`false`即可禁用缓存。
+
+#### CONFIGURING THE EMBEDDED SERVER
+#### 配置嵌入式服务器
+
+When you run a Spring Boot application from the command line (or via Spring Tool Suite), the application starts an embedded server (Tomcat, by default) listening on port 8080. This is fine for most cases, but it can become problematic if you find yourself needing to run multiple applications simultaneously. If all of the applications try to start a Tomcat server on the same port, there’ll be port collisions starting with the second application.  
+从命令行（或者Spring Tool Suite）运行Spring Boot应用程序时，应用程序会启动一个嵌入式的服务器（默认是Tomcat），监听8080端口。大部分情况下这挺好的，但如果你要同时运行多个应用程序可能就会有问题了。要是所有应用程序都试着让Tomcat服务器监听同一个端口，在启动第二个应用程序时就会有冲突。
+
+If, for any reason, you’d rather the server listen on a different port, then all you need to do is set the server.port property. If this is a one-time change, it’s easy enough to do this as a command-line argument:  
+出于各种原因，你想让服务器监听不同的端口，你所要做的就是设置`server.port`属性。要是只改一次，可以用命令行参数：
+
+```
+$ java -jar readinglist-0.0.1-SNAPSHOT.jar --server.port=8000
+```
+
+But if you want the port change to be more permanent, you could set server.port in one of the other supported locations. For instance, you might set it in an application.yml file at the root of the application’s classpath:  
+但如果希望端口变更时间更长一点，可以在其他支持的配置位置上设置`server.port`。例如，把它放在应用程序Classpath根目录的application.yml文件里：
+
+```
+server:
+  port: 8000
+```
+
+Aside from adjusting the server’s port, you might also need to enable the server to serve securely over HTTPS. The first thing you’ll need to do is create a keystore using the JDK’s keytool utility:  
+除了服务器的端口，你还可能希望服务器能提供HTTPS服务。为此，第一步就是用JDK的`keytool`工具来创建一个密钥存储（keystore）：
+
+```
+$ keytool -keystore mykeys.jks -genkey -alias tomcat -keyalg RSA
+```
+
+You’ll be asked several questions about your name and organization, most of which are irrelevant. But when asked for a password, be sure to remember what you choose. For the sake of this example, I chose “letmein” as the password.  
+该工具会询问几个与名字和组织相关的问题，大部分都无关紧要。但在询问密码时，一定要记住你的选择。在本例中，我选择“letmein”作为密码。
+
+Now you just need to set a few properties to enable HTTPS in the embedded server. You could specify them all at the command line, but that would be terribly inconvenient. Instead, you’ll probably set them in application.properties or application.yml. In application.yml, they might look like this:  
+现在只需要设置几个属性就能开启嵌入式服务器的HTTPS服务了。可以把它们都配置在命令行里，但这样太不方便了，可以把它们放在application.properties或application.yml里。在application.yml中，它们可能是这样的：
+
+```
+server:
+  port: 8443
+  ssl:
+    key-store: file:///path/to/mykeys.jks
+    key-store-password: letmein
+    key-password: letmein
+```
+
+Here the server.port property is being set to 8443, a common choice for development HTTPS servers. The server.ssl.key-store property should be set to the path where the keystore file was created. Here it’s shown with a file:// URL to load it from the filesystem, but if you package it within the application JAR file, you should use a classpath: URL to reference it. And both the server.ssl.key-store-password and server.ssl.key-password properties are set to the password that was given when creating the keystore.  
+此处的`server.port`设置为8443，开发环境的HTTPS服务器大多会选这个端口。`server.ssl.key-store`属性指向密钥存储文件的存放路径，这里用了一个file://开头的URL，从文件系统里加载该文件。你也可以把它打在应用程序的JAR文件里，用classpath: URL来引用它。`server.ssl.key-store-password`和`server.ssl.key-password`设置为创建该文件时给定的密码。
+
+With these properties in place, your application should be listening for HTTPS requests on port 8443. (Depending on which browser you’re using, you may encounter a warning about the server not being able to verify its identity. This is nothing to worry about when serving from localhost during development.)  
+有了这些属性，应用程序就能在8443端口上监听HTTPS请求了。（根据你所用的浏览器，可能会出现警告框提示该服务器无法验证其身份。在开发时，访问的是localhost，这没什么好担心的。）
+
+#### CONFIGURING LOGGING
+Most applications provide some form of logging. And even if your application doesn’t log anything directly, the libraries that your application uses will certainly log their activity.
+
+By default, Spring Boot configures logging via Logback (http://logback.qos.ch) to log to the console at INFO level. You’ve probably already seen plenty of INFO-level logging as you’ve run the application and other examples.
+
+>__Swapping out Logback for another logging implementation__
+>Generally speaking, you should never need to switch logging implementations; Log- back should suit you fine. However, if you decide that you’d rather use Log4j or Log4j2, you’ll need to change your dependencies to include the appropriate starter for the logging implementation you want to use and to exclude Logback.
+
+>For Maven builds, you can exclude Logback by excluding the default logging starter transitively resolved by the root starter dependency:
+
+>```
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter</artifactId>
+  <exclusions>
+    <exclusion>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-logging</artifactId>
+    </exclusion>
+  </exclusions>
+</dependency>
+```
+
+>In Gradle, it’s easiest to place the exclusion under the configurations section:
+
+>```
+configurations {
+  all*.exclude group:'org.springframework.boot',
+               module:'spring-boot-starter-logging'
+}
+```
+
+>With the default logging starter excluded, you can now include the starter for the log- ging implementation you’d rather use. With a Maven build you can add Log4j like this:
+
+>```
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-log4j</artifactId>
+</dependency>
+```
+
+>In a Gradle build you can add Log4j like this:
+>```
+compile("org.springframework.boot:spring-boot-starter-log4j")
+```
+
+>If you’d rather use Log4j2, change the artifact from “spring-boot-starter-log4j” to “spring-boot-starter-log4j2”.
+
+For full control over the logging configuration, you can create a logback.xml file at the root of the classpath (in src/main/resources). Here’s an example of a simple log- back.xml file you might use:
+
+```
+<configuration>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>
+        %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+      </pattern>
+    </encoder>
+  </appender>
+
+  <logger name="root" level="INFO"/>
+
+  <root level="INFO">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>
+```
+
+Aside from the pattern used for logging, this Logback configuration is more or less equivalent to the default you’ll get if you have no logback.xml file. But by editing log- back.xml you can gain full control over your application’s log files. The specifics of what can go into logback.xml are outside the scope of this book, so refer to Logback’s documentation for more information.
+
+Even so, the most common changes you’ll make to a logging configuration are to change the logging levels and perhaps to specify a file where the logs should be writ- ten. With Spring Boot configuration properties, you can make those changes without having to create a logback.xml file.
+
+To set the logging levels, you create properties that are prefixed with logging.level, followed by the name of the logger for which you want to set the logging level. For instance, suppose you’d like to set the root logging level to WARN, but log Spring Security logs at DEBUG level. The following entries in application.yml will take care of it for you:
+
+```
+logging:
+  level:
+    root: WARN
+    org:
+      springframework:
+        security: DEBUG
+```
+
+Optionally, you can collapse the Spring Security package name to a single line:
+
+```
+logging:
+  level:
+    root: WARN
+    org.springframework.security: DEBUG
+```
+
+Now suppose that you want to write the log entries to a file named BookWorm.log at /var/logs/. The logging.path and logging.file properties can help with that:
+
+```
+logging:
+  path: /var/logs/
+  file: BookWorm.log
+  level:
+    root: WARN
+    org:
+      springframework:
+        security: DEBUG
+```
+
+Assuming that the application has write permissions to /var/logs/, the log entries will be written to /var/logs/BookWorm.log. By default, the log files will rotate once they hit 10 megabytes in size.
+
+Similarly, all of these properties can be set in application.properties like this:
+
+```
+logging.path=/var/logs/
+logging.file=BookWorm.log
+logging.level.root=WARN
+logging.level.root.org.springframework.security=DEBUG
+```
+
+If you still need full control of the logging configuration, but would rather name the Logback configuration file something other than logback.xml, you can specify a cus- tom name by setting the logging.config property:
+
+```
+logging:
+  config:
+    classpath:logging-config.xml
+```
+
+Although you usually won’t need to change the configuration file’s name, it can come in handy if you want to use two different logging configurations for different runtime profiles (see section 3.2.3).
