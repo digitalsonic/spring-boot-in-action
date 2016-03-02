@@ -528,14 +528,22 @@ With these properties in place, your application should be listening for HTTPS r
 有了这些属性，应用程序就能在8443端口上监听HTTPS请求了。（根据你所用的浏览器，可能会出现警告框提示该服务器无法验证其身份。在开发时，访问的是localhost，这没什么好担心的。）
 
 #### CONFIGURING LOGGING
-Most applications provide some form of logging. And even if your application doesn’t log anything directly, the libraries that your application uses will certainly log their activity.
+#### 配置日志
 
-By default, Spring Boot configures logging via Logback (http://logback.qos.ch) to log to the console at INFO level. You’ve probably already seen plenty of INFO-level logging as you’ve run the application and other examples.
+Most applications provide some form of logging. And even if your application doesn’t log anything directly, the libraries that your application uses will certainly log their activity.  
+大部分应用程序都会提供某种形式的日志，就算你的应用程序不会直接打日志，你所用的库也会记录它们的活动。
 
->__Swapping out Logback for another logging implementation__
->Generally speaking, you should never need to switch logging implementations; Log- back should suit you fine. However, if you decide that you’d rather use Log4j or Log4j2, you’ll need to change your dependencies to include the appropriate starter for the logging implementation you want to use and to exclude Logback.
+By default, Spring Boot configures logging via Logback (http://logback.qos.ch) to log to the console at INFO level. You’ve probably already seen plenty of INFO-level logging as you’ve run the application and other examples.  
+默认情况下，Spring Boot会用Logback（[http://logback.qos.ch](http://logback.qos.ch)）来打日志，并用INFO级别输出到控制台。在运行应用程序和其他例子时，你应该已经看到很多INFO级别的日志了。
 
->For Maven builds, you can exclude Logback by excluding the default logging starter transitively resolved by the root starter dependency:
+>__Swapping out Logback for another logging implementation__  
+__用其他日志实现替换Logback__
+
+>Generally speaking, you should never need to switch logging implementations; Log- back should suit you fine. However, if you decide that you’d rather use Log4j or Log4j2, you’ll need to change your dependencies to include the appropriate starter for the logging implementation you want to use and to exclude Logback.  
+一般来说，你不不需要切换日志实现；Logback能很好地满足你的需要。但是，如果你决定使用Log4j或者Log4j2，只需要修改依赖，引入对应该日志实现的起步依赖，同时排除掉Logback。
+
+>For Maven builds, you can exclude Logback by excluding the default logging starter transitively resolved by the root starter dependency:  
+以Maven为例，排除掉根起步依赖传递引入的默认日志起步依赖，这样就能排除Logback了：
 
 >```
 <dependency>
@@ -550,7 +558,8 @@ By default, Spring Boot configures logging via Logback (http://logback.qos.ch) t
 </dependency>
 ```
 
->In Gradle, it’s easiest to place the exclusion under the configurations section:
+>In Gradle, it’s easiest to place the exclusion under the configurations section:  
+Gradle里，在`configurations`下排除该起步依赖是最简单的办法：
 
 >```
 configurations {
@@ -559,7 +568,8 @@ configurations {
 }
 ```
 
->With the default logging starter excluded, you can now include the starter for the log- ging implementation you’d rather use. With a Maven build you can add Log4j like this:
+>With the default logging starter excluded, you can now include the starter for the log- ging implementation you’d rather use. With a Maven build you can add Log4j like this:  
+排除默认日志的起步依赖后，就可以引入你想用的日志实现的起步依赖了。在Maven里可以这样添加Log4j：
 
 >```
 <dependency>
@@ -568,14 +578,18 @@ configurations {
 </dependency>
 ```
 
->In a Gradle build you can add Log4j like this:
+>In a Gradle build you can add Log4j like this:  
+在Gradle里可以这样添加Log4j：
+
 >```
 compile("org.springframework.boot:spring-boot-starter-log4j")
 ```
 
->If you’d rather use Log4j2, change the artifact from “spring-boot-starter-log4j” to “spring-boot-starter-log4j2”.
+>If you’d rather use Log4j2, change the artifact from “spring-boot-starter-log4j” to “spring-boot-starter-log4j2”.  
+如果你想用Log4j2，把“spring-boot-starter-log4j”改成“spring-boot-starter-log4j2”。
 
-For full control over the logging configuration, you can create a logback.xml file at the root of the classpath (in src/main/resources). Here’s an example of a simple log- back.xml file you might use:
+For full control over the logging configuration, you can create a logback.xml file at the root of the classpath (in src/main/resources). Here’s an example of a simple log- back.xml file you might use:  
+要完全掌握日志配置，可以在Classpath的根目录（src/main/resources）里创建logback.xml文件，下面是一个简单的logback.xml的例子：
 
 ```
 <configuration>
