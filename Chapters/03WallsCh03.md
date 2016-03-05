@@ -609,11 +609,14 @@ For full control over the logging configuration, you can create a logback.xml fi
 </configuration>
 ```
 
-Aside from the pattern used for logging, this Logback configuration is more or less equivalent to the default you’ll get if you have no logback.xml file. But by editing log- back.xml you can gain full control over your application’s log files. The specifics of what can go into logback.xml are outside the scope of this book, so refer to Logback’s documentation for more information.
+Aside from the pattern used for logging, this Logback configuration is more or less equivalent to the default you’ll get if you have no logback.xml file. But by editing logback.xml you can gain full control over your application’s log files. The specifics of what can go into logback.xml are outside the scope of this book, so refer to Logback’s documentation for more information.  
+除了日志格式之外，这个Logback配置和不加logback.xml文件的默认配置差不多。但是，通过编辑logback.xml你可以完全掌控应用程序的日志文件。哪些配置应该放进logback.xml这个话题不在本书的讨论范围内，请参考Logback的文档以了解更多信息。
 
-Even so, the most common changes you’ll make to a logging configuration are to change the logging levels and perhaps to specify a file where the logs should be writ- ten. With Spring Boot configuration properties, you can make those changes without having to create a logback.xml file.
+Even so, the most common changes you’ll make to a logging configuration are to change the logging levels and perhaps to specify a file where the logs should be written. With Spring Boot configuration properties, you can make those changes without having to create a logback.xml file.  
+即使如此，你最常改动的日志配置一般是修改日志级别和指定日志输出的文件。使用了Spring Boot的配置属性后，你可以在不创建logback.xml文件的情况下修改那些配置。
 
-To set the logging levels, you create properties that are prefixed with logging.level, followed by the name of the logger for which you want to set the logging level. For instance, suppose you’d like to set the root logging level to WARN, but log Spring Security logs at DEBUG level. The following entries in application.yml will take care of it for you:
+To set the logging levels, you create properties that are prefixed with logging.level, followed by the name of the logger for which you want to set the logging level. For instance, suppose you’d like to set the root logging level to WARN, but log Spring Security logs at DEBUG level. The following entries in application.yml will take care of it for you:  
+要设置日志级别，你可以创建`logging.level`开头的属性，后面是你想设置日志级别的日志名称。举例来说，假设你要把根日志级别设置为`WARN`，但Spring Security的日志要用`DEBUG`级别。在application.yml里加入以下内容就行了：
 
 ```
 logging:
@@ -625,6 +628,7 @@ logging:
 ```
 
 Optionally, you can collapse the Spring Security package name to a single line:
+另外，你也可以把Spring Security的包名写成一行：
 
 ```
 logging:
@@ -633,7 +637,8 @@ logging:
     org.springframework.security: DEBUG
 ```
 
-Now suppose that you want to write the log entries to a file named BookWorm.log at /var/logs/. The logging.path and logging.file properties can help with that:
+Now suppose that you want to write the log entries to a file named BookWorm.log at /var/logs/. The logging.path and logging.file properties can help with that:  
+现在，假设你想把日志写到位于/var/logs/目录里的BookWorm.log文件里。使用`logging.path`和`loggin.file`属性就行了：
 
 ```
 logging:
@@ -646,9 +651,11 @@ logging:
         security: DEBUG
 ```
 
-Assuming that the application has write permissions to /var/logs/, the log entries will be written to /var/logs/BookWorm.log. By default, the log files will rotate once they hit 10 megabytes in size.
+Assuming that the application has write permissions to /var/logs/, the log entries will be written to /var/logs/BookWorm.log. By default, the log files will rotate once they hit 10 megabytes in size.  
+假设应用程序有/var/logs/的写权限，日志就能被写入/var/logs/BookWorm.log了。默认情况下，日志文件的大小达到10MB时会切分一次。
 
-Similarly, all of these properties can be set in application.properties like this:
+Similarly, all of these properties can be set in application.properties like this:  
+类似的，这些属性也能在application.properties里设置：
 
 ```
 logging.path=/var/logs/
@@ -657,7 +664,8 @@ logging.level.root=WARN
 logging.level.root.org.springframework.security=DEBUG
 ```
 
-If you still need full control of the logging configuration, but would rather name the Logback configuration file something other than logback.xml, you can specify a cus- tom name by setting the logging.config property:
+If you still need full control of the logging configuration, but would rather name the Logback configuration file something other than logback.xml, you can specify a custom name by setting the logging.config property:  
+如果你还是想要完全掌控日志配置，但是又不想用logback.xml作为Logback配置的名字，可以通过`logging.config`属性指定自定义的名字：
 
 ```
 logging:
@@ -665,4 +673,201 @@ logging:
     classpath:logging-config.xml
 ```
 
-Although you usually won’t need to change the configuration file’s name, it can come in handy if you want to use two different logging configurations for different runtime profiles (see section 3.2.3).
+Although you usually won’t need to change the configuration file’s name, it can come in handy if you want to use two different logging configurations for different runtime profiles (see section 3.2.3).  
+虽然一般并不需要改变配置文件的名字，但是如果你想针对不同运行时Profile使用不同的日志配置时（见3.2.3节），这个功能会很有用。
+
+#### CONFIGURING A DATA SOURCE
+#### 配置数据源
+
+At this point, we’re still developing our reading-list application. As such, the embedded H2 database we’re using is perfect for our needs. But once we take the application into production, we may want to consider a more permanent database solution.  
+此时，你还在开发我们的阅读列表应用程序，嵌入式的H2数据库能很好地满足我们的需要。可是一旦要投放到生产环境，我们可能要考虑更持久的数据库解决方案。
+
+Although you could explicitly configure your own DataSource bean, it’s usually not necessary. Instead, simply configure the URL and credentials for your database via properties. For example, if you’re using a MySQL database, your application.yml file might look like this:  
+虽然你可以显式配置自己的`DataSource` Bean，但通常并不用这么做，只需简单地通过属性配置数据库的URL和身份信息就可以了。举例来说，如果你用的是MySQL数据库，你的application.yml文件看起来可能是这样的：
+
+```
+spring:
+  datasource:
+    url: jdbc:mysql://localhost/readinglist
+    username: dbuser
+    password: dbpass
+```
+
+You usually won’t need to specify the JDBC driver; Spring Boot can figure it out from the database URL. But if there is a problem, you can try setting the spring.datasource.driver-class-name property:  
+通常你都无需指定JDBC驱动，Spring Boot会根据数据库URL识别出需要的驱动，但如果识别出问题了，你还可以设置`spring.datasource.driver-class-name`属性：
+
+```
+spring:
+  datasource:
+    url: jdbc:mysql://localhost/readinglist
+    username: dbuser
+    password: dbpass
+    driver-class-name: com.mysql.jdbc.Driver
+```
+
+Spring Boot will use this connection data when auto-configuring the DataSource bean. The DataSource bean will be pooled, using Tomcat’s pooling DataSource if it’s available on the classpath. If not, it will look for and use one of these other connection pool implementations on the classpath:  
+在自动配置`DataSource` Bean的时候Spring Boot会使用这里的连接数据。`DataSource` Bean是一个连接池，如果Classpath里有Tomcat的连接池`DataSource`，那么就会使用这个连接池；否则的话，Spring Boot会在Classpath里查找以下连接池：
+
+* HikariCP
+* Commons DBCP
+* Commons DBCP 2
+
+Although these are the only connection pool options available through auto-configuration, you are always welcome to explicitly configure a DataSource bean to use whatever connection pool implementation you’d like.  
+这里列出的只是自动配置支持的连接池，你还可以自己配置`DataSource` Bean，使用你喜欢的各种连接池。
+
+You may also choose to look up the DataSource from JNDI by setting the spring.datasource.jndi-name property:  
+你也可以设置`spring.datasource.jndi-name`属性，从JNDI里查找`DataSource`：
+
+```
+spring:
+  datasource:
+    jndi-name: java:/comp/env/jdbc/readingListDS
+```
+
+If you set the spring.datasource.jndi-name property, the other datasource connection properties (if set) will be ignored.  
+一旦设置了`spring.datasource.jndi-name`属性，就会忽略其他数据源连接属性（如果设置了的话）。
+
+There are many ways to influence the components that Spring Boot auto-configures by just setting a property or two. But this style of externalized configuration is not limited to the beans configured by Spring Boot. Let’s look at how you can use the very same property configuration mechanism to fine-tune your own application components.  
+有很多影响Spring Boot自动配置组件的方法，只需设置一两个属性即可。但这种配置外置的方法并不局限于Spring Boot配置的Bean，让我们看看如何使用这种属性配置机制来微调自己的应用程序组件。
+
+### 3.2.2 Externally configuring application beans
+### 3.2.2 应用程序Bean的配置外置
+
+Suppose that we wanted to show not just the title of a book on someone’s reading list, but also provide a link to the book on Amazon.com. And, not only do we want to provide a link to the book, but we also want to tag the book to take advantage of Amazon’s associate program so that if anyone purchases a book through one of the links in our application, we’d receive a small payment for the referral.  
+假设我们在某人的阅读列表里不止想要展示图书标题，还要提供该书的Amazon.com的链接。不仅是提供该书的链接，还要标记该书，利用好Amazon的Associate Program，这样如果有人用我们应用程序里的链接买了书，我们还能收到一笔推荐费。
+
+This is simple enough to do by changing the Thymeleaf template to render the title of each book as a link:  
+这很简单，只需修改Thymeleaf模板，以链接的形式来呈现每本书的标题就可以了：
+
+```
+<a th:href="'http://www.amazon.com/gp/product/'
+            + ${book.isbn}
+            + '/tag=habuma-20'"
+   th:text="${book.title}">Title</a>
+```
+
+This will work perfectly. Now if anyone clicks on the link and buys the book, I will get credit for the referral. That’s because “habuma-20” is my Amazon Associate ID. If you’d rather receive credit, you can easily change the value of the tag attribute to your Amazon Associate ID in the Thymeleaf template.  
+这样就好了。现在如果有人点击该链接并购买了本书，我就能得到推荐费了。因为“habuma-20”是我的Amazon Associate ID。如果你也想收到推荐费，可以把Thymeleaf模板中tag的值改成你的Amazon Associate ID。
+
+Even though it’s easy enough to change the Amazon Associate ID in the template, it’s still hard-coded. We’re only linking to Amazon from this one template, but we may later add features to the application where we link to Amazon from several pages. In that case, changes to the Amazon Associate ID would require changes to several places in the application code. That’s why details like this are often better kept out of the code so that they can be managed in a single place.  
+虽然在模板里修改这个值很简单，但毕竟这也算是硬编码。我们现在只在这一个模板里链接到Amazon，但后续可能在为应用程序添加功能时会有更多页面要链接到Amazon。那样的话修改Amazon Associate ID就要改动好几个地方的代码。这就是为什么说类似这种细节的东西最好不要放在代码里，要把它们维护在一个地方。
+
+Rather than hard-code the Amazon Associate ID in the template, we can refer to it as a value in the model:  
+比起在模板里硬编码Amazon Associate ID，我们可以把它变成模型中的一个值：
+
+```
+<a th:href="'http://www.amazon.com/gp/product/'
+            + ${book.isbn}
+            + '/tag=' + ${amazonID}"
+   th:text="${book.title}">Title</a>
+```
+
+In addition, ReadingListController will need to populate the model at the key “amazonID” to contain the Amazon Associate ID. Again, we shouldn’t hard-code it, but instead refer to an instance variable. And that instance variable should be populated from the property configuration. Listing 3.4 shows the new ReadingListController, which populates the model from an injected Amazon Associate ID.  
+此外，`ReadingListController`需要在模型里包含“amazonID”这个键，其中的内容是Amazon Associate ID。同样的道理，我们不应该硬编码这个值，而是引用一个实例变量，这个变量的值应该来自属性配置。代码3.4就是新的`ReadingListController`，它会返回注入的Amazon Associate ID。
+
+__Listing3.4 ReadingListController modified to accept an AmazonID__
+__代码3.4 修改后的ReadingListController，能接受AmazonID__
+
+```
+package readinglist;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("/")
+@ConfigurationProperties(prefix="amazon")
+public class ReadingListController {
+
+  private String associateId;
+
+  private ReadingListRepository readingListRepository;
+
+  @Autowired
+  public ReadingListController(
+        ReadingListRepository readingListRepository) {
+    this.readingListRepository = readingListRepository;
+  }
+
+  public void setAssociateId(String associateId) {
+    this.associateId = associateId;
+  }
+
+  @RequestMapping(method=RequestMethod.GET)
+  public String readersBooks(Reader reader, Model model) {
+    List<Book> readingList =
+               readingListRepository.findByReader(reader);
+    if (readingList != null) {
+      model.addAttribute("books", readingList);
+      model.addAttribute("reader", reader);
+      model.addAttribute("amazonID", associateId);
+    }
+    return "readingList";
+  }
+
+  @RequestMapping(method=RequestMethod.POST)
+  public String addToReadingList(Reader reader, Book book) {
+    book.setReader(reader);
+    readingListRepository.save(book);
+    return "redirect:/";
+  }
+
+}
+```
+
+Inject with properties  
+属性注入
+
+Setter method for associateId  
+`associateId`的Setter方法
+
+Put associateId into model  
+将`associateId`放入模型
+
+As you can see, the ReadingListController now has an associateId property and a corresponding setAssociateId() method through which the property can be set. And readersBooks() now adds the value of associateId to the model under the key “amazonID”.  
+如你所见，`ReadingListController`现在有了一个`associateId`属性，还有对应的`setAssociateId()`方法，用它可以设置该属性。`readersBooks()`现在能通过“amazonID”这个键把`associateId`放入模型。
+
+Perfect! Now the only question is where associateId gets its value.  
+棒极了！现在就剩一个问题——从哪里能取到`associateId`的值。
+
+Notice that ReadingListController is now annotated with @ConfigurationProperties. This specifies that this bean should have its properties injected (via setter methods) with values from configuration properties. More specifically, the prefix attribute specifies that the ReadingListController bean will be injected with properties with an “amazon” prefix.  
+请注意，`ReadingListController`上加了`@ConfigurationProperties`注解，这说明该Bean的属性应该是（通过Setter方法）从配置属性值注入的。更具体一点，`prefix`属性说明`ReadingListController`应该注入带“amazon”前缀的属性。
+
+Putting this all together, we’ve specified that ReadingListController should have its properties injected from “amazon”-prefixed configuration properties. ReadingListController has only one property with a setter method—the associateId property. Therefore, all we need to do to specify the Amazon Associate ID is to add an amazon.associateId property in one of the supported property source locations.  
+综合起来，我们指定了`ReadingListController`的属性应该从“amazon”前缀的配置属性中进行注入。`ReadingListController`只有一个Setter方法——设置`associateId`属性用的。因此，设置Amazon Associate ID唯一要做的就是添加`amazon.associateId`属性，把它加入支持的任意属性源位置里即可。
+
+For example, we could set that property in application.properties:  
+例如，我们可以在application.properties里设置该属性：
+
+```
+amazon.associateId=habuma-20
+```
+
+Or in application.yml:  
+或者在application.yml里：
+
+```
+amazon:
+  associateId: habuma-20
+```
+
+Or we could set it as an environment variable, specify it as a command-line argument, or add it in any of the other places where configuration properties can be set.  
+或者，我们可以将其设置为环境变量，把它作为命令行参数，把它加到任意能够设置配置属性的地方都可以。
+
+>__ENABLING CONFIGURATION PROPERTIES__ Technically, the @ConfigurationProperties annotation won’t work unless you’ve enabled it by adding @EnableConfigurationProperties in one of your Spring configuration classes. This is often unnecessary, however, because all of the configuration classes behind Spring Boot auto-configuration are already annotated with @EnableConfigurationProperties. Therefore, unless you aren’t taking advantage of auto-configuration at all (and why would that ever happen?), you shouldn’t need to explicitly use @EnableConfigurationProperties.  
+__开启配置属性__ 从技术上来说，在向任意Spring配置类添加`@EnableConfigurationProperties`注解前，`@ConfigurationProperties`注解都不会生效。但通常都无需这么做，因为Spring Boot自动配置后面的全部配置类都已经加上了`@EnableConfigurationProperties`注解。因此，无论你是否使用自动配置（那怎么可能？），你都无需显式地添加`@EnableConfigurationProperties`。
+
+It’s also worth noting that Spring Boot’s property resolver is clever enough to treat camel-cased properties as interchangeable with similarly named properties with hyphens or underscores. In other words, a property named amazon.associateId is equivalent to both amazon.associate_id and amazon.associate-id. Feel free to use the naming convention that suits you best.  
+还有一点需要注意，Spring Boot的属性解析器非常聪明，它会自动把驼峰规则的属性和使用连字符或下划线的同名属性关联起来。换句话说，`amazon.associateId`这个属性和`amazon.associate_id`以及`amazon.associate-id`都是等价的。随便去用你习惯的命名规则就好。
+
+#### COLLECTING PROPERTIES IN ONE CLASS
+
+Although annotating ReadingListController with @ConfigurationProperties works fine, it may not be ideal. Doesn’t it seem a little odd that the property prefix is “amazon” when, in fact, ReadingListController has little to do with Amazon? Moreover, future enhancements might present the need to configure properties unrelated to Amazon in ReadingListController.
+
+Instead of capturing the configuration properties in ReadingListController, it may be better to annotate a separate bean with @ConfigurationProperties and let that bean collect all of the configuration properties. AmazonProperties in listing 3.5, for example, captures the Amazon-specific configuration properties.
