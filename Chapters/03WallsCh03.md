@@ -867,7 +867,311 @@ It’s also worth noting that Spring Boot’s property resolver is clever enough
 还有一点需要注意，Spring Boot的属性解析器非常聪明，它会自动把驼峰规则的属性和使用连字符或下划线的同名属性关联起来。换句话说，`amazon.associateId`这个属性和`amazon.associate_id`以及`amazon.associate-id`都是等价的。随便去用你习惯的命名规则就好。
 
 #### COLLECTING PROPERTIES IN ONE CLASS
+#### 在一个类里收集属性
 
-Although annotating ReadingListController with @ConfigurationProperties works fine, it may not be ideal. Doesn’t it seem a little odd that the property prefix is “amazon” when, in fact, ReadingListController has little to do with Amazon? Moreover, future enhancements might present the need to configure properties unrelated to Amazon in ReadingListController.
+Although annotating ReadingListController with @ConfigurationProperties works fine, it may not be ideal. Doesn’t it seem a little odd that the property prefix is “amazon” when, in fact, ReadingListController has little to do with Amazon? Moreover, future enhancements might present the need to configure properties unrelated to Amazon in ReadingListController.  
+虽然在`ReadingListController`上加上`@ConfigurationProperties`注解跑起来没问题，但这并不是一个理想的方案。`ReadingListController`和Amazon没什么关系，但属性的前缀却是“amazon”，看起来难道不奇怪么？再说了，后续的各种功能可能需要在`ReadingListController`里新增配置属性，而它们则和Amazon无关。
 
-Instead of capturing the configuration properties in ReadingListController, it may be better to annotate a separate bean with @ConfigurationProperties and let that bean collect all of the configuration properties. AmazonProperties in listing 3.5, for example, captures the Amazon-specific configuration properties.
+Instead of capturing the configuration properties in ReadingListController, it may be better to annotate a separate bean with @ConfigurationProperties and let that bean collect all of the configuration properties. AmazonProperties in listing 3.5, for example, captures the Amazon-specific configuration properties.  
+与其在`ReadingListController`里加载配置属性，还不如弄一个单独的Bean，为它加上`@ConfigurationProperties`属性，让这个Bean收集所有配置属性。代码3.5里的`AmazonProperties`就是一个例子，用来加载Amazon相关的配置属性。
+
+__Listing 3.5 Capturing configuration properties in a bean__
+__代码3.5 在一个Bean里加载配置属性__
+
+```
+package readinglist;
+
+import org.springframework.boot.context.properties.
+                                   ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+@Component
+@ConfigurationProperties("amazon")
+public class AmazonProperties {
+
+  private String associateId;
+
+  public void setAssociateId(String associateId) {
+    this.associateId = associateId;
+  }
+
+  public String getAssociateId() {
+    return associateId;
+  }
+
+}
+```
+
+Inject with “amazon”-prefixed properties  
+注入带“amazon”前缀的属性
+
+associateId setter method  
+`associateId`的Setter方法
+
+With AmazonProperties capturing the amazon.associateId configuration property, we can change ReadingListController (as shown in listing 3.6) to pull the Amazon Associate ID from an injected AmazonProperties.  
+有了加载`amazon.associateId`配置属性的`AmazonProperties`后，我们可以调整`ReadingListController`（如代码3.6所示），让它从注入的`AmazonProperties`中获取Amazon Associate ID。
+
+__Listing3.6 ReadingListController injected with AmazonProperties__  
+__代码3.6 注入了`AmazonProperties`的`ReadingListController`__
+
+```
+package readinglist;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("/")
+public class ReadingListController {
+
+  private ReadingListRepository readingListRepository;
+  private AmazonProperties amazonProperties;
+
+  @Autowired
+  public ReadingListController(
+      ReadingListRepository readingListRepository,
+      AmazonProperties amazonProperties) {
+    this.readingListRepository = readingListRepository;
+    this.amazonProperties = amazonProperties;
+  }
+
+  @RequestMapping(method=RequestMethod.GET)
+  public String readersBooks(Reader reader, Model model) {
+    List<Book> readingList =
+        readingListRepository.findByReader(reader);
+    if (readingList != null) {
+      model.addAttribute("books", readingList); model.addAttribute("reader", reader); model.addAttribute("amazonID", amazonProperties.getAssociateId());
+    }
+    return "readingList";
+  }
+
+  @RequestMapping(method=RequestMethod.POST)
+  public String addToReadingList(Reader reader, Book book) {
+    book.setReader(reader);
+    readingListRepository.save(book);
+    return "redirect:/";
+  }
+}
+```
+
+Inject AmazonProperties  
+注入`AmazonProperties`
+
+Add Associate ID to model  
+向模型中添加Associate ID
+
+ReadingListController is no longer the direct recipient of configuration properties. Instead, it obtains the information it needs from the injected AmazonProperties bean.  
+`ReadingListController`不再直接加载配置属性，转而通过注入其中的`AmazonProperties` Bean来获取所需的信息。
+
+As we’ve seen, configuration properties are useful for tweaking both auto-configured components as well as the details injected into our own application beans. But what if we need to configure different properties for different deployment environments? Let’s take a look at how to use Spring profiles to set up environment-specific configuration.  
+如你所见，配置属性在调优方面十分有用，不仅是自动配置的组件，还有注入自有应用程序Bean的细节。但如果我们想为不同的部署环境配置不同的属性又该怎么办？让我们看看如何使用Spring的Profile来设置环境特定的配置。
+
+### 3.2.3 Configuring with profiles
+### 3.2.3 使用Profile进行配置
+
+When applications are deployed to different runtime environments, there are usually some configuration details that will differ. The details of a database connection, for instance, are likely different in a development environment than in a quality assurance environment, and different still in a production environment. The Spring Framework introduced support for profile-based configuration in Spring 3.1. Profiles are a type of conditional configuration where different beans or configuration classes are used or ignored based on what profiles are active at runtime.  
+当应用程序需要被部署到不同的运行环境时，一些配置细节通常会有所不同。比如，数据库连接的细节在开发环境和测试环境就会不一样，和生产环境也不一样。Spring Framework在Spring 3.1里开始支持基于Profile的配置。Profile是一种条件化配置，基于运行时激活的Profile，会使用或者忽略不同的Bean或配置类。
+
+For instance, suppose that the security configuration we created in listing 3.1 is for production purposes, but the auto-configured security configuration is fine for development. In that case, we can annotate SecurityConfig with @Profile like this:  
+举例来说，假设我们在代码3.1里创建的安全配置是针对生产环境的，而自动配置的安全配置用在开发环境就刚刚好。在这个例子中，我们就能为`SecurityConfig`加上`@Profile`注解：
+
+```
+@Profile("production")
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+...
+
+}
+```
+
+The @Profile annotation used here requires that the “production” profile be active at runtime for this configuration to be applied. If the “production” profile isn’t active, this configuration will be ignored and, for lack of another overriding security configuration, the auto-configured security configuration will be applied.  
+这里用的`@Profile`注解要求运行时激活“production” Profile，这样才能应用该配置。如果“production” Profile没有激活，就会忽略该配置，此时缺少其他用于覆盖的安全配置，就会应用自动配置的安全配置。
+
+Profiles can be activated by setting the spring.profiles.active property using any of the means available for setting any other configuration property. For example, you could activate the “production” profile by running the application at the command line like this:  
+通过设置`spring.profiles.active`属性就能激活Profile，任意设置配置属性的方式都能用于设置这个值。例如，在命令行里运行应用程序时，可以像这样来激活“production” Profile：
+
+```
+$ java -jar readinglist-0.0.1-SNAPSHOT.jar --
+     spring.profiles.active=production
+```
+
+Or you can add the spring.profiles.active property to application.yml:  
+也可以向application.yml里添加`spring.profiles.active`属性：
+
+```
+spring:
+  profiles:
+    active: production
+```
+
+Or you could set an environment variable and put it in application.properties or use any of the other options mentioned at the beginning of section 3.2.  
+还可以设置环境变量，将其放入application.properties，3.2节开头时提到的各种方法都管用。
+
+But because Spring Boot auto-configures so much for you, it would be very inconvenient to write explicit configuration just so that you can have a place to put @Profile.  
+但因为Spring Boot的自动配置替你做了太多的事情，要找到一个能给你放`@Profile`的地方还真是不怎么方便。
+
+Fortunately, Spring Boot supports profiles for properties set in application.properties and application.yml.  
+幸运的是，Spring Boot支持为application.properties和application.yml里的属性配置Profile。
+
+To demonstrate profiled properties, suppose that you want a different logging configuration in production than in development. In production, you’re only interested in log entries at WARN level or higher, and you want to write the log entries to a log file. In development, however, you only want things logged to the console and at DEBUG level or higher.  
+为了演示区分Profile的属性，假设你希望针对生产环境和开发环境能有不同的日志配置。在生产环境中，你只关心WARN或更高级别的日志项，想把日志写到日志文件里。在开发环境中，你只想把日志打到控制台，记录DEBUG或更高级别。
+
+All you need to do is create separate configurations for each environment. How you do that, however, depends on whether you’re using a properties file configuration or YAML configuration.  
+而你所要做的就是为每个环境分别创建配置。那要怎么做呢？这取决于你是否在用属性文件配置或YAML配置。
+
+#### WORKING WITH PROFILE-SPECIFIC PROPERTIES FILES
+#### 使用特定于Profile的属性文件
+
+If you’re using application.properties to express configuration properties, you can provide profile-specific properties by creating additional properties files named with the pattern “application-{profile}.properties”.  
+如果你正在使用application.properties，可以创建额外的属性文件，遵循“application-{profile}.properties”这种命名格式，这样就能提供特定于Profile的属性了。
+
+For the logging scenario, the development configuration would be in a file named application-development.properties and contain properties for verbose, console-written logging:  
+在日志这个例子里，开发环境的配置可以放在名为application-development.properties的文件里，配置包含日志级别和输出到控制台：
+
+```
+logging.level.root=DEBUG
+```
+
+But for production, application-production.properties would configure logging to be at WARN level and higher and to write to a log file:  
+对于生产环境，application-production.properties会将日志级别设置为WARN或更高级别，并将日志写入日志文件：
+
+```
+logging.path=/var/logs/
+logging.file=BookWorm.log
+logging.level.root=WARN
+```
+
+Meanwhile, any properties that aren’t specific to any profile or that serve as defaults (in case a profile-specific configuration doesn’t specify otherwise) can continue to be expressed in application.properties:  
+与此同时，那些并不特定于哪个Profile或者保持默认值（万一有哪个特定于Profile的配置不指定这个值）的属性可以继续放在application.properties里：
+
+```
+amazon.associateId=habuma-20
+logging.level.root=INFO
+```
+
+#### CONFIGURING WITH MULTI-PROFILE YAML FILES
+#### 使用多Profile YAML文件进行配置
+
+If you’re using YAML for configuration properties, you can follow a similar naming convention as for properties files. That is, you can create YAML files whose names follow a pattern of “application-{profile}.yml” and continue to put non-profiled properties in application.yml.  
+如果你使用YAML来配置属性，可以遵循与配置文件相同的命名规范。即创建“application-{profile}.yml”这样的YAML文件，并将与Profile无关的属性继续放在application.yml里。
+
+But with YAML, you also have the option of expressing configuration properties for all profiles in a single application.yml file. For example, the logging configuration we want can be declared in application.yml like this:  
+但既然用了YAML，你就可以把所有Profile的配置属性都放在一个application.yml文件里。举例来说，我们可以像下面这样来声明日志配置：
+
+```
+logging:
+  level:
+    root: INFO
+
+---
+
+spring:
+  profiles: development
+
+logging:
+  level:
+    root: DEBUG
+
+---
+
+spring:
+  profiles: production
+
+logging:
+  path: /tmp/
+  file: BookWorm.log
+  level:
+    root: WARN
+```
+
+As you can see, this application.yml file is divided into three sections by a set of triple hyphens (---). The second and third sections each specify a value for spring.profiles. This property indicates which profile each section’s properties apply to. The properties defined in the middle section apply to development because it sets spring.profiles to “development”. Similarly, the last section has spring.profiles set to “production”, making it applicable when the “production” profile is active.  
+如你所见，这个application.yml文件被分为三个部分，使用一组三个的连字符（---）作为分隔符。第二段和第三段分别为`spring.profiles`指定了一个值，这个值表示该部分配置应该被应用在哪个Profile里。当中定义的属性应用于开发环境，因为`spring.profiles`设置为“development”。类似的，最后一段的`spring.profile`设置为“production”，在“production” Profile被激活时生效。
+
+The first section, on the other hand, doesn’t specify a value for spring.profiles. Therefore, its properties are common to all profiles or are defaults if the active profile doesn’t otherwise have the properties set.  
+另一方面，第一段并未指定`spring.profiles`，因此这里的属性对全部Profile都生效，或者是对那些未设置该属性的激活Profile生效。
+
+Aside from auto-configuration and external configuration properties, Spring Boot has one other trick up its sleeve to simplify a common development task: it automatically configures a page to be displayed when an application encounters any errors. To wrap up this chapter, we’ll take a look at Spring Boot’s error page and see how to customize it to fit our application.  
+除了自动配置和外置配置属性，Spring Boot还有其他简化常用开发任务的绝招：当应用程序遇到错误时，它自动配置了一个错误页面。在结束本章内容之前，我们会看到Spring Boot的错误页，以及如何定制这个错误页来适应我们的应用程序。
+
+## 3.3 Customizing application error pages
+
+Errors happen. Even some of the most robust applications running in production occasionally run into trouble. Although it’s important to reduce the chance that a user will encounter an error, it’s also important that your application still present itself well when displaying an error page.
+
+In recent years, creative error pages have become an art form. If you’ve ever seen the Star Wars–inspired error page at GitHub.com or DropBox.com’s Escher-like error page, you have an idea of what I’m talking about.
+
+I don’t know if you’ve encountered any errors while trying out the reading-list appli- cation, but if so you’ve probably seen an error page much like the one in figure 3.1.
+
+![图3.1](../Figures/figure-3.1.png)
+
+__Figure 3.1 Spring Boot’s default whitelabel error page.__
+
+Spring Boot offers this “whitelabel” error page by default as part of auto-configuration. Even though it’s slightly more attractive than a stack trace, it doesn’t compare with some of the great works of error art available on the internet. In the interest of presenting your application failures as masterpieces, you’ll probably want to create a custom error page for your applications.
+
+The default error handler that’s auto-configured by Spring Boot looks for a view whose name is “error”. If it can’t find one, it uses its default whitelabel error view shown in figure 3.1. Therefore, the easiest way to customize the error page is to create a custom view that will resolve for a view named “error”.
+
+Ultimately this depends on the view resolvers in place when the error view is being resolved. This includes
+
+* Any bean that implements Spring’s View interface and has a bean ID of “error” (resolved by Spring’s BeanNameViewResolver)
+* A Thymeleaf template named “error.html” if Thymeleaf is configured
+* A FreeMarker template named “error.ftl” if FreeMarker is configured
+* A Velocity template named “error.vm” if Velocity is configured
+* A JSP template named “error.jsp” if using JSP views
+
+Because we’re using Thymeleaf for the reading-list application, all we must do to customize the error page is create a file named “error.html” and place it in the templates folder along with our other application templates. Listing 3.7 shows a simple, yet effective replacement for the default whitelabel error page.
+
+__Listing 3.7 Custom error page for the reading-list application__
+
+```
+<html>
+  <head>
+    <title>Oops!</title>
+    <link rel="stylesheet" th:href="@{/style.css}"></link>
+  </head>
+
+  <html>
+    <div class="errorPage">
+      <span class="oops">Oops!</span><br/>
+      <img th:src="@{/MissingPage.png}"></img>
+      <p>There seems to be a problem with the page you requested
+         (<span th:text="${path}"></span>).</p>
+
+      <p th:text="${'Details: ' + message}"></p>
+    </div>
+  </html>
+
+</html>
+```
+
+Show requested path
+
+Show error details
+
+This custom error template should be named “error.html” and placed in the templates directory for the Thymeleaf template resolver to find. For a typical Maven or Gradle build, that means putting it in src/main/resources/templates so that it’s at the root of the classpath during runtime.
+
+For the most part, this is a simple Thymeleaf template that displays an image and some error text. There are two specific pieces of information that it also renders: the request path of the error and the exception message. These aren’t the only details available to an error page, however. By default, Spring Boot makes the following error attributes available to the error view:
+
+* timestamp—The time that the error occurred
+* status—The HTTP status code
+* error—The error reason
+* exception—The class name of the exception
+* message—The exception message (if the error was caused by an exception)
+* errors—Any errors from a BindingResult exception (if the error was caused by an exception)
+* trace—The exception stack trace (if the error was caused by an exception)
+* path—The URL path requested when the error occurred
+
+Some of these attributes, such as path, are useful when communicating the problem to the user. Others, such as trace, should be used sparingly, be hidden, or be used cleverly on the error page to keep the error page as user-friendly as possible.
+
+You’ll also notice that the template references an image named MissingPage.png. The actual content of the image is unimportant, so feel free to flex your graphic design muscles and come up with an image that suits you. But be sure to put it in src/ main/resources/static or src/main/resources/public so that it can be served when the application is running.
+
+![图3.2](../Figures/figure-3.2.png)
+
+__Figure 3.2 A custom error page exhibits style in the face of failure__
+
+Figure 3.2 shows what the user will see when an error occurs. It may not quite be a work of art, but I think it raises the aesthetics of the application’s error page a notch or two.
