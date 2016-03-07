@@ -1101,32 +1101,47 @@ Aside from auto-configuration and external configuration properties, Spring Boot
 除了自动配置和外置配置属性，Spring Boot还有其他简化常用开发任务的绝招：当应用程序遇到错误时，它自动配置了一个错误页面。在结束本章内容之前，我们会看到Spring Boot的错误页，以及如何定制这个错误页来适应我们的应用程序。
 
 ## 3.3 Customizing application error pages
+## 3.3 定制应用程序错误页面
 
-Errors happen. Even some of the most robust applications running in production occasionally run into trouble. Although it’s important to reduce the chance that a user will encounter an error, it’s also important that your application still present itself well when displaying an error page.
+Errors happen. Even some of the most robust applications running in production occasionally run into trouble. Although it’s important to reduce the chance that a user will encounter an error, it’s also important that your application still present itself well when displaying an error page.  
+错误总是会发生的，即使是那些运行在生产环境里的最健壮的应用程序偶尔也会遇到麻烦。虽然减少用户遇到错误的概率很重要，但让应用程序展现一个好的错误页面也同样重要。
 
-In recent years, creative error pages have become an art form. If you’ve ever seen the Star Wars–inspired error page at GitHub.com or DropBox.com’s Escher-like error page, you have an idea of what I’m talking about.
+In recent years, creative error pages have become an art form. If you’ve ever seen the Star Wars–inspired error page at GitHub.com or DropBox.com’s Escher-like error page, you have an idea of what I’m talking about.  
+近些年来，富有创意的错误页已经成为了一种艺术形式。如果你曾见到过Github.com的星球大战错误页或者是Dropbox.com的Escher立方体错误页的话，你就能明白我在说什么了。
 
-I don’t know if you’ve encountered any errors while trying out the reading-list appli- cation, but if so you’ve probably seen an error page much like the one in figure 3.1.
+I don’t know if you’ve encountered any errors while trying out the reading-list application, but if so you’ve probably seen an error page much like the one in figure 3.1.  
+我不知道你在使用阅读列表应用程序时有没有碰到错误，如果有的话，你看到的页面应该和图3.1里的很像。
 
 ![图3.1](../Figures/figure-3.1.png)
 
-__Figure 3.1 Spring Boot’s default whitelabel error page.__
+__Figure 3.1 Spring Boot’s default whitelabel error page.__  
+__图3.1 Spring Boot的默认白标错误页__
 
-Spring Boot offers this “whitelabel” error page by default as part of auto-configuration. Even though it’s slightly more attractive than a stack trace, it doesn’t compare with some of the great works of error art available on the internet. In the interest of presenting your application failures as masterpieces, you’ll probably want to create a custom error page for your applications.
+Spring Boot offers this “whitelabel” error page by default as part of auto-configuration. Even though it’s slightly more attractive than a stack trace, it doesn’t compare with some of the great works of error art available on the internet. In the interest of presenting your application failures as masterpieces, you’ll probably want to create a custom error page for your applications.  
+Spring Boot默认提供了这个“白标”（whitelabel）错误页，它是自动配置的一部分。虽然这比错误跟踪栈要好一点，但和网上那些伟大的错误页艺术品却不可同日而语。为了让你的应用程序故障页变成大师作品，你需要为应用程序创建一个自定义的错误页。
 
-The default error handler that’s auto-configured by Spring Boot looks for a view whose name is “error”. If it can’t find one, it uses its default whitelabel error view shown in figure 3.1. Therefore, the easiest way to customize the error page is to create a custom view that will resolve for a view named “error”.
+The default error handler that’s auto-configured by Spring Boot looks for a view whose name is “error”. If it can’t find one, it uses its default whitelabel error view shown in figure 3.1. Therefore, the easiest way to customize the error page is to create a custom view that will resolve for a view named “error”.  
+Spring Boot自动配置的默认错误处理器会查找名为“error”的视图，如果找不到就用默认的白标错误视图，如图3.1所示。因此，最简单的方法就是创建一个自定义视图，解析出的视图名为“error”。
 
-Ultimately this depends on the view resolvers in place when the error view is being resolved. This includes
+Ultimately this depends on the view resolvers in place when the error view is being resolved. This includes  
+它最终依赖错误视图解析时的视图解析器，包括：
 
-* Any bean that implements Spring’s View interface and has a bean ID of “error” (resolved by Spring’s BeanNameViewResolver)
-* A Thymeleaf template named “error.html” if Thymeleaf is configured
-* A FreeMarker template named “error.ftl” if FreeMarker is configured
-* A Velocity template named “error.vm” if Velocity is configured
-* A JSP template named “error.jsp” if using JSP views
+* Any bean that implements Spring’s View interface and has a bean ID of “error” (resolved by Spring’s BeanNameViewResolver)  
+实现了Spring的`View`接口的Bean，它的Bean ID是“error”（由Spring的`BeanNameViewResolver`所解析）
+* A Thymeleaf template named “error.html” if Thymeleaf is configured  
+如果配置了Thymeleaf，则是名为“error.html”的Thymeleaf模板
+* A FreeMarker template named “error.ftl” if FreeMarker is configured  
+如果配置了FreeMarker，则是名为“error.ftl”的FreeMarker模板
+* A Velocity template named “error.vm” if Velocity is configured  
+如果配置了Velocity，则是名为“error.vm”的Velocity模板
+* A JSP template named “error.jsp” if using JSP views  
+如果是用JSP视图，则是名为“error.jsp”的JSP模板
 
-Because we’re using Thymeleaf for the reading-list application, all we must do to customize the error page is create a file named “error.html” and place it in the templates folder along with our other application templates. Listing 3.7 shows a simple, yet effective replacement for the default whitelabel error page.
+Because we’re using Thymeleaf for the reading-list application, all we must do to customize the error page is create a file named “error.html” and place it in the templates folder along with our other application templates. Listing 3.7 shows a simple, yet effective replacement for the default whitelabel error page.  
+因为我们的阅读列表应用程序使用了Thymeleaf，所以我们要做的就是创建一个名为“error.html”的文件，把它和其他的应用程序模板一起放在模板文件夹里。代码3.7是一个简单有效的错误页，可以用来代替默认的白标错误页。
 
-__Listing 3.7 Custom error page for the reading-list application__
+__Listing 3.7 Custom error page for the reading-list application__  
+__代码3.7 阅读列表应用程序的自定义错误页__
 
 ```
 <html>
@@ -1149,9 +1164,11 @@ __Listing 3.7 Custom error page for the reading-list application__
 </html>
 ```
 
-Show requested path
+Show requested path  
+显示请求路径
 
-Show error details
+Show error details  
+显示错误明细
 
 This custom error template should be named “error.html” and placed in the templates directory for the Thymeleaf template resolver to find. For a typical Maven or Gradle build, that means putting it in src/main/resources/templates so that it’s at the root of the classpath during runtime.
 
