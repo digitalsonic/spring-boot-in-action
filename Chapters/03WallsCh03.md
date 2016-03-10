@@ -1170,9 +1170,11 @@ Show requested path
 Show error details  
 显示错误明细
 
-This custom error template should be named “error.html” and placed in the templates directory for the Thymeleaf template resolver to find. For a typical Maven or Gradle build, that means putting it in src/main/resources/templates so that it’s at the root of the classpath during runtime.
+This custom error template should be named “error.html” and placed in the templates directory for the Thymeleaf template resolver to find. For a typical Maven or Gradle build, that means putting it in src/main/resources/templates so that it’s at the root of the classpath during runtime.  
+这个自定义的错误模板应该命名为“error.html”，放在模板目录里，这样Thymeleaf模板解析器才能找到它。在典型的Maven或Gradle项目里，这就意味着要把该文件放在src/main/resources/templates中，运行时它就在Classpath的根目录里。
 
-For the most part, this is a simple Thymeleaf template that displays an image and some error text. There are two specific pieces of information that it also renders: the request path of the error and the exception message. These aren’t the only details available to an error page, however. By default, Spring Boot makes the following error attributes available to the error view:
+For the most part, this is a simple Thymeleaf template that displays an image and some error text. There are two specific pieces of information that it also renders: the request path of the error and the exception message. These aren’t the only details available to an error page, however. By default, Spring Boot makes the following error attributes available to the error view:  
+基本上，这个简单的Thymeleaf模板就是显示一张图片和一些错误文案。其中有两处特别的信息需要呈现：错误的请求路径和异常消息。但这还不是错误页上的全部细节，默认情况下，Spring Boot会为错误视图提供如下错误属性：
 
 * timestamp—The time that the error occurred
 * status—The HTTP status code
@@ -1183,12 +1185,38 @@ For the most part, this is a simple Thymeleaf template that displays an image an
 * trace—The exception stack trace (if the error was caused by an exception)
 * path—The URL path requested when the error occurred
 
-Some of these attributes, such as path, are useful when communicating the problem to the user. Others, such as trace, should be used sparingly, be hidden, or be used cleverly on the error page to keep the error page as user-friendly as possible.
+* `timestamp`——错误发生的时间
+* `status`——HTTP状态码
+* `error`——错误原因
+* `exception`——异常的类名
+* `message`——异常消息（如果这个错误是由异常引起的）
+* `errors`——`BindingResult`异常里的各种错误（如果这个错误是由异常引起的）
+* `trace`——异常跟踪栈（如果这个错误是由异常引起的）
+* `path`——错误发生时请求的URL路径
 
-You’ll also notice that the template references an image named MissingPage.png. The actual content of the image is unimportant, so feel free to flex your graphic design muscles and come up with an image that suits you. But be sure to put it in src/ main/resources/static or src/main/resources/public so that it can be served when the application is running.
+Some of these attributes, such as path, are useful when communicating the problem to the user. Others, such as trace, should be used sparingly, be hidden, or be used cleverly on the error page to keep the error page as user-friendly as possible.  
+其中某些属性，比如`path`，在向用户交待问题时还是很有用的。其他的，比如`trace`，用起来要保守一点，将其隐藏或者是用的聪明点，让错误页尽可能对用户友好一些。
+
+You’ll also notice that the template references an image named MissingPage.png. The actual content of the image is unimportant, so feel free to flex your graphic design muscles and come up with an image that suits you. But be sure to put it in src/main/resources/static or src/main/resources/public so that it can be served when the application is running.  
+请注意，模板里还引用了一张名为MissingPage.png的图片。图片的实际内容并不重要，所以挑选适合你的图片就好了，但请一定将它放在src/main/resources/static或src/main/resources/public里，这样应用程序运行时才能找到它。
 
 ![图3.2](../Figures/figure-3.2.png)
 
-__Figure 3.2 A custom error page exhibits style in the face of failure__
+__Figure 3.2 A custom error page exhibits style in the face of failure__  
+__图3.2 遇到错误时展现的自定义错误页__
 
-Figure 3.2 shows what the user will see when an error occurs. It may not quite be a work of art, but I think it raises the aesthetics of the application’s error page a notch or two.
+Figure 3.2 shows what the user will see when an error occurs. It may not quite be a work of art, but I think it raises the aesthetics of the application’s error page a notch or two.  
+图3.2是发生错误时用户会看到的页面。虽然它算不上一件艺术品，但还是把应用程序错误页的艺术水准稍微提高了那么一点。
+
+## 3.4 Summary
+## 3.4 小结
+
+Spring Boot eliminates much of the boilerplate configuration that’s often required in Spring applications. But by letting Spring Boot do all of the configuration, you’re relying on it to configure components in ways that suit your application. When autoconfiguration doesn’t fit your needs, Spring Boot allows you to override and fine-tune the configuration it provides.
+
+Overriding auto-configuration is a simple matter of writing explicit Spring configuration as you would in the absence of Spring Boot. Spring Boot’s auto-configuration is designed to favor application-provided configuration over its own auto-configuration.
+
+Even when auto-configuration is suitable, you may need to adjust a few details. Spring Boot enables several property resolvers that let you tweak configuration by setting properties as environment variables, in properties files, in YAML files, and in several other ways. This same property-based configuration model can even be applied to application-defined components, enabling value-injection into bean properties from external configuration sources.
+
+Spring Boot also auto-configures a simple whitelabel error page. Although it’s more user-friendly than an exception and stack trace, the whitelabel error page still leaves a lot to be desired aesthetically. Fortunately, Spring Boot offers several options for customizing or completely replacing the whitelabel error page to suit an application’s specific style.
+
+Now that we’ve written a complete application with Spring Boot, we should verify that it actually does what we expect it to do. That is, instead of poking at it in the web browser manually, we should write some automated and repeatable tests that exercise the application and prove that it’s working correctly. That’s exactly what we’ll do in the next chapter.
