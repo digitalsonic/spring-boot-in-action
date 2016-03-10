@@ -1211,12 +1211,17 @@ Figure 3.2 shows what the user will see when an error occurs. It may not quite b
 ## 3.4 Summary
 ## 3.4 小结
 
-Spring Boot eliminates much of the boilerplate configuration that’s often required in Spring applications. But by letting Spring Boot do all of the configuration, you’re relying on it to configure components in ways that suit your application. When autoconfiguration doesn’t fit your needs, Spring Boot allows you to override and fine-tune the configuration it provides.
+Spring Boot eliminates much of the boilerplate configuration that’s often required in Spring applications. But by letting Spring Boot do all of the configuration, you’re relying on it to configure components in ways that suit your application. When auto-configuration doesn’t fit your needs, Spring Boot allows you to override and fine-tune the configuration it provides.  
+Spring Boot消除了Spring应用程序中经常要用到的很多样板式的配置。让Spring Boot处理全部配置，你可以仰仗它来配置那些适合你应用程序的组件。当自动配置无法满足需求时，Spring Boot允许你覆盖并微调它提供的配置。
 
-Overriding auto-configuration is a simple matter of writing explicit Spring configuration as you would in the absence of Spring Boot. Spring Boot’s auto-configuration is designed to favor application-provided configuration over its own auto-configuration.
+Overriding auto-configuration is a simple matter of writing explicit Spring configuration as you would in the absence of Spring Boot. Spring Boot’s auto-configuration is designed to favor application-provided configuration over its own auto-configuration.  
+覆盖自动配置其实很简单，就是显式地编写那些没有Spring Boot时你要做的Spring配置。Spring Boot的自动配置被设计为优先使用应用程序提供的配置，然后才轮到自己的自动配置。
 
-Even when auto-configuration is suitable, you may need to adjust a few details. Spring Boot enables several property resolvers that let you tweak configuration by setting properties as environment variables, in properties files, in YAML files, and in several other ways. This same property-based configuration model can even be applied to application-defined components, enabling value-injection into bean properties from external configuration sources.
+Even when auto-configuration is suitable, you may need to adjust a few details. Spring Boot enables several property resolvers that let you tweak configuration by setting properties as environment variables, in properties files, in YAML files, and in several other ways. This same property-based configuration model can even be applied to application-defined components, enabling value-injection into bean properties from external configuration sources.  
+即使在自动配置合适的时候，你还是需要调整一些细节。Spring Boot会开启多个属性解析器，让你通过环境变量、属性文件、YAML文件和多种方式来设置属性，以此微调配置。这套基于属性的配置模型也能用于应用程序自己定义的组件，可以从外部配置源加载属性并注入到Bean里。
 
-Spring Boot also auto-configures a simple whitelabel error page. Although it’s more user-friendly than an exception and stack trace, the whitelabel error page still leaves a lot to be desired aesthetically. Fortunately, Spring Boot offers several options for customizing or completely replacing the whitelabel error page to suit an application’s specific style.
+Spring Boot also auto-configures a simple whitelabel error page. Although it’s more user-friendly than an exception and stack trace, the whitelabel error page still leaves a lot to be desired aesthetically. Fortunately, Spring Boot offers several options for customizing or completely replacing the whitelabel error page to suit an application’s specific style.  
+Spring Boot还自动配置了一个简单的白标错误页，虽然它比异常和跟踪栈要更友好一点，但在艺术性方面这个错误页还有很大的提升空间。幸运的是Spring Boot提供了好几种选项来自定义或完全替换这个白标错误页，让它能满足应用程序的特定风格。
 
-Now that we’ve written a complete application with Spring Boot, we should verify that it actually does what we expect it to do. That is, instead of poking at it in the web browser manually, we should write some automated and repeatable tests that exercise the application and prove that it’s working correctly. That’s exactly what we’ll do in the next chapter.
+Now that we’ve written a complete application with Spring Boot, we should verify that it actually does what we expect it to do. That is, instead of poking at it in the web browser manually, we should write some automated and repeatable tests that exercise the application and prove that it’s working correctly. That’s exactly what we’ll do in the next chapter.  
+现在我们已经用Spring Boot写了一个完整的应用程序，验证了它能满足我们的预期。除了自己在浏览器里手工点点之外，我们应该要写一些自动化、可重复运行的测试来检查这个应用程序，证明它能正确运作。这也是我们下一章里要做的事。
