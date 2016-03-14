@@ -114,10 +114,13 @@ Speaking of web testing, that’s what we’re going to do next.
 说到Web测试，正式我们接下来要做的。
 
 ## 4.2 Testing web applications
+## 4.2 测试Web应用程序
 
-One of the nice things about Spring MVC is that it promotes a programming model around plain old Java objects (POJOs) that are annotated to declare how they should process web requests. This programming model is not only simple, it enables you to treat controllers just as you would any other component in your application. You might even be tempted to write tests against your controller that test them as POJOs.
+One of the nice things about Spring MVC is that it promotes a programming model around plain old Java objects (POJOs) that are annotated to declare how they should process web requests. This programming model is not only simple, it enables you to treat controllers just as you would any other component in your application. You might even be tempted to write tests against your controller that test them as POJOs.  
+Spring MVC有一点好处，它的编程模型是围绕POJO（plain old Java object）展开的，在POJO上添加注解声明如何处理Web请求。这种编程模型不仅简单，还让你能像对待应用程序中的其他组件一样来对待这些控制器。你还可以针对这些控制器编写测试，就像测试POJO一样。
 
-For instance, consider the addToReadingList() method from ReadingListController:
+For instance, consider the addToReadingList() method from ReadingListController:  
+举例来说，考虑`ReadingListController`里的`addToReadingList()`方法：
 
 ```
 @RequestMapping(method=RequestMethod.POST)
@@ -128,15 +131,22 @@ public String addToReadingList(Book book) {
 }
 ```
 
-If you were to disregard the @RequestMapping method, you’d be left with a rather basic Java method. It wouldn’t take much to imagine a test that provides a mock implementation of ReadingListRepository, calls addToReadingList() directly, and asserts the return value and verifies the call to the repository’s save() method.
+If you were to disregard the @RequestMapping method, you’d be left with a rather basic Java method. It wouldn’t take much to imagine a test that provides a mock implementation of ReadingListRepository, calls addToReadingList() directly, and asserts the return value and verifies the call to the repository’s save() method.  
+如果忽略`@RequestMapping`注解，你得到的就是一个相当基础的Java方法。你立马就能想到这样一个测试，提供一个`ReadingListRepository`的模拟实现，直接调用`addToReadingList()`，判断返回值并验证对`ReadingListRepository`的`save()`方法有过调用。
 
-The problem with such a test is that it only tests the method itself. While that’s better than no test at all, it fails to test that the method handles a POST request to /readingList. It also fails to test that form fields are properly bound to the Book parameter. And although you could assert that the returned String contains a certain value, it would be impossible to test definitively that the request is, in fact, redirected to /readingList after the method is finished.
+The problem with such a test is that it only tests the method itself. While that’s better than no test at all, it fails to test that the method handles a POST request to /readingList. It also fails to test that form fields are properly bound to the Book parameter. And although you could assert that the returned String contains a certain value, it would be impossible to test definitively that the request is, in fact, redirected to /readingList after the method is finished.  
+该测试的问题是它仅仅测试了方法本身，当然，这要比没有测试好一点。它没有测试该方法要处理/readingList的POST请求，也没有测试表单域绑定到`Book`参数。虽然你可以判断返回的`String`包含特定值，但没法明确测试请求在方法处理完之后被重定向到/readingList。
 
-To properly test a web application, you need a way to throw actual HTTP requests at it and assert that it processes those requests correctly. Fortunately, there are two options available to Spring Boot application developers that make those kinds of tests possible:
+To properly test a web application, you need a way to throw actual HTTP requests at it and assert that it processes those requests correctly. Fortunately, there are two options available to Spring Boot application developers that make those kinds of tests possible:  
+要恰当地测试一个Web应用程序，你需要扔些实际的HTTP请求给它，确认它能正确地处理那些请求。幸运的是，Spring Boot开发者有两个可选的方案能实现这类测试：
 
 * Spring Mock MVC—Enables controllers to be tested in a mocked approximation of a servlet container without actually starting an application server
 * Web integration tests—Actually starts the application in an embedded servlet container (such as Tomcat or Jetty), enabling tests that exercise the application in a real application server
+* Spring Mock MVC——能在一个近似真是的模拟Servlet容器里测试控制器，而实际并不用启动一个应用服务器
+* Web集成测试——在嵌入式Servlet容器（比如Tomcat或Jetty）里启动应用程序，在真正的应用服务器里执行测试
 
-Each of these kinds of tests has its share of pros and cons. Obviously, starting a server will result in a slower test than mocking a servlet container. But there’s no doubt that server-based tests are closer to the real-world environment that they’ll be running in when deployed to production.
+Each of these kinds of tests has its share of pros and cons. Obviously, starting a server will result in a slower test than mocking a servlet container. But there’s no doubt that server-based tests are closer to the real-world environment that they’ll be running in when deployed to production.  
+这两种方法各有利弊。很明显，启动一个应用服务器会比模拟Servlet容器要慢一些，但毫无疑问基于服务器的测试会更接近真实环境，更接近部署到生产环境运行的情况。
 
-We’re going to start by looking at how you can test a web application using Spring’s Mock MVC test framework. Then, in section 4.3, you’ll see how to write tests against an application that’s actually running in an application server.
+We’re going to start by looking at how you can test a web application using Spring’s Mock MVC test framework. Then, in section 4.3, you’ll see how to write tests against an application that’s actually running in an application server.  
+接下来，你会看到如何使用Spring Mock MVC测试框架来测试Web应用程序。然后，在4.3节里你会看到如何针对运行在应用服务器里的应用程序编写测试。
