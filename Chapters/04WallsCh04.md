@@ -150,3 +150,114 @@ Each of these kinds of tests has its share of pros and cons. Obviously, starting
 
 We’re going to start by looking at how you can test a web application using Spring’s Mock MVC test framework. Then, in section 4.3, you’ll see how to write tests against an application that’s actually running in an application server.  
 接下来，你会看到如何使用Spring Mock MVC测试框架来测试Web应用程序。然后，在4.3节里你会看到如何针对运行在应用服务器里的应用程序编写测试。
+
+### 4.2.1 Mocking Spring MVC
+### 4.2.1 模拟Spring MVC
+
+Since Spring 3.2, the Spring Framework has had a very useful facility for testing web applications by mocking Spring MVC. This makes it possible to perform HTTP requests against a controller without running the controller within an actual servlet container. Instead, Spring’s Mock MVC framework mocks enough of Spring MVC to make it almost as though the application is running within a servlet container … but it’s not.  
+自Spring 3.2开始，Spring Framework就有一套非常有用的Web应用程序测试工具，它就能用来模拟Spring MVC，能在不需要真实Servlet容器的情况下对控制器发送HTTP请求。Spring的Mock MVC框架模拟了很多Spring MVC的功能，让它几乎能和运行在Servlet容器里的应用程序一样，而实际它并没跑在容器里。
+
+To set up a Mock MVC in your test, you can use MockMvcBuilders. This class offers two static methods:  
+要在你的测试里设置Mock MVC，可以使用`MockMvcBuilders`，该类提供了两个静态方法：
+
+* standaloneSetup()—Builds a Mock MVC to serve one or more manually created and configured controllers
+* webAppContextSetup()—Builds a Mock MVC using a Spring application context, which presumably includes one or more configured controllers
+* standaloneSetup()——构建一个Mock MVC，提供一个或多个手工创建并配置的控制器
+* webAppContextSetup()——使用Spring应用程序上下文来构建Mock MVC，该上下文里可以包含一个或多个配置好的控制器
+
+The primary difference between these two options is that standaloneSetup() expects you to manually instantiate and inject the controllers you want to test, whereas webAppContextSetup() works from an instance of WebApplicationContext, which itself was probably loaded by Spring. The former is slightly more akin to a unit test in that you’ll likely only use it for very focused tests around a single controller. The latter, however, lets Spring load your controllers as well as their dependencies for a fullblown integration test.  
+两者的主要区别在于`standaloneSetup()`希望你手工初始化并注入你要测试的控制器，而`webAppContextSetup()`则基于一个`WebApplicationContext`的实例，通常它是由Spring加载的。前者同单元测试更加接近，你可能只想让它聚焦于单一控制器的测试。而后者让Spring来加载控制器及其依赖，以便进行集成测试。
+
+For our purposes, we’re going to use webAppContextSetup() so that we can test the ReadingListController as it has been instantiated and injected from the application context that Spring Boot has auto-configured.  
+对我们而言，我们要用`webAppContextSetup()`，Spring完成了`ReadingListController`的初始化并从Spring Boot自动配置的应用程序上下文里将其注入进来，我们直接对其进行测试。
+
+The webAppContextSetup() takes a WebApplicationContext as an argument. Therefore, we’ll need to annotate the test class with @WebAppConfiguration and use
+@Autowired to inject the WebApplicationContext into the test as an instance variable. The following listing shows the starting point for our Mock MVC tests.  
+`webAppContextSetup()`接受一个`WebApplicationContext`参数。因此，我们需要为测试类加上'@WebAppConfiguration'注解，使用`@Autowired`将`WebApplicationContext`作为实例变量注入测试类。以下代码演示了Mock MVC测试的执行入口。
+
+__Listing 4.2 Creating a Mock MVC for integration testing controllers__  
+__代码4.2 为集成测试控制器创建Mock MVC__
+
+```
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(
+             classes = ReadingListApplication.class)
+@WebAppConfiguration
+public class MockMvcWebTests {
+  @Autowired
+  private WebApplicationContext webContext;
+
+  private MockMvc mockMvc;
+
+  @Before
+  public void setupMockMvc() {
+    mockMvc = MockMvcBuilders
+            .webAppContextSetup(webContext)
+            .build();
+  }
+}
+```
+
+Enables web context testing  
+开启Web上下文测试
+
+Injects WebApplicationContext  
+注入`WebApplicationContext`
+
+Sets up MockMvc  
+设置`MockMvc`
+
+The @WebAppConfiguration annotation declares that the application context created by SpringJUnit4ClassRunner should be a WebApplicationContext (as opposed to a
+basic non-web ApplicationContext).  
+`@WebAppConfiguration`注解声明了由`SpringJUnit4ClassRunner`创建的应用程序上下文应该是一个`WebApplicationContext`（相对于基本的非Web的`ApplicationContext`）。
+
+The setupMockMvc() method is annotated with JUnit’s @Before, indicating that it should be executed before any test methods. It passes the injected WebApplicationContext into the webAppContextSetup() method and then calls build() to produce a MockMvc instance, which is assigned to an instance variable for test methods to use.  
+`setupMockMvc()`方法上添加了JUnit的`@Before`注解，表明它应该在测试方法之前执行。它将`WebApplicationContext`注入`webAppContextSetup()`方法，然后调用`build()`产生了一个`MockMvc`实例，该实例被赋给了一个实例变量以供测试方法使用。
+
+Now that we have a MockMvc, we’re ready to write some test methods. Let’s start with a simple test method that performs an HTTP GET request against /readingList and asserts that the model and view meet our expectations. The following homePage() test method does what we need:  
+现在我们有了一个`MockMvc`，已经可以开始写测试方法了。让我们先写个简单的测试方法，向/readingList发送一个HTTP GET请求，判断模型和视图是否满足我们的期望。下面的`homePage()`测试方法就是我们所需要的：
+
+```
+@Test
+public void homePage() throws Exception {
+  mockMvc.perform(MockMvcRequestBuilders.get("/readingList"))
+          .andExpect(MockMvcResultMatchers.status().isOk())
+          .andExpect(MockMvcResultMatchers.view().name("readingList"))
+          .andExpect(MockMvcResultMatchers.model().attributeExists("books"))
+          .andExpect(MockMvcResultMatchers.model().attribute("books",
+                   Matchers.is(Matchers.empty())));
+}
+```
+
+As you can see, a lot of static methods are being used in this test method, including static methods from Spring’s MockMvcRequestBuilders and MockMvcResultMatchers, as well as from the Hamcrest library’s Matchers. Before we dive into the details of this test method, let’s add a few static imports so that the code is easier to read:  
+如你所见，在这个测试方法里我们使用了很多静态方法，包括Spring的`MockMvcRequestBuilders`和`MockMvcResultMatchers`里的静态方法，还有Hamcrest库的`Matchers`里的静态方法。在我们深入探讨这个测试方法前，先加点静态`import`，这样代码看起来更清爽一些：
+
+```
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.request.
+        ➥ MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.
+        ➥ MockMvcResultMatchers.*;
+```
+
+With those static imports in place, the test method can be rewritten like this:  
+有了这些静态`import`后，测试方法可以稍作调整：
+
+```
+@Test
+public void homePage() throws Exception {
+mockMvc.perform(get("/readingList"))
+        .andExpect(status().isOk())
+        .andExpect(view().name("readingList"))
+        .andExpect(model().attributeExists("books"))
+        .andExpect(model().attribute("books", is(empty())));
+}
+```
+
+Now the test method almost reads naturally. First it performs a GET request against /readingList. Then it expects that the request is successful (isOk() asserts an HTTP 200 response code) and that the view has a logical name of readingList. It also asserts that the model contains an attribute named books, but that attribute is an empty collection. It’s all very straightforward.
+
+The main thing to note here is that at no time is the application deployed to a web server. Instead it’s run within a mocked out Spring MVC, just capable enough to handle the HTTP requests we throw at it via the MockMvc instance.
+
+Pretty cool, huh?
+
+Let’s try one more test method. This time we’ll make it a bit more interesting by actually sending an HTTP POST request to post a new book. We should expect that after the POST request is handled, the request will be redirected back to /readingList and that the books attribute in the model will contain the newly added book. The following listing shows how we can use Spring’s Mock MVC to do this kind of test.
