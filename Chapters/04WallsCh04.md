@@ -254,10 +254,170 @@ mockMvc.perform(get("/readingList"))
 }
 ```
 
-Now the test method almost reads naturally. First it performs a GET request against /readingList. Then it expects that the request is successful (isOk() asserts an HTTP 200 response code) and that the view has a logical name of readingList. It also asserts that the model contains an attribute named books, but that attribute is an empty collection. It’s all very straightforward.
+Now the test method almost reads naturally. First it performs a GET request against /readingList. Then it expects that the request is successful (isOk() asserts an HTTP 200 response code) and that the view has a logical name of readingList. It also asserts that the model contains an attribute named books, but that attribute is an empty collection. It’s all very straightforward.  
+现在这个测试方法读起来就很自然了。首先向/readingList发起一个GET请求，然后希望该请求处理成功（`isOk()`会判断HTTP 200响应码），并且视图的逻辑名称是`readingList`，测试里还要判断模型包含一个名为`books`的属性，该属性是一个空集合。所有的断言都很直观。
 
-The main thing to note here is that at no time is the application deployed to a web server. Instead it’s run within a mocked out Spring MVC, just capable enough to handle the HTTP requests we throw at it via the MockMvc instance.
+The main thing to note here is that at no time is the application deployed to a web server. Instead it’s run within a mocked out Spring MVC, just capable enough to handle the HTTP requests we throw at it via the MockMvc instance.  
+值得一提的是此处完全不需要将应用程序部署到Web服务器上，它是运行在模拟的Spring MVC中的，刚好能通过`MockMvc`实例来处理我们扔给它的HTTP请求。
 
-Pretty cool, huh?
+Pretty cool, huh?  
+太酷了，不是么？
 
-Let’s try one more test method. This time we’ll make it a bit more interesting by actually sending an HTTP POST request to post a new book. We should expect that after the POST request is handled, the request will be redirected back to /readingList and that the books attribute in the model will contain the newly added book. The following listing shows how we can use Spring’s Mock MVC to do this kind of test.
+Let’s try one more test method. This time we’ll make it a bit more interesting by actually sending an HTTP POST request to post a new book. We should expect that after the POST request is handled, the request will be redirected back to /readingList and that the books attribute in the model will contain the newly added book. The following listing shows how we can use Spring’s Mock MVC to do this kind of test.  
+让我们再来看一个测试方法，这次会更有趣一些，我们实际发送一个HTTP POST请求提交一本新书。我们应该期待在POST请求处理后重定向回/readingList，模型中将包含新添加的图书。以下代码演示了如何通过Spring的Mock MVC来实现这个测试。
+
+__Listing 4.3 Testing the post of a new book__  
+__代码4.3 测试提交一本新书__
+
+```
+@Test
+public void postBook() throws Exception {
+  mockMvc.perform(post("/readingList")
+         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+         .param("title", "BOOK TITLE")
+         .param("author", "BOOK AUTHOR")
+         .param("isbn", "1234567890")
+         .param("description", "DESCRIPTION"))
+         .andExpect(status().is3xxRedirection())
+         .andExpect(header().string("Location", "/readingList"));
+
+  Book expectedBook = new Book();
+  expectedBook.setId(1L);
+  expectedBook.setReader("craig");
+  expectedBook.setTitle("BOOK TITLE");
+  expectedBook.setAuthor("BOOK AUTHOR");
+  expectedBook.setIsbn("1234567890");
+  expectedBook.setDescription("DESCRIPTION");
+
+  mockMvc.perform(get("/readingList"))
+         .andExpect(status().isOk())
+         .andExpect(view().name("readingList"))
+         .andExpect(model().attributeExists("books"))
+         .andExpect(model().attribute("books", hasSize(1)))
+         .andExpect(model().attribute("books",
+                     contains(samePropertyValuesAs(expectedBook))));
+```
+
+Performs POST request  
+执行POST请求
+
+Sets up expected book  
+配置期望的图书
+
+Performs GET request  
+执行GET请求
+
+Obviously, the test in listing 4.3 is a bit more involved. It’s actually two tests in one method. The first part posts the book and asserts the results from that request. The second part performs a fresh GET request against the home page and asserts that the newly created book is in the model.  
+很明显，代码4.3里的测试更复杂一些，实际是两个测试放在一个方法里。第一部分提交图书并检查了请求的结果，第二部分执行了一次对主页的GET请求，检查新建的图书是否在模型中。
+
+When posting the book, we must make sure we set the content type to “application/ x-www-form-urlencoded” (with MediaType.APPLICATION_FORM_URLENCODED) as that will be the content type that a browser will send when the book is posted in the running application. We then use the MockMvcRequestBuilders’s param() method to set the fields that simulate the form being submitted. Once the request has been performed, we assert that the response is a redirect to /readingList.  
+在提交图书时，我们必须确保将内容类型设置为“application/x-www-form-urlencoded”（通过`MediaType.APPLICATION_FORM_URLENCODED`），这才是运行应用程序时浏览器会发送的内容类型。随后用`MockMvcRequestBuilders`的`param`方法设置表单域，模拟要提交的表单。一旦请求执行后，我们要检查响应是否是一个到/readingList的重定向。
+
+Assuming that much of the test method passes, we move on to part two. First, we set up a Book object that contains the expected values. We’ll use this to compare with the value that’s in the model after fetching the home page.  
+假定以上测试都通过，我们进入第二部分。首先设置一个`Book`对象，包含想要的值。我们将用这个对象来和首页获取的模型的值进行对比。
+
+Then we perform a GET request for /readingList. For the most part, this is no different than how we tested the home page before, except that instead of an empty collection in the model, we’re checking that it has one item, and that the item is the same as the expected Book we created. If so, then our controller seems to be doing its job of saving a book when one is posted to it.  
+随后对/readingList发起一个GET请求，大部分内容和我们之前测试主页时一样，除了之前模型中的那个空集合，现在有了一个集合项，它的内容和我们创建的`expectedBook`一致。如此一来，我们的控制器看起来完成了保存发送给它的图书的工作。
+
+So far, these tests have assumed an unsecured application, much like the one we wrote in chapter 2. But what if we want to test a secured application, such as the one from chapter 3?  
+至此，这些测试完成了对一个未经保护的应用程序的验证，就和我们在第2章里写的应用程序很类似。但如果我们想要测试一个安全加固过的应用程序呢，比如我们在第3章里写的那个，该怎么办？
+
+### 4.2.2 Testing web security
+### 4.2.2 测试Web安全
+
+Spring Security offers support for testing secured web applications easily. In order to take advantage of it, you must add Spring Security’s test module to your build. The following testCompile dependency in Gradle is all you need:
+
+```
+testCompile("org.springframework.security:spring-security-test")
+```
+
+Or if you’re using Maven, add the following <dependency> to your build:
+
+```
+<dependency>
+  <groupId>org.springframework.security</groupId>
+  <artifactId>spring-security-test</artifactId>
+  <scope>test</scope>
+</dependency>
+```
+
+With Spring Security’s test module in your application’s classpath, you just need to apply the Spring Security configurer when creating the MockMvc instance:
+
+```
+@Before
+public void setupMockMvc() {
+  mockMvc = MockMvcBuilders
+    .webAppContextSetup(webContext)
+    .apply(springSecurity())
+    .build();
+}
+```
+
+The springSecurity() method returns a Mock MVC configurer that enables Spring Security for Mock MVC. By simply applying it as shown here, Spring Security will be in play on all requests performed through MockMvc. The specific security configuration will depend on how you’ve configured Spring Security (or how Spring Boot has auto- configured Spring Security). In the case of the reading-list application, it’s the same security configuration we created in SecurityConfig.java in chapter 3.
+
+> THE SPRINGSECURITY() METHOD springSecurity() is a static method of SecurityMockMvcConfigurers, which I’ve statically imported for readability’s sake.
+
+With Spring Security enabled, we can no longer simply request the home page and expect an HTTP 200 response. If the request isn’t authenticated, we should expect a redirect to the login page:
+
+```
+@Test
+public void homePage_unauthenticatedUser() throws Exception {
+  mockMvc.perform(get("/"))
+    .andExpect(status().is3xxRedirection())
+    .andExpect(header().string("Location",
+                               "http://localhost/login"));
+}
+```
+
+But how can we perform an authenticated request? Spring Security offers two annotations that can help:
+* @WithMockUser—Loads the security context with a UserDetails using the given username, password, and authorization
+* @WithUserDetails—Loads the security context by looking up a UserDetails object for the given username
+
+In both cases, Spring Security’s security context is loaded with a UserDetails object that is to be used for the duration of the annotated test method. The @WithMockUser annotation is the most basic of the two. It allows you to explicitly declare a UserDetails to be loaded into the security context:
+
+```
+@Test
+@WithMockUser(username="craig",
+              password="password",
+              roles="READER")
+public void homePage_authenticatedUser() throws Exception {
+  ...
+}
+```
+
+As you can see, @WithMockUser bypasses the normal lookup of a UserDetails object and instead creates one with the values specified. For simple tests, this may be fine. But for our test, we need a Reader (which implements UserDetails) instead of the generic UserDetails that @WithMockUser creates. For that, we’ll need @WithUserDetails.
+
+The @WithUserDetails annotation uses the configured UserDetailsService to load the UserDetails object. As you’ll recall from chapter 3, we configured a User- DetailsService bean that looks up and returns a Reader object for a given username. That’s perfect! So we’ll annotate our test method with @WithUserDetails, as shown in the following listing.
+
+__Listing 4.4 Testing a secured method with user authentication__
+
+```
+@Test
+@WithUserDetails("craig")
+public void homePage_authenticatedUser() throws Exception {
+  Reader expectedReader = new Reader();
+  expectedReader.setUsername("craig");
+  expectedReader.setPassword("password");
+  expectedReader.setFullname("Craig Walls");
+
+  mockMvc.perform(get("/"))
+      .andExpect(status().isOk())
+      .andExpect(view().name("readingList"))
+      .andExpect(model().attribute("reader",
+                         samePropertyValuesAs(expectedReader)))
+      .andExpect(model().attribute("books", hasSize(0)));
+
+}
+```
+
+Uses “craig” user
+
+Sets up expected Reader
+
+Performs GET request
+
+In listing 4.4, we use @WithUserDetails to declare that the “craig” user should be loaded into the security context for the duration of this test method. Knowing that the Reader will be placed into the model, the method starts by creating an expected Reader object that it can compare with the model later in the test. Then it performs the GET request and asserts the view name and model contents, including the model attribute with the name “reader”.
+
+Once again, no servlet container is started up to run these tests. Spring’s Mock MVC takes the place of an actual servlet container. The benefit of this approach is that the test methods run faster because they don’t have to wait for the server to start. Moreover, there’s no need to fire up a web browser to post the form, so the test is simpler and faster.
+
+On the other hand, it’s not a complete test. It’s better than simply calling the controller methods directly, but it doesn’t truly exercise the application in a web browser and verify the rendered view. To do that, we’ll need to start a real web server and hit it with a real web browser. Let’s see how Spring Boot can help us start a real web server for our tests.
