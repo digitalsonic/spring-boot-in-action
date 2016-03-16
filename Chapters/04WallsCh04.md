@@ -325,13 +325,15 @@ So far, these tests have assumed an unsecured application, much like the one we 
 ### 4.2.2 Testing web security
 ### 4.2.2 测试Web安全
 
-Spring Security offers support for testing secured web applications easily. In order to take advantage of it, you must add Spring Security’s test module to your build. The following testCompile dependency in Gradle is all you need:
+Spring Security offers support for testing secured web applications easily. In order to take advantage of it, you must add Spring Security’s test module to your build. The following testCompile dependency in Gradle is all you need:  
+Spring Security让你能非常方便地测试安全加固后的Web应用程序，为了利用这点优势，你必须在项目里添加Spring Security的测试模块。在Gradle里，以下`testCompile`依赖就是你所需要的：
 
 ```
 testCompile("org.springframework.security:spring-security-test")
 ```
 
-Or if you’re using Maven, add the following <dependency> to your build:
+Or if you’re using Maven, add the following <dependency> to your build:  
+或者，如果你用的是Maven，添加以下`<dependency>`：
 
 ```
 <dependency>
@@ -341,7 +343,8 @@ Or if you’re using Maven, add the following <dependency> to your build:
 </dependency>
 ```
 
-With Spring Security’s test module in your application’s classpath, you just need to apply the Spring Security configurer when creating the MockMvc instance:
+With Spring Security’s test module in your application’s classpath, you just need to apply the Spring Security configurer when creating the MockMvc instance:  
+应用程序的Classpath里有了Spring Security的测试模块之后，只需在创建`MockMvc`实例时运用Spring Security的配置器就好了：
 
 ```
 @Before
@@ -353,11 +356,14 @@ public void setupMockMvc() {
 }
 ```
 
-The springSecurity() method returns a Mock MVC configurer that enables Spring Security for Mock MVC. By simply applying it as shown here, Spring Security will be in play on all requests performed through MockMvc. The specific security configuration will depend on how you’ve configured Spring Security (or how Spring Boot has auto- configured Spring Security). In the case of the reading-list application, it’s the same security configuration we created in SecurityConfig.java in chapter 3.
+The springSecurity() method returns a Mock MVC configurer that enables Spring Security for Mock MVC. By simply applying it as shown here, Spring Security will be in play on all requests performed through MockMvc. The specific security configuration will depend on how you’ve configured Spring Security (or how Spring Boot has auto-configured Spring Security). In the case of the reading-list application, it’s the same security configuration we created in SecurityConfig.java in chapter 3.  
+`springSecurity()`方法返回了一个Mock MVC配置器，为Mock MVC开启了Spring Security支持。只需像上面这样运用就行了，Spring Security会介入`MockMvc`上执行的每个请求。具体的安全配置取决于你是如何配置Spring Security的（或者Spring Boot是如何自动配置Spring Security的）。在阅读列表这个应用程序里，这个配置与我们在第3章里创建的`SecurityConfig.java`里的配置是一样的。
 
-> THE SPRINGSECURITY() METHOD springSecurity() is a static method of SecurityMockMvcConfigurers, which I’ve statically imported for readability’s sake.
+> THE SPRINGSECURITY() METHOD springSecurity() is a static method of SecurityMockMvcConfigurers, which I’ve statically imported for readability’s sake.  
+__springSecurity()方法__ `springSecurity()`是`SecurityMockMvcConfigurers`的一个静态方法，出于可读性考虑我已经将其静态导入了。
 
-With Spring Security enabled, we can no longer simply request the home page and expect an HTTP 200 response. If the request isn’t authenticated, we should expect a redirect to the login page:
+With Spring Security enabled, we can no longer simply request the home page and expect an HTTP 200 response. If the request isn’t authenticated, we should expect a redirect to the login page:  
+开启了Spring Security之后，我们不能再简单地请求主页并期待HTTP 200响应了。如果请求未经身份验证，我们应该期待重定向到登录页面：
 
 ```
 @Test
@@ -369,11 +375,16 @@ public void homePage_unauthenticatedUser() throws Exception {
 }
 ```
 
-But how can we perform an authenticated request? Spring Security offers two annotations that can help:
+But how can we perform an authenticated request? Spring Security offers two annotations that can help:  
+但是我们又该如何发起一个经过身份验证的请求呢？Spring Security提供了两个注解：
+
 * @WithMockUser—Loads the security context with a UserDetails using the given username, password, and authorization
 * @WithUserDetails—Loads the security context by looking up a UserDetails object for the given username
+* `@WithMockUser`——加载安全上下文，其中包含一个`UserDetails`，使用了给定的用户名、密码和授权
+* `@WithUserDetails`——根据给定的用户名查找`UserDetails对象`，加载安全上下文
 
-In both cases, Spring Security’s security context is loaded with a UserDetails object that is to be used for the duration of the annotated test method. The @WithMockUser annotation is the most basic of the two. It allows you to explicitly declare a UserDetails to be loaded into the security context:
+In both cases, Spring Security’s security context is loaded with a UserDetails object that is to be used for the duration of the annotated test method. The @WithMockUser annotation is the most basic of the two. It allows you to explicitly declare a UserDetails to be loaded into the security context:  
+在这两种情况下，Spring Security的安全上下文都会加载一个`UserDetails`对象，在添加了该注解的测试方法运行过程中都会使用该对象。`@WithMockUser`注解是两者里比较基础的那个，它允许你显式声明一个`UserDetails`并加载到安全上下文里：
 
 ```
 @Test
@@ -385,11 +396,14 @@ public void homePage_authenticatedUser() throws Exception {
 }
 ```
 
-As you can see, @WithMockUser bypasses the normal lookup of a UserDetails object and instead creates one with the values specified. For simple tests, this may be fine. But for our test, we need a Reader (which implements UserDetails) instead of the generic UserDetails that @WithMockUser creates. For that, we’ll need @WithUserDetails.
+As you can see, @WithMockUser bypasses the normal lookup of a UserDetails object and instead creates one with the values specified. For simple tests, this may be fine. But for our test, we need a Reader (which implements UserDetails) instead of the generic UserDetails that @WithMockUser creates. For that, we’ll need @WithUserDetails.  
+如你所见，`@WithMockUser`绕过了对`UserDetails`对象的正常查询，用给定的值创建了一个`UserDetails`对象取而代之。在简单的测视里，这就够用了。但对我们的测试而言，我们需要一个`Reader`（实现了`UserDetails`）而非`@WithMockUser`创建的通用`UserDetails`。为此，我们需要`@WithUserDetails`。
 
-The @WithUserDetails annotation uses the configured UserDetailsService to load the UserDetails object. As you’ll recall from chapter 3, we configured a User- DetailsService bean that looks up and returns a Reader object for a given username. That’s perfect! So we’ll annotate our test method with @WithUserDetails, as shown in the following listing.
+The @WithUserDetails annotation uses the configured UserDetailsService to load the UserDetails object. As you’ll recall from chapter 3, we configured a UserDetailsService bean that looks up and returns a Reader object for a given username. That’s perfect! So we’ll annotate our test method with @WithUserDetails, as shown in the following listing.  
+`@WithUserDetails`注解使用事先配置好的`UserDetailsService`来加载`UserDetails`对象。回想一下第3章，我们配置了一个`UserDetailsService` Bean，它会根据给定的用户名查找并范围一个`Reader`对象。太完美了！所以我们要为测试方法添加`@WithUserDetails`注解，就像下面的代码一样。
 
-__Listing 4.4 Testing a secured method with user authentication__
+__Listing 4.4 Testing a secured method with user authentication__  
+__代码4.4 测试带有用户身份验证的安全加固方法__
 
 ```
 @Test
@@ -410,14 +424,67 @@ public void homePage_authenticatedUser() throws Exception {
 }
 ```
 
-Uses “craig” user
+Uses “craig” user  
+使用“craig”用户
 
-Sets up expected Reader
+Sets up expected Reader  
+配置期望的`Reader`
+
+Performs GET request  
+发起GET请求
+
+In listing 4.4, we use @WithUserDetails to declare that the “craig” user should be loaded into the security context for the duration of this test method. Knowing that the Reader will be placed into the model, the method starts by creating an expected Reader object that it can compare with the model later in the test. Then it performs the GET request and asserts the view name and model contents, including the model attribute with the name “reader”.  
+在代码4.4里，我们通过`@WithUserDetails`注解声明了要在测试方法执行过程中向安全上下文里加载“craig”用户。`Reader`会被放入模型之中，该测试方法先创建了一个期望的`Reader`对象，后续可以用来进行比较。随后发起GET请求，对视图名和模型内容做了断言，包括名为“reader”的模型属性。
+
+Once again, no servlet container is started up to run these tests. Spring’s Mock MVC takes the place of an actual servlet container. The benefit of this approach is that the test methods run faster because they don’t have to wait for the server to start. Moreover, there’s no need to fire up a web browser to post the form, so the test is simpler and faster.  
+同样的，此处没有启动Servlet容器来运行这些测试，Spring的Mock MVC取代了实际的Servlet容器。这样做的好处是测试方法运行相对较快，因为不需要等待服务器启动。而且，不需要打开Web浏览器发送表单，因此测试比较简单快速。
+
+On the other hand, it’s not a complete test. It’s better than simply calling the controller methods directly, but it doesn’t truly exercise the application in a web browser and verify the rendered view. To do that, we’ll need to start a real web server and hit it with a real web browser. Let’s see how Spring Boot can help us start a real web server for our tests.  
+另一方面，这并不是一个完整的测试。它比直接简单地调用控制器方法要好点，但它并没有真的在Web浏览器里执行应用程序，验证呈现出的视图。为此，我们需要启动一个真正的Web服务器，用真实浏览器来访问它。让我们来看看Spring Boot是如何帮我们启动一个真实的Web服务器来帮助测试的。
+
+## 4.3 Testing a running application
+
+When it comes to testing web applications, nothing beats the real thing. Firing up the application in a real server and hitting it with a real web browser is far more indicative of how it will behave in the hands of users than poking at it with a mock testing engine.
+
+But real tests in real servers with real web browsers can be tricky. Although there are build-time plugins for deploying applications in Tomcat or Jetty, they are clunky to set up. Moreover, it’s nearly impossible to run any one of a suite of many such tests in isolation or without starting up your build tool.
+
+Spring Boot, however, has a solution. Because Spring Boot already supports running embedded servlet containers such as Tomcat or Jetty as part of the running application, it stands to reason that the same mechanism could be used to start up the application along with its embedded servlet container for the duration of a test.
+
+That’s exactly what Spring Boot’s @WebIntegrationTest annotation does. By annotating a test class with @WebIntegrationTest, you declare that you want Spring Boot to not only create an application context for your test, but also to start an embedded servlet container. Once the application is running along with the embedded container, you can issue real HTTP requests against it and make assertions against the results.
+
+For example, consider the simple web test in listing 4.5, which uses @WebIntegrationTest to start the application along with a server and uses Spring’s RestTemplate to perform HTTP requests against the application.
+
+__Listing 4.5 Testing a web application in-server__
+
+```
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(
+      classes=ReadingListApplication.class)
+@WebIntegrationTest
+public class SimpleWebTest {
+
+  @Test(expected=HttpClientErrorException.class)
+  public void pageNotFound() {
+    try {
+      RestTemplate rest = new RestTemplate();
+      rest.getForObject(
+           "http://localhost:8080/bogusPage", String.class);
+      fail("Should result in HTTP 404");
+    } catch (HttpClientErrorException e) {
+      assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
+      throw e;
+    }
+  }
+
+}
+```
+
+Runs test in server
 
 Performs GET request
 
-In listing 4.4, we use @WithUserDetails to declare that the “craig” user should be loaded into the security context for the duration of this test method. Knowing that the Reader will be placed into the model, the method starts by creating an expected Reader object that it can compare with the model later in the test. Then it performs the GET request and asserts the view name and model contents, including the model attribute with the name “reader”.
+Asserts HTTP 404 (not found) response
 
-Once again, no servlet container is started up to run these tests. Spring’s Mock MVC takes the place of an actual servlet container. The benefit of this approach is that the test methods run faster because they don’t have to wait for the server to start. Moreover, there’s no need to fire up a web browser to post the form, so the test is simpler and faster.
+Although this is a very simple test, it sufficiently demonstrates how to use the @WebIntegrationTest to start the application with a server. The actual server that’s started will be determined in the same way it would be if we were running the application at the command line. By default, it starts Tomcat listening on port 8080. Option- ally, however, it could start Jetty or Undertow if either of those is in the classpath.
 
-On the other hand, it’s not a complete test. It’s better than simply calling the controller methods directly, but it doesn’t truly exercise the application in a web browser and verify the rendered view. To do that, we’ll need to start a real web server and hit it with a real web browser. Let’s see how Spring Boot can help us start a real web server for our tests.
+The body of the test method is written assuming that the application is running and listening on port 8080. It uses Spring’s RestTemplate to make a request for a nonexistent page and asserts that the response from the server is an HTTP 404 (not found). The test will fail if any other response is returned.
