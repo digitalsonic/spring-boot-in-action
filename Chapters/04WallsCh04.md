@@ -502,41 +502,113 @@ The body of the test method is written assuming that the application is running 
 测试方法的主体部分假设应用程序已经运行，监听了8080端口。它使用了Spring的`RestTemplate`对一个不存在的页面发起请求，判断服务器的响应是否是HTTP 404 (NOT FOUND)。如果返回了其他响应测试即告失败。
 
 ### 4.3.1 Starting the server on a random port
+### 4.3.1 用随机端口启动服务器
 
-As mentioned, the default behavior is to start the server listening on port 8080. That’s fine for running a single test at a time on a machine where no other server is already listening on port 8080. But if you’re like me, you’ve probably always got something listening on port 8080 on your local machine. In that case, the test would fail because the server wouldn’t start due to the port collision. There must be a better way.
+As mentioned, the default behavior is to start the server listening on port 8080. That’s fine for running a single test at a time on a machine where no other server is already listening on port 8080. But if you’re like me, you’ve probably always got something listening on port 8080 on your local machine. In that case, the test would fail because the server wouldn’t start due to the port collision. There must be a better way.  
+前面提到过，此处的默认行为是启动服务器监听8080端口。在一台机器上一次只运行一个测试的话，这没什么问题，因为没有其他服务器监听8080端口。但如果你和我一样，在本机总是有其他服务器在监听8080端口该怎么办？这时测试就会失败，因为端口冲突，服务器启动不了。一定有个更好的办法。
 
-Fortunately, it’s easy enough to ask Spring Boot to start up the server on a randomly selected port. One way is to set the server.port property to 0 to ask Spring Boot to select a random available port. @WebIntegrationTest accepts an array of String for its value attribute. Each entry in the array is expected to be a name/value pair, in the form name=value, to set properties for use in the test. To set server.port you can use @WebIntegrationTest like this:
+Fortunately, it’s easy enough to ask Spring Boot to start up the server on a randomly selected port. One way is to set the server.port property to 0 to ask Spring Boot to select a random available port. @WebIntegrationTest accepts an array of String for its value attribute. Each entry in the array is expected to be a name/value pair, in the form name=value, to set properties for use in the test. To set server.port you can use @WebIntegrationTest like this:  
+幸运的是，可以很方便地让Spring Boot在随机选择的端口上启动服务器。一种办法是将`server.port`属性设置为0，让Spring Boot选择一个随机的可用端口。`@WebIntegrationTest`的`value`属性接受一个`String`数组，数组中的每项都是一个键值对，形如`name=value`，用来设置测试中使用的属性。要设置`server.port`，你可以这样做：
 
 ```
 @WebIntegrationTest(value={"server.port=0"})
 ```
 
-Or, because there’s only one property being set, it can take a simpler form:
+Or, because there’s only one property being set, it can take a simpler form:  
+或者，因为只要设置一个属性，还能有个更简单的形式：
 
 ```
 @WebIntegrationTest("server.port=0")
 ```
 
-Setting properties via the value attribute is handy in the general sense, but @WebIntegrationTest also offers a randomPort attribute for a more expressive way of asking the server to be started on a random port. You can ask for a random port by setting randomPort to true:
+Setting properties via the value attribute is handy in the general sense, but @WebIntegrationTest also offers a randomPort attribute for a more expressive way of asking the server to be started on a random port. You can ask for a random port by setting randomPort to true:  
+通过`value`属性来设置属性通常还算方便，但`@WebIntegrationTest`还提供了一个`randomPort`属性，更明确地表示让服务器以随机端口启动。你可以将`randomPort`设置为`true`，启用随机端口：
 
 ```
 @WebIntegrationTest(randomPort=true)
 ```
 
-Now that we have the server starting on a random port, we need to be sure we use the correct port when making web requests. At the moment, the getForObject() method is hard-coded with port 8080 in its URL. If the port is randomly chosen, how can we construct the request to use the right port?
+Now that we have the server starting on a random port, we need to be sure we use the correct port when making web requests. At the moment, the getForObject() method is hard-coded with port 8080 in its URL. If the port is randomly chosen, how can we construct the request to use the right port?  
+既然我们在随机端口上启动了服务器，就需要在发起Web请求时确保使用正确的端口。此时的`getForObject()`方法在URL里硬编码了8080端口。如果端口是随机选择的，那在构造请求时又该怎么确定正确的端口呢？
 
-First we’ll need to inject the chosen port as an instance variable. To make this convenient, Spring Boot sets a property with the name local.server.port to the value of the chosen port. All we need to do is use Spring’s @Value to inject that property:
+First we’ll need to inject the chosen port as an instance variable. To make this convenient, Spring Boot sets a property with the name local.server.port to the value of the chosen port. All we need to do is use Spring’s @Value to inject that property:  
+首先，我们需要以实例变量的形式注入选中的端口。为了方便起见，Spring Boot将`local.server.port`的值设置为了选中的端口。我们只需使用Spring的`@Value`注解将其注入即可：
 
 ```
 @Value("${local.server.port}")
 private int port;
 ```
 
-Now that we have the port, we just need to make a slight change to the getForObject() call to use it:
+Now that we have the port, we just need to make a slight change to the getForObject() call to use it:  
+有了端口之后，只需对`getForObject()`稍作修改，使用这个`port`就好了：
 
 ```
 rest.getForObject(
     "http://localhost:{port}/bogusPage", String.class, port);
 ```
 
-Here we’ve traded the hardcoded 8080 for a {port} placeholder in the URL. By passing the port property as the last parameter in the getForObject() call, we can be assured that the placeholder will be replaced with whatever value was injected into port.
+Here we’ve traded the hardcoded 8080 for a {port} placeholder in the URL. By passing the port property as the last parameter in the getForObject() call, we can be assured that the placeholder will be replaced with whatever value was injected into port.  
+这里我们在URL里把硬编码的8080改为`{port}`占位符。在`getForObject()`调用里把`port`属性作为最后一个参数传入，就能确保该占位符被替换为注入到`port`里的值了。
+
+### 4.3.2 Testing HTML pages with Selenium
+
+RestTemplate is fine for simple requests and it’s perfect for testing REST endpoints. But even though it can be used to make requests against URLs that return HTML pages, it’s not very convenient for asserting the contents of the page or performing operations on the page itself. At best, you’ll be able to assert the precise content of the resulting HTML (which will result in fragile tests). But you won’t easily be able to assert selected content on the page or perform operations such as clicking links or submitting forms.
+
+A better choice for testing HTML applications is Selenium (www.seleniumhq.org). Selenium does more than just perform requests and fetch the results for you to verify. Selenium actually fires up a web browser and executes your test within the context of the browser. It’s as close as you can possibly get to performing the tests manually with your own hands. But unlike manual testing, Selenium tests are automated and repeatable.
+
+To test our reading list application using Selenium, let’s write a test that fetches the home page, fills out the form for a new book, posts the form, and then finally asserts that the landing page includes the newly added book.
+
+First we’ll need to add Selenium to the build as a test dependency:
+
+```
+testCompile("org.seleniumhq.selenium:selenium-java:2.45.0")
+```
+
+Now we can write the test class. The following listing shows a basic template for a Sele- nium test that uses Spring Boot’s @WebIntegrationTest.
+
+__Listing 4.6 A template for Selenium testing with Spring Boot__
+
+```
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(
+      classes=ReadingListApplication.class)
+@WebIntegrationTest(randomPort=true)
+public class ServerWebTests {
+
+  private static FirefoxDriver browser;
+
+  @Value("${local.server.port}")
+  private int port;
+
+  @BeforeClass
+  public static void openBrowser() {
+    browser = new FirefoxDriver();
+    browser.manage().timeouts()
+        .implicitlyWait(10, TimeUnit.SECONDS);
+  }
+
+  @AfterClass
+  public static void closeBrowser() {
+    browser.quit();
+  }
+
+}
+```
+
+Starts on a random port
+
+Injects the port
+
+Sets up Firefox driver
+
+Shuts down browser
+
+As with the simpler web test we wrote earlier, this class is annotated with @WebIntegrationTest and sets randomPort to true so that the application will be started and run with a server listening on a random port. And, as before, that port is injected into the port property so that we can use it to construct URLs to the running application.
+
+The static openBrowser() method creates a new instance of FirefoxDriver, which will open a Firefox browser (it will need to be installed on the machine running the test). When we write our test method, we’ll perform browser operations through the FirefoxDriver instance. The FirefoxDriver is also configured to wait up to 10 seconds when looking for any elements on the page (in case those elements are slow to load).
+
+After the test has completed, we’ll need to shut down the Firefox browser. Therefore, closeBrowser() calls quit() on the FirefoxDriver instance to bring it down.
+
+>PICK YOUR BROWSER Although we’re testing with Firefox, Selenium also provides drivers for several other browsers, including Internet Explorer, Google’s Chrome, and Apple’s Safari. Not only can you use other browsers, it’s probably a good idea to write your tests to use any and all browsers you want to support.
+
+Now we can write our test method. As a reminder, we want to load the home page, fill in and submit the form, and then assert that we land on a page that includes our newly added book in the list. The following listing shows how to do this with Selenium.
