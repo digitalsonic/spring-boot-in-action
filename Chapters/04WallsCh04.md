@@ -443,18 +443,25 @@ On the other hand, it’s not a complete test. It’s better than simply calling
 另一方面，这并不是一个完整的测试。它比直接简单地调用控制器方法要好点，但它并没有真的在Web浏览器里执行应用程序，验证呈现出的视图。为此，我们需要启动一个真正的Web服务器，用真实浏览器来访问它。让我们来看看Spring Boot是如何帮我们启动一个真实的Web服务器来帮助测试的。
 
 ## 4.3 Testing a running application
+## 4.3 测试运行中的应用程序
 
-When it comes to testing web applications, nothing beats the real thing. Firing up the application in a real server and hitting it with a real web browser is far more indicative of how it will behave in the hands of users than poking at it with a mock testing engine.
+When it comes to testing web applications, nothing beats the real thing. Firing up the application in a real server and hitting it with a real web browser is far more indicative of how it will behave in the hands of users than poking at it with a mock testing engine.  
+在测试Web应用程序时，我们都还没接触到实质的内容。在真实的服务器里启动应用程序，用真实的Web浏览器访问它，这样比使用模拟的测试引擎更能表现应用程序在用户端的行为。
 
-But real tests in real servers with real web browsers can be tricky. Although there are build-time plugins for deploying applications in Tomcat or Jetty, they are clunky to set up. Moreover, it’s nearly impossible to run any one of a suite of many such tests in isolation or without starting up your build tool.
+But real tests in real servers with real web browsers can be tricky. Although there are build-time plugins for deploying applications in Tomcat or Jetty, they are clunky to set up. Moreover, it’s nearly impossible to run any one of a suite of many such tests in isolation or without starting up your build tool.  
+但是用真实的Web浏览器在真实的服务器上运行测试会很麻烦。虽然有构建时的插件能把应用程序部署到Tomcat或者Jetty里，但它们配置起来都很不便。而且几乎不可能隔离运行这么多测试，或者不启动构建工具。
 
-Spring Boot, however, has a solution. Because Spring Boot already supports running embedded servlet containers such as Tomcat or Jetty as part of the running application, it stands to reason that the same mechanism could be used to start up the application along with its embedded servlet container for the duration of a test.
+Spring Boot, however, has a solution. Because Spring Boot already supports running embedded servlet containers such as Tomcat or Jetty as part of the running application, it stands to reason that the same mechanism could be used to start up the application along with its embedded servlet container for the duration of a test.  
+然而Spring Boot找到了解决方案。因为它支持将Tomcat或Jetty这样的嵌入式Servlet容器作为运行中的应用程序的一部分，可以运用相同的机制，在测试过程中用嵌入式Servlet容器来启动应用程序。
 
-That’s exactly what Spring Boot’s @WebIntegrationTest annotation does. By annotating a test class with @WebIntegrationTest, you declare that you want Spring Boot to not only create an application context for your test, but also to start an embedded servlet container. Once the application is running along with the embedded container, you can issue real HTTP requests against it and make assertions against the results.
+That’s exactly what Spring Boot’s @WebIntegrationTest annotation does. By annotating a test class with @WebIntegrationTest, you declare that you want Spring Boot to not only create an application context for your test, but also to start an embedded servlet container. Once the application is running along with the embedded container, you can issue real HTTP requests against it and make assertions against the results.  
+Spring Boot的`@WebIntegrationTest`注解就是这么做的。在测试类上添加`@WebIntegrationTest`注解，以此声明你不仅希望Spring Boot为测试创建应用程序上下文，还要启动过一个嵌入式的Servlet容器。一旦应用程序运行在嵌入式容器里之后，你就可以发起真实的HTTP请求，对结果做断言了。
 
-For example, consider the simple web test in listing 4.5, which uses @WebIntegrationTest to start the application along with a server and uses Spring’s RestTemplate to perform HTTP requests against the application.
+For example, consider the simple web test in listing 4.5, which uses @WebIntegrationTest to start the application along with a server and uses Spring’s RestTemplate to perform HTTP requests against the application.  
+举例来说，考虑代码4.5里的那段简单的Web测试，它用了`@WebIntegrationTest`，在服务器里启动了应用程序，使用Spring的`RestTemplate`对应用程序发起HTTP请求。
 
-__Listing 4.5 Testing a web application in-server__
+__Listing 4.5 Testing a web application in-server__  
+__代码4.5 测试运行在服务器里的Web应用程序__
 
 ```
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -479,12 +486,57 @@ public class SimpleWebTest {
 }
 ```
 
-Runs test in server
+Runs test in server  
+在服务器里运行测试
 
-Performs GET request
+Performs GET request  
+发起GET请求
 
-Asserts HTTP 404 (not found) response
+Asserts HTTP 404 (not found) response  
+判断HTTP 404 (NOT FOUND)响应
 
-Although this is a very simple test, it sufficiently demonstrates how to use the @WebIntegrationTest to start the application with a server. The actual server that’s started will be determined in the same way it would be if we were running the application at the command line. By default, it starts Tomcat listening on port 8080. Option- ally, however, it could start Jetty or Undertow if either of those is in the classpath.
+Although this is a very simple test, it sufficiently demonstrates how to use the @WebIntegrationTest to start the application with a server. The actual server that’s started will be determined in the same way it would be if we were running the application at the command line. By default, it starts Tomcat listening on port 8080. Optionally, however, it could start Jetty or Undertow if either of those is in the classpath.  
+虽然这个测试非常简单，但足以演示如何使用`@WebIntegrationTest`在服务器里启动应用程序了。实际启动的服务器究竟是哪个，这个判断逻辑与在命令行里运行应用程序时一样的。默认情况下，会启动一个监听8080端口的Tomcat。但是，如果Classpath里有Jetty或者Undertow，它也能启动这些服务器。
 
-The body of the test method is written assuming that the application is running and listening on port 8080. It uses Spring’s RestTemplate to make a request for a nonexistent page and asserts that the response from the server is an HTTP 404 (not found). The test will fail if any other response is returned.
+The body of the test method is written assuming that the application is running and listening on port 8080. It uses Spring’s RestTemplate to make a request for a nonexistent page and asserts that the response from the server is an HTTP 404 (not found). The test will fail if any other response is returned.  
+测试方法的主体部分假设应用程序已经运行，监听了8080端口。它使用了Spring的`RestTemplate`对一个不存在的页面发起请求，判断服务器的响应是否是HTTP 404 (NOT FOUND)。如果返回了其他响应测试即告失败。
+
+### 4.3.1 Starting the server on a random port
+
+As mentioned, the default behavior is to start the server listening on port 8080. That’s fine for running a single test at a time on a machine where no other server is already listening on port 8080. But if you’re like me, you’ve probably always got something listening on port 8080 on your local machine. In that case, the test would fail because the server wouldn’t start due to the port collision. There must be a better way.
+
+Fortunately, it’s easy enough to ask Spring Boot to start up the server on a randomly selected port. One way is to set the server.port property to 0 to ask Spring Boot to select a random available port. @WebIntegrationTest accepts an array of String for its value attribute. Each entry in the array is expected to be a name/value pair, in the form name=value, to set properties for use in the test. To set server.port you can use @WebIntegrationTest like this:
+
+```
+@WebIntegrationTest(value={"server.port=0"})
+```
+
+Or, because there’s only one property being set, it can take a simpler form:
+
+```
+@WebIntegrationTest("server.port=0")
+```
+
+Setting properties via the value attribute is handy in the general sense, but @WebIntegrationTest also offers a randomPort attribute for a more expressive way of asking the server to be started on a random port. You can ask for a random port by setting randomPort to true:
+
+```
+@WebIntegrationTest(randomPort=true)
+```
+
+Now that we have the server starting on a random port, we need to be sure we use the correct port when making web requests. At the moment, the getForObject() method is hard-coded with port 8080 in its URL. If the port is randomly chosen, how can we construct the request to use the right port?
+
+First we’ll need to inject the chosen port as an instance variable. To make this convenient, Spring Boot sets a property with the name local.server.port to the value of the chosen port. All we need to do is use Spring’s @Value to inject that property:
+
+```
+@Value("${local.server.port}")
+private int port;
+```
+
+Now that we have the port, we just need to make a slight change to the getForObject() call to use it:
+
+```
+rest.getForObject(
+    "http://localhost:{port}/bogusPage", String.class, port);
+```
+
+Here we’ve traded the hardcoded 8080 for a {port} placeholder in the URL. By passing the port property as the last parameter in the getForObject() call, we can be assured that the placeholder will be replaced with whatever value was injected into port.
