@@ -551,22 +551,29 @@ Here we’ve traded the hardcoded 8080 for a {port} placeholder in the URL. By p
 这里我们在URL里把硬编码的8080改为`{port}`占位符。在`getForObject()`调用里把`port`属性作为最后一个参数传入，就能确保该占位符被替换为注入到`port`里的值了。
 
 ### 4.3.2 Testing HTML pages with Selenium
+### 4.3.2 使用Selenium测试HTML页面
 
-RestTemplate is fine for simple requests and it’s perfect for testing REST endpoints. But even though it can be used to make requests against URLs that return HTML pages, it’s not very convenient for asserting the contents of the page or performing operations on the page itself. At best, you’ll be able to assert the precise content of the resulting HTML (which will result in fragile tests). But you won’t easily be able to assert selected content on the page or perform operations such as clicking links or submitting forms.
+RestTemplate is fine for simple requests and it’s perfect for testing REST endpoints. But even though it can be used to make requests against URLs that return HTML pages, it’s not very convenient for asserting the contents of the page or performing operations on the page itself. At best, you’ll be able to assert the precise content of the resulting HTML (which will result in fragile tests). But you won’t easily be able to assert selected content on the page or perform operations such as clicking links or submitting forms.  
+`RestTemplate`对于简单的请求而言很好用，也是测试REST端点的理想工具。但是，就算它能对返回HTML页面的URL发起请求，也不方便对页面内容或者页面上执行的操作进行断言。最好可以精确判断结果HTML里的内容（这种测试很脆弱）。不过你无法方便地判断页面上选中的内容，或者执行诸如点击链接或提交表单这样的操作。
 
-A better choice for testing HTML applications is Selenium (www.seleniumhq.org). Selenium does more than just perform requests and fetch the results for you to verify. Selenium actually fires up a web browser and executes your test within the context of the browser. It’s as close as you can possibly get to performing the tests manually with your own hands. But unlike manual testing, Selenium tests are automated and repeatable.
+A better choice for testing HTML applications is Selenium (www.seleniumhq.org). Selenium does more than just perform requests and fetch the results for you to verify. Selenium actually fires up a web browser and executes your test within the context of the browser. It’s as close as you can possibly get to performing the tests manually with your own hands. But unlike manual testing, Selenium tests are automated and repeatable.  
+测试HTML应用程序有一个更好的选择——Selenium（[www.seleniumhq.org](http://www.seleniumhq.org)），它的功能远不止为你提交请求并获取结果，它能实际打开一个Web浏览器，在浏览器的上下文中执行你的测试。Selenium能尽可能地接近手动执行测试，但与手工测试不同，Selenium的测试是自动的，而且可以重复运行。
 
-To test our reading list application using Selenium, let’s write a test that fetches the home page, fills out the form for a new book, posts the form, and then finally asserts that the landing page includes the newly added book.
+To test our reading list application using Selenium, let’s write a test that fetches the home page, fills out the form for a new book, posts the form, and then finally asserts that the landing page includes the newly added book.  
+为了用Selenium测试我们的阅读列表应用程序，让我们先一个测试来获取首页，为新书填写表单，提交表单，随后判断返回的页面里是否包含新添加的图书。
 
-First we’ll need to add Selenium to the build as a test dependency:
+First we’ll need to add Selenium to the build as a test dependency:  
+首先需要把Selenium作为测试依赖添加到项目里：
 
 ```
 testCompile("org.seleniumhq.selenium:selenium-java:2.45.0")
 ```
 
-Now we can write the test class. The following listing shows a basic template for a Sele- nium test that uses Spring Boot’s @WebIntegrationTest.
+Now we can write the test class. The following listing shows a basic template for a Selenium test that uses Spring Boot’s @WebIntegrationTest.  
+现在就可以编写测试了，以下代码是一个基本的Selenium测试模板，使用了Spring Boot的`@WebIntegrationTest`。
 
-__Listing 4.6 A template for Selenium testing with Spring Boot__
+__Listing 4.6 A template for Selenium testing with Spring Boot__  
+__代码4.6 在Spring Boot里使用Selenium测试的模板__
 
 ```
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -595,20 +602,87 @@ public class ServerWebTests {
 }
 ```
 
-Starts on a random port
+Starts on a random port  
+用随机端口启动
 
-Injects the port
+Injects the port  
+注入端口号
 
-Sets up Firefox driver
+Sets up Firefox driver  
+配置Firefox驱动
 
-Shuts down browser
+Shuts down browser  
+关闭浏览器
 
-As with the simpler web test we wrote earlier, this class is annotated with @WebIntegrationTest and sets randomPort to true so that the application will be started and run with a server listening on a random port. And, as before, that port is injected into the port property so that we can use it to construct URLs to the running application.
+As with the simpler web test we wrote earlier, this class is annotated with @WebIntegrationTest and sets randomPort to true so that the application will be started and run with a server listening on a random port. And, as before, that port is injected into the port property so that we can use it to construct URLs to the running application.  
+和我们之前写的更简单的Web测试一样，这个类添加了`@WebIntegrationTest`注解，将`randomPort`设置为`true`，这样应用程序启动后会运行一个监听随机端口的服务器。同样的，端口号被注入到`port`属性里，这样我们就能用它来构造指向运行中的应用程序的URL了。
 
-The static openBrowser() method creates a new instance of FirefoxDriver, which will open a Firefox browser (it will need to be installed on the machine running the test). When we write our test method, we’ll perform browser operations through the FirefoxDriver instance. The FirefoxDriver is also configured to wait up to 10 seconds when looking for any elements on the page (in case those elements are slow to load).
+The static openBrowser() method creates a new instance of FirefoxDriver, which will open a Firefox browser (it will need to be installed on the machine running the test). When we write our test method, we’ll perform browser operations through the FirefoxDriver instance. The FirefoxDriver is also configured to wait up to 10 seconds when looking for any elements on the page (in case those elements are slow to load).  
+静态方法`openBrowser()`会创建一个`FirefoxDriver`的实例，它将打开一个Firefox浏览器（需要在运行测试的服务器上安装该浏览器）。我们的测试方法将通过`FirefoxDriver`实例来执行浏览器操作。在页面上查找元素时，`FirefoxDriver`配置了10秒的等候时间（以防那些元素加载很慢）。
 
-After the test has completed, we’ll need to shut down the Firefox browser. Therefore, closeBrowser() calls quit() on the FirefoxDriver instance to bring it down.
+After the test has completed, we’ll need to shut down the Firefox browser. Therefore, closeBrowser() calls quit() on the FirefoxDriver instance to bring it down.  
+测试执行完毕后，我们需要关闭Firefox浏览器，因此在`closeBrowser()`里要调用`FirefoxDriver`实例的`quit()`方法，关闭浏览器。
 
->PICK YOUR BROWSER Although we’re testing with Firefox, Selenium also provides drivers for several other browsers, including Internet Explorer, Google’s Chrome, and Apple’s Safari. Not only can you use other browsers, it’s probably a good idea to write your tests to use any and all browsers you want to support.
+>PICK YOUR BROWSER Although we’re testing with Firefox, Selenium also provides drivers for several other browsers, including Internet Explorer, Google’s Chrome, and Apple’s Safari. Not only can you use other browsers, it’s probably a good idea to write your tests to use any and all browsers you want to support.  
+__选择浏览器__ 虽然我们用Firefox进行了测试，但Selenium还提供了不少其他浏览器的驱动，包括Internet Explorer、Google的Chrome，还有Apple的Safari。不仅可以使用其他浏览器，要是你的测试能使用各种你想支持的浏览器进行测试，也许也是个不错的想法。
 
-Now we can write our test method. As a reminder, we want to load the home page, fill in and submit the form, and then assert that we land on a page that includes our newly added book in the list. The following listing shows how to do this with Selenium.
+Now we can write our test method. As a reminder, we want to load the home page, fill in and submit the form, and then assert that we land on a page that includes our newly added book in the list. The following listing shows how to do this with Selenium.  
+现在可以开始编写我们的测试方法了，给你提个醒，我们想要加载首页，填充并发送表单，然后判断我们登录到的页面上包含刚刚新添加的图书。下面的代码演示了如何用Selenium实现这个功能。
+
+__Listing 4.7 Testing the reading-list application with Selenium__  
+__代码4.7 用Selenium测试阅读列表应用程序__
+
+```
+@Test
+public void addBookToEmptyList() {
+  String baseUrl = "http://localhost:" + port;
+
+  browser.get(baseUrl);
+  
+  assertEquals("You have no books in your book list",
+               browser.findElementByTagName("div").getText());
+  
+  browser.findElementByName("title")
+  .sendKeys("BOOK TITLE");
+  browser.findElementByName("author")
+         .sendKeys("BOOK AUTHOR");
+  browser.findElementByName("isbn")
+         .sendKeys("1234567890");
+  browser.findElementByName("description")
+         .sendKeys("DESCRIPTION");
+  browser.findElementByTagName("form")
+         .submit();
+  
+  WebElement dl =
+      browser.findElementByCssSelector("dt.bookHeadline");
+  assertEquals("BOOK TITLE by BOOK AUTHOR (ISBN: 1234567890)",
+               dl.getText());
+  WebElement dt =
+      browser.findElementByCssSelector("dd.bookDescription");
+  assertEquals("DESCRIPTION", dt.getText());
+}
+```
+
+Fetches the home page  
+获取主页
+
+Asserts an empty book list  
+判断图书列表是否为空
+
+Fills in and submits form  
+填充并发送表单
+
+Asserts new book in list  
+判断列表中是否包含新书
+
+The very first thing that the test method does is use the FirefoxDriver to perform a GET request for the reading list’s home page. It then looks for a <div> element on the page and asserts that its text indicates that no books are in the list.
+
+The next several lines look for the fields in the form and use the driver’s sendKeys() method to simulate keystroke events on those field elements (essentially filling in those fields with the given values). Finally, it looks for the <form> element and submits it.
+
+After the form submission is processed, the browser should land on a page with the new book in the list. So the final few lines look for the <dt> and <dd> elements in that list and assert that they contain the data that the test submitted in the form.
+
+When you run this test, you’ll see the browser pop up and load the reading-list application. If you pay close attention, you’ll see the form filled out, as if by a ghost. But it’s no spectre using your application—it’s the test.
+
+The main thing to notice about this test is that @WebIntegrationTest was able to start up the application and server for us so that Selenium could start poking at it with a web browser. But what’s especially interesting about how this works is that you can use the test facilities of your IDE to run as many or as few of these tests as you want, without having to rely on some plugin in your application’s build to start a server for you.
+
+If testing with Selenium is something that you think you’ll find useful, you should check out Selenium WebDriver in Practice by Yujun Liang and Alex Collins (http://manning.com/liang/), which goes into far more details about testing with Selenium.
