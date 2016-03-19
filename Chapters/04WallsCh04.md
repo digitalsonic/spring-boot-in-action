@@ -638,10 +638,10 @@ public void addBookToEmptyList() {
   String baseUrl = "http://localhost:" + port;
 
   browser.get(baseUrl);
-  
+
   assertEquals("You have no books in your book list",
                browser.findElementByTagName("div").getText());
-  
+
   browser.findElementByName("title")
   .sendKeys("BOOK TITLE");
   browser.findElementByName("author")
@@ -652,7 +652,7 @@ public void addBookToEmptyList() {
          .sendKeys("DESCRIPTION");
   browser.findElementByTagName("form")
          .submit();
-  
+
   WebElement dl =
       browser.findElementByCssSelector("dt.bookHeadline");
   assertEquals("BOOK TITLE by BOOK AUTHOR (ISBN: 1234567890)",
@@ -675,14 +675,41 @@ Fills in and submits form
 Asserts new book in list  
 判断列表中是否包含新书
 
-The very first thing that the test method does is use the FirefoxDriver to perform a GET request for the reading list’s home page. It then looks for a <div> element on the page and asserts that its text indicates that no books are in the list.
+The very first thing that the test method does is use the FirefoxDriver to perform a GET request for the reading list’s home page. It then looks for a <div> element on the page and asserts that its text indicates that no books are in the list.  
+该测试方法做的第一件事是使用`FirefoxDriver`来发起GET请求，获取阅读列表的主页，随后查找页面里的一个`<div>`元素，从它的文本里判断出列表里没有图书。
 
-The next several lines look for the fields in the form and use the driver’s sendKeys() method to simulate keystroke events on those field elements (essentially filling in those fields with the given values). Finally, it looks for the <form> element and submits it.
+The next several lines look for the fields in the form and use the driver’s sendKeys() method to simulate keystroke events on those field elements (essentially filling in those fields with the given values). Finally, it looks for the <form> element and submits it.  
+接下来的几行是在查找表单里的元素，使用驱动的`sendKeys()`方法模拟敲击键盘事件（实际上就是用给定的值填充那些表单域）。最后，找到`<form>`元素并提交。
 
-After the form submission is processed, the browser should land on a page with the new book in the list. So the final few lines look for the <dt> and <dd> elements in that list and assert that they contain the data that the test submitted in the form.
+After the form submission is processed, the browser should land on a page with the new book in the list. So the final few lines look for the <dt> and <dd> elements in that list and assert that they contain the data that the test submitted in the form.  
+提交的表单被处理后，浏览器就会跳到一个页面，上面的列表里包含了新添加的图书。因此最后的几行就是在查找列表里的`<dt>`和`<dd>`元素，判断其中是否包含测试表单里提交的数据。
 
-When you run this test, you’ll see the browser pop up and load the reading-list application. If you pay close attention, you’ll see the form filled out, as if by a ghost. But it’s no spectre using your application—it’s the test.
+When you run this test, you’ll see the browser pop up and load the reading-list application. If you pay close attention, you’ll see the form filled out, as if by a ghost. But it’s no spectre using your application—it’s the test.  
+运行测试时，你会看到浏览器被打开，加载了阅读列表应用程序。如果你够仔细，还会看到填充表单的过程，就好像幽灵在操作，当然，并没有幽灵在使用你的应用程序——这只是一个测试。
 
-The main thing to notice about this test is that @WebIntegrationTest was able to start up the application and server for us so that Selenium could start poking at it with a web browser. But what’s especially interesting about how this works is that you can use the test facilities of your IDE to run as many or as few of these tests as you want, without having to rely on some plugin in your application’s build to start a server for you.
+The main thing to notice about this test is that @WebIntegrationTest was able to start up the application and server for us so that Selenium could start poking at it with a web browser. But what’s especially interesting about how this works is that you can use the test facilities of your IDE to run as many or as few of these tests as you want, without having to rely on some plugin in your application’s build to start a server for you.  
+这个测试里需要注意的`@WebIntegrationTest`可以为我们启动应用程序和服务器，这样Selenium才可以用Web浏览器执行测试。但真正有趣的是你可以使用IDE的测试功能来运行测试，随便你想跑几次都行，无需依赖构建过程中的某些插件来为你启动服务器。
 
-If testing with Selenium is something that you think you’ll find useful, you should check out Selenium WebDriver in Practice by Yujun Liang and Alex Collins (http://manning.com/liang/), which goes into far more details about testing with Selenium.
+If testing with Selenium is something that you think you’ll find useful, you should check out Selenium WebDriver in Practice by Yujun Liang and Alex Collins (http://manning.com/liang/), which goes into far more details about testing with Selenium.  
+要是你觉得使用Selenium进行测试对你有用，可以阅读Yujun Liang和Alex Collins的《Selenium WebDriver in Practice》（[http://manning.com/liang/](http://manning.com/liang/)），该书更深入地讨论了Selenium测试的细节。
+
+## 4.4 Summary
+## 4.4 小结
+
+Testing is an important part of developing quality software. Without a good suite of tests, you’ll never know for sure if your application is doing what it’s expected to do.  
+测试是开发高质量软件的重要一环，没有好的测试，你永远都不无法保证你的应用程序能如你期望的那样运作。
+
+For unit tests, which focus on a single component or a method of a component, Spring isn’t really necessary. The benefits and techniques promoted by Spring—loose coupling, dependency injection, and interface-driven design—make writing unit tests easy. But Spring doesn’t need to be directly involved in unit tests.  
+对单元测试而言，它专注于单一组件或组件中的一个方法，此处并不一定要用Spring。Spring提供了一些好处和技术——松耦合、依赖注入和接口驱动设计，这些都让编写单元测试变容易了。但Spring不用直接涉足单元测试。
+
+Integration-testing multiple components, however, begs for help from Spring. In fact, if Spring is responsible for wiring those components up at runtime, then Spring should also be responsible for wiring them up in integration tests.  
+集成测试会涉及众多组件，这时就要靠Spring来帮忙了。实际上，如果在运行时Spring负责拼装那些组件，那么在集成测试里Spring同样应该肩负这一职责。
+
+The Spring Framework provides integration-testing support in the form of a JUnit class runner that loads a Spring application context and enables beans from the context to be injected into a test. Spring Boot builds upon Spring integration-testing support with a configuration loader that loads the application context in the same way as Spring Boot itself, including support for externalized properties and Spring Boot logging.  
+Spring Framework以JUnit类运行器的方式提供了集成测试支持，它会加载Spring应用程序上下文，把上下文里的Bean注入到测试里。Spring Boot在Spring的集成测试之上又增加了配置加载器，以Spring Boot的方式加载应用程序上下文，包括对外置属性的支持和Spring Boot日志。
+
+Spring Boot also enables in-container testing of web applications, making it possible to fire up your application to be served by the same container that it will be served by when running in production. This gives your tests the closest thing to a real-world environment for verifying the behavior of the application.  
+Spring Boot还支持容器内测试Web应用程序，让你能用和生产环境一样的容器来启动应用程序。这让你的测试更接近真实运行环境，验证应用程序的行为。
+
+At this point we’ve built a rather complete (albeit simple) application that leverages Spring Boot starters and auto-configuration to handle the grunt work so that we can focus on writing our application. And we’ve also seen how to take advantage of Spring Boot’s support for testing the application. Coming up in the next couple of chapters, we’re going to take a slightly different tangent and explore the ways that Groovy can make developing Spring Boot applications even easier. We’ll start in the next chapter by looking at a few features from the Grails framework that have made their way into Spring Boot.  
+此时我们已经构建了一个相当完整的应用程序（虽然有点简单），它利用Spring Boot的起步依赖和自动配置来处理低级的工作，让我们能专心开发自己的应用程序。我们也看到了如何使用Spring Boot的支持来测试应用程序。在后续几章里，我们会看到一些不同的东西，了解到Groovy能让Spring Boot应用程序的开发更加简单。下一章里会先了解一些Grails框架的特性，看看它们是如何进入Spring Boot的。
