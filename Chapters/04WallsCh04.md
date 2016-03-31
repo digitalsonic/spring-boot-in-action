@@ -638,10 +638,10 @@ public void addBookToEmptyList() {
   String baseUrl = "http://localhost:" + port;
 
   browser.get(baseUrl);
-  
+
   assertEquals("You have no books in your book list",
                browser.findElementByTagName("div").getText());
-  
+
   browser.findElementByName("title")
   .sendKeys("BOOK TITLE");
   browser.findElementByName("author")
@@ -652,7 +652,7 @@ public void addBookToEmptyList() {
          .sendKeys("DESCRIPTION");
   browser.findElementByTagName("form")
          .submit();
-  
+
   WebElement dl =
       browser.findElementByCssSelector("dt.bookHeadline");
   assertEquals("BOOK TITLE by BOOK AUTHOR (ISBN: 1234567890)",
