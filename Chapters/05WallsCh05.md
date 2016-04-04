@@ -135,7 +135,7 @@ interface ReadingListRepository {
 Aside from a clear lack of semicolons and no public modifier on the interface, the Groovy version of ReadingListRepository isn’t much different from its Java counterpart. The most significant difference is that it doesn’t extend JpaRepository because we’re not working with Spring Data JPA in this chapter. And since we’re not using Spring Data JPA, we’re going to have to write the implementation of ReadingListRepository ourselves. The following listing shows what JdbcReadingListRepository.groovy should look like.  
 除了没有分号，以及接口上没有`public`修饰符，`ReadingListRepository`的Groovy版本和与之对应的Java版本并无二致。最显著的区别是它没有扩展`JpaRepository`，因为本章中我们并不适用Spring Data JPA。既然不用Spring Data JPA，我们就不得不自己来实现`ReadingListRepository`了。下面的代码就是JdbcReadingListRepository.groovy的内容：
 
-__Listing 5.1 A Groovy and JDBC implementation of ReadingListRepository__
+__Listing 5.1 A Groovy and JDBC implementation of ReadingListRepository__  
 __代码5.1 ReadingListRepository的Groovy JDBC实现__
 
 ```
@@ -277,24 +277,64 @@ new file named Grabs.groovy and put these three lines in it:
 class Grabs {}
 ```
 
-We’ll talk more about what this class does later. For now, just know that the @Grab annotations on this class tell Groovy to fetch a few dependency libraries on the fly as the application is started.
+We’ll talk more about what this class does later. For now, just know that the @Grab annotations on this class tell Groovy to fetch a few dependency libraries on the fly as the application is started.  
+稍后我们再来讨论这个类的作用，现在你只需要知道类上的`@Grab`注解会告诉Groovy在启动应用程序时自动去获取一些依赖的库。
 
-Believe it or not, we’re ready to run the application. We’ve created a project direc- tory, copied a stylesheet and Thymeleaf template into it, and filled it with Groovy code. All that’s left is to run it with the Spring Boot CLI (from within the project directory):
+Believe it or not, we’re ready to run the application. We’ve created a project directory, copied a stylesheet and Thymeleaf template into it, and filled it with Groovy code. All that’s left is to run it with the Spring Boot CLI (from within the project directory):  
+不管你信还是不信，我们已经可以运行这个应用程序了。我们创建了一个项目目录，向其中复制了一个样式表和Thymeleaf模板，填充了一些Groovy代码。剩下的就是用Spring Boot CLI（在项目目录里）来运行它了：
 
 ```
 $ spring run .
 ```
 
-After a few seconds, the application should be fully started. Open your web browser and navigate to http://localhost:8080. Assuming everything goes well, you should see the same reading-list application you saw in chapter 2.
+After a few seconds, the application should be fully started. Open your web browser and navigate to http://localhost:8080. Assuming everything goes well, you should see the same reading-list application you saw in chapter 2.  
+几秒后，应用程序就完全启动起来了。打开浏览器，访问http://localhost:8080。如果一切正常，你应该就能看到和第2章里一样的阅读列表应用程序了。
 
-Success! In just a few pages of this book, you’ve written a complete (albeit simple) Spring application!
+Success! In just a few pages of this book, you’ve written a complete (albeit simple) Spring application!  
+成功啦！只用了几页纸的篇幅，你就写了一个完整（相对简单）的Spring应用程序！
 
-At this point, however, you might be wondering how it works, considering that...
+At this point, however, you might be wondering how it works, considering that...  
+然而，此时此刻你也许会好奇，这是怎么办到的……
 
 * There’s no Spring configuration. How are the beans created and wired together? Where does the JdbcTemplate bean come from?
 * There’s no build file. Where do the library dependencies like Spring MVC and Thymeleaf come from?
 * There are no import statements. How can Groovy resolve types like JdbcTemplate and RequestMapping if there are no import statements to specify what packages they’re in?
 * We never deployed the app. Where’d the web server come from?
+* ___没有Spring配置。___Bean是如何创建并组装的？`JdbcTemplate` Bean又是从哪来的？
+* ___没有构建文件。___Spring MVC和Thymeleaf这样的依赖库是哪来的？
+* ___没有`import`语句。___如果没有`import`语句来指定具体的包，Groovy是如何解析`JdbcTemplate`和`RequestMapping`类型的？
 
-Indeed, the code we’ve written seems to be missing more than just a few semicolons.
-How does this code even work?
+Indeed, the code we’ve written seems to be missing more than just a few semicolons. How does this code even work?  
+实际上，我们编写的代码看起来缺少的不止是分号。这些代码究竟是怎么跑起来的？
+
+### 5.1.3 What just happened?
+### 5.1.3 发生了什么？
+
+As you’ve probably surmised, there’s more to Spring Boot’s CLI than just a convenient means of writing Spring applications with Groovy. The Spring Boot CLI has several tricks in its repertoire, including the following:  
+如你所猜测的那样，此处不仅是用Groovy编写Spring应用程序，更多的是Spring Boot的CLI。Spring Boot CLI使劲了浑身解数，包括：
+
+* The CLI is able to leverage Spring Boot auto-configuration and starter dependencies.
+* The CLI is able to detect when certain types are in use and automatically resolve the appropriate dependency libraries to support those types.
+* The CLI knows which packages several commonly used types are in and, if those types are used, adds those packages to Groovy’s default packages.
+* By applying both automatic dependency resolution and auto-configuration, the CLI can detect that it’s running a web application and automatically include an embedded web container (Tomcat by default) to serve the application.
+* CLI可以利用Spring Boot的自动配置和起步依赖。
+* CLI可以检测到正在使用的特定类，自动解析合适的依赖库来支持那些类。
+* CLI知道多数常用类都在哪些包里，如果用到了这些类，它会把那些包加入Groovy的默认包里。
+* 应用了自动依赖解析和自动配置后，CLI可以检测到当前运行的是一个Web应用程序，自动引入嵌入式Web容器（默认是Tomcat）供应用程序使用。
+
+If you think about it, these are the most important features that the CLI offers. The Groovy syntax is just a bonus!  
+如果你仔细想想，这些事CLI提供的最重要的特性。Groovy语法只是额外的福利！
+
+When you run the reading-list application through the Spring Boot CLI, several things happen under the covers to make this magic work. One of the very first things the CLI does is attempt to compile the Groovy code using an embedded Groovy compiler. Without you knowing it, however, the code fails to compile due to several unknown types in the code (such as JdbcTemplate, Controller, RequestMapping, and so on).
+
+But the CLI doesn’t give up. The CLI knows that JdbcTemplate can be added to the classpath by adding the Spring Boot JDBC starter as a dependency. It also knows that the Spring MVC types can be found by adding the Spring Boot web starter as a dependency. So it grabs those dependencies from the Maven repository (Maven Central, by default).
+
+If the CLI were to try to recompile at this point, it would still fail because of the missing import statements. But the CLI also knows the packages of many commonly used types. Taking advantage of the ability to customize the Groovy compiler’s default package imports, the CLI adds all of the necessary packages to the Groovy compiler’s default imports list.
+
+Now it’s time for the CLI to attempt another compile. Assuming there are no other problems outside of the CLI’s abilities (such as syntax errors or types that the CLI doesn’t know about), the code will compile cleanly and the CLI will run it via an internal bootstrap method similar to the main() method we put in Application for the Java- based example.
+
+At this point, Spring Boot auto-configuration kicks in. It sees that Spring MVC is on the classpath (as a result of the CLI resolving the web starter), so it automatically configures the appropriate beans to support Spring MVC, as well as an embedded Tomcat bean to serve the application. It also sees that JdbcTemplate is on the classpath, so it automatically creates a JdbcTemplate bean, wiring it with a DataSource bean that was also automatically created.
+
+Speaking of the DataSource bean, it’s just one of several other beans that are created via Spring Boot auto-configuration. Spring Boot also automatically configures beans that support Thymeleaf views in Spring MVC. This happens because we used @Grab to add H2 and Thymeleaf to the classpath, which triggers auto-configuration for an embedded H2 database and Thymeleaf.
+
+The @Grab annotation is an easy way to add dependencies that the CLI isn’t able to automatically resolve. In spite of its ease of use, however, there’s more to this little annotation than meets the eye. Let’s take a closer look at @Grab to see what makes it tick, how the Spring Boot CLI makes it even easier by requiring only an artifact name for many commonly used dependencies, and how to configure its dependency-resolution process.
