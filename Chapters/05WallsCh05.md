@@ -300,9 +300,9 @@ At this point, however, you might be wondering how it works, considering that...
 * There’s no build file. Where do the library dependencies like Spring MVC and Thymeleaf come from?
 * There are no import statements. How can Groovy resolve types like JdbcTemplate and RequestMapping if there are no import statements to specify what packages they’re in?
 * We never deployed the app. Where’d the web server come from?
-* ___没有Spring配置。___Bean是如何创建并组装的？`JdbcTemplate` Bean又是从哪来的？
-* ___没有构建文件。___Spring MVC和Thymeleaf这样的依赖库是哪来的？
-* ___没有`import`语句。___如果没有`import`语句来指定具体的包，Groovy是如何解析`JdbcTemplate`和`RequestMapping`类型的？
+* ___没有Spring配置。___ Bean是如何创建并组装的？`JdbcTemplate` Bean又是从哪来的？
+* ___没有构建文件。___ Spring MVC和Thymeleaf这样的依赖库是哪来的？
+* ___没有`import`语句。___ 如果没有`import`语句来指定具体的包，Groovy是如何解析`JdbcTemplate`和`RequestMapping`类型的？
 
 Indeed, the code we’ve written seems to be missing more than just a few semicolons. How does this code even work?  
 实际上，我们编写的代码看起来缺少的不止是分号。这些代码究竟是怎么跑起来的？
@@ -325,16 +325,94 @@ As you’ve probably surmised, there’s more to Spring Boot’s CLI than just a
 If you think about it, these are the most important features that the CLI offers. The Groovy syntax is just a bonus!  
 如果你仔细想想，这些事CLI提供的最重要的特性。Groovy语法只是额外的福利！
 
-When you run the reading-list application through the Spring Boot CLI, several things happen under the covers to make this magic work. One of the very first things the CLI does is attempt to compile the Groovy code using an embedded Groovy compiler. Without you knowing it, however, the code fails to compile due to several unknown types in the code (such as JdbcTemplate, Controller, RequestMapping, and so on).
+When you run the reading-list application through the Spring Boot CLI, several things happen under the covers to make this magic work. One of the very first things the CLI does is attempt to compile the Groovy code using an embedded Groovy compiler. Without you knowing it, however, the code fails to compile due to several unknown types in the code (such as JdbcTemplate, Controller, RequestMapping, and so on).  
+当你通过Spring Boot CLI来运行阅读列表应用程序时，表面看似平凡无奇，实则大有乾坤。首先，CLI尝试用内嵌的Groovy编译器来编译Groovy代码，虽然你不知道，但实际上代码会由于未知类型的原因最终编译失败（比如`JdbcTemplate`、`Controller`及`RequestMapping`等等）。
 
-But the CLI doesn’t give up. The CLI knows that JdbcTemplate can be added to the classpath by adding the Spring Boot JDBC starter as a dependency. It also knows that the Spring MVC types can be found by adding the Spring Boot web starter as a dependency. So it grabs those dependencies from the Maven repository (Maven Central, by default).
+But the CLI doesn’t give up. The CLI knows that JdbcTemplate can be added to the classpath by adding the Spring Boot JDBC starter as a dependency. It also knows that the Spring MVC types can be found by adding the Spring Boot web starter as a dependency. So it grabs those dependencies from the Maven repository (Maven Central, by default).  
+但CLI不会放弃，它知道只要把Spring Boot JDBC起步依赖加入Classpath就能找到`JdbcTemplate`了，它还知道把Spring Boot web起步依赖加入Classpath就能找到Spring MVC的相关类。因此CLI会从Maven仓库（默认是Maven中心仓库）里获取那些依赖。
 
-If the CLI were to try to recompile at this point, it would still fail because of the missing import statements. But the CLI also knows the packages of many commonly used types. Taking advantage of the ability to customize the Groovy compiler’s default package imports, the CLI adds all of the necessary packages to the Groovy compiler’s default imports list.
+If the CLI were to try to recompile at this point, it would still fail because of the missing import statements. But the CLI also knows the packages of many commonly used types. Taking advantage of the ability to customize the Groovy compiler’s default package imports, the CLI adds all of the necessary packages to the Groovy compiler’s default imports list.  
+如果此时CLI重新编译，那还是会编译失败，因为缺少`import`语句，但CLI知道很多常用类的包，在利用了定制Groovy编译器默认包导入的能力后，CLI把所有需要用到的包都加入了Groovy编译器的默认导入列表里。
 
-Now it’s time for the CLI to attempt another compile. Assuming there are no other problems outside of the CLI’s abilities (such as syntax errors or types that the CLI doesn’t know about), the code will compile cleanly and the CLI will run it via an internal bootstrap method similar to the main() method we put in Application for the Java- based example.
+Now it’s time for the CLI to attempt another compile. Assuming there are no other problems outside of the CLI’s abilities (such as syntax errors or types that the CLI doesn’t know about), the code will compile cleanly and the CLI will run it via an internal bootstrap method similar to the main() method we put in Application for the Java- based example.  
+现在CLI可以尝试再做一次编译了，假设没有其他CLI能力范围外的问题（比如CLI不知道的语法或类型错误），代码就能完成编译，CLI将通过内置的启动方法（与我们放在基于Java的例子里的`main()`方法类似）来运行应用程序。
 
-At this point, Spring Boot auto-configuration kicks in. It sees that Spring MVC is on the classpath (as a result of the CLI resolving the web starter), so it automatically configures the appropriate beans to support Spring MVC, as well as an embedded Tomcat bean to serve the application. It also sees that JdbcTemplate is on the classpath, so it automatically creates a JdbcTemplate bean, wiring it with a DataSource bean that was also automatically created.
+At this point, Spring Boot auto-configuration kicks in. It sees that Spring MVC is on the classpath (as a result of the CLI resolving the web starter), so it automatically configures the appropriate beans to support Spring MVC, as well as an embedded Tomcat bean to serve the application. It also sees that JdbcTemplate is on the classpath, so it automatically creates a JdbcTemplate bean, wiring it with a DataSource bean that was also automatically created.  
+此时，Spring Boot自动配置就能发挥作用了，它发现Classpath里存在Spring MVC（因为CLI解析了web起步依赖），就自动配置了合适的Bean来支持Spring MVC，还有嵌入式Tomcat Bean来供应用程序使用。它还发现Classpath里有`JdbcTemplate`，所以自动创建了`JdbcTemplate` Bean，注入了同样是自动创建的`DataSource` Bean。
 
-Speaking of the DataSource bean, it’s just one of several other beans that are created via Spring Boot auto-configuration. Spring Boot also automatically configures beans that support Thymeleaf views in Spring MVC. This happens because we used @Grab to add H2 and Thymeleaf to the classpath, which triggers auto-configuration for an embedded H2 database and Thymeleaf.
+Speaking of the DataSource bean, it’s just one of several other beans that are created via Spring Boot auto-configuration. Spring Boot also automatically configures beans that support Thymeleaf views in Spring MVC. This happens because we used @Grab to add H2 and Thymeleaf to the classpath, which triggers auto-configuration for an embedded H2 database and Thymeleaf.  
+说起`DataSource` Bean，这只是Spring Boot自动配置创建的众多Bean中的一个。Spring Boot还自动配置了很多Bean来支持Spring MVC中的Thymeleaf模板。正是由于我们使用了`@Grab`注解向Classpath里添加了H2和Thymeleaf，这才触发了针对嵌入式H2数据库和Thymeleaf的自动配置。
 
-The @Grab annotation is an easy way to add dependencies that the CLI isn’t able to automatically resolve. In spite of its ease of use, however, there’s more to this little annotation than meets the eye. Let’s take a closer look at @Grab to see what makes it tick, how the Spring Boot CLI makes it even easier by requiring only an artifact name for many commonly used dependencies, and how to configure its dependency-resolution process.
+The @Grab annotation is an easy way to add dependencies that the CLI isn’t able to automatically resolve. In spite of its ease of use, however, there’s more to this little annotation than meets the eye. Let’s take a closer look at @Grab to see what makes it tick, how the Spring Boot CLI makes it even easier by requiring only an artifact name for many commonly used dependencies, and how to configure its dependency-resolution process.  
+`@Grab`注解的作用是方便地添加CLI无法自动解析的依赖。虽然它看上去很简单，但实际上这个小小的注解的作用远比你想象的要大。让我们仔细看看这个注解，Spring Boot CLI是如何通过一个Artifact名称来找到这么多常用依赖的，看看整个依赖解析的过程是如何配置的。
+
+## 5.2 Grabbing dependencies
+## 5.2 获取依赖
+
+In the case of Spring MVC and JdbcTemplate, Groovy compilation errors triggered the Spring Boot CLI to go fetch the necessary dependencies and add them to the classpath. But what if a dependency is required but there’s no failing code to trigger automatic dependency resolution? Or what if the required dependency isn’t among the ones the CLI knows about?
+
+In the reading-list example, we needed Thymeleaf libraries so that we could write our views using Thymeleaf templates. And we needed the H2 database library so that we could have an embedded H2 database. But because none of the Groovy code directly referenced Thymeleaf or H2 classes, there were no compilation failures to trigger them to be resolved automatically. Therefore, we had to help the CLI out a bit by adding the @Grab dependencies in the Grabs class.
+
+> __WHERE SHOULD YOU PLACE @GRAB?__ It’s not strictly necessary to put the @Grab annotations in a separate class as we have. They would still do their magic had we put them in ReadingListController or JdbcReadingListRepository. For organization’s sake, however, it’s useful to create an otherwise empty class definition that has all of the @Grab annotations. This makes it easy to view all of the explicitly declared library dependencies in one place.
+
+The @Grab annotation comes from Groovy’s Grape (Groovy Adaptable Packaging Engine or Groovy Advanced Packaging Engine) facility. In a nutshell, Grape enables Groovy scripts to download dependency libraries at runtime without using a build tool like Maven or Gradle. In addition to providing the functionality behind the @Grab annotation, Grape is also used by the Spring Boot CLI to fetch dependencies deduced from the code.
+
+Using @Grab is as simple as expressing the dependency coordinates. For example, suppose you want to add the H2 database to your project. Adding the following @Grab to one of the project’s Groovy scripts will do just that:
+
+```
+@Grab(group="com.h2database", module="h2", version="1.4.190")
+```
+
+Used this way, the group, module, and version attributes explicitly specify the dependency. Alternatively, you can express the same dependency more succinctly using a colon-separated form similar to how dependencies can be expressed in a Gradle build specification:
+
+```
+@Grab("com.h2database:h2:1.4.185")
+```
+
+These are two textbook examples of using @Grab. But the Spring Boot CLI extends @Grab in a couple of ways to make working with @Grab even easier.
+
+First, for many dependencies it’s unnecessary to specify the version. Applying this to the example of the H2 database dependency, it’s possible to express the dependency with the following @Grab:
+
+```
+@Grab("com.h2database:h2")
+```
+
+The specific version of the dependency is determined by the version of the CLI that you’re using. In the case of Spring Boot CLI 1.3.0.RELEASE, the H2 dependency resolved will be 1.4.190.
+
+But that’s not all. For many commonly used dependencies, it’s also possible to leave out the group ID, expressing the dependency by only giving the module ID to @Grab. This is what enabled us to express the following @Grab for H2 in the previous section:
+
+```
+@Grab("h2")
+```
+
+How can you know which dependencies require a group ID and version and which you can grab using only the module ID? I’ve included a complete list of all the dependencies the Spring Boot CLI knows about in appendix D. But generally speaking, it’s easy enough to try @Grab dependencies with only a module ID first and then only express the group ID and version if the module ID alone doesn’t work.
+
+Although it’s very convenient to express dependencies giving only their module IDs, what if you disagree with the version chosen by Spring Boot? What if one of Spring Boot’s starters transitively pulls in a certain version of a library, but you’d prefer to use a newer version that contains a bug fix?
+
+### 5.2.1 Overriding default dependency versions
+
+Spring Boot brings a new @GrabMetadata annotation that can be used with @Grab to override the default dependency versions in a properties file.
+
+To use @GrabMetadata, add it to one of the Groovy script files giving it the coordinates for a properties file with the overriding dependency metadata:
+
+```
+@GrabMetadata(“com.myorg:custom-versions:1.0.0”)
+```
+
+This will load a properties file named custom-versions.properties from a Maven repository in the com/myorg directory. Each line in the properties file should have a group ID and module ID as the key, and the version as the value. For example, to override the default version for H2 with 1.4.186, you can point @GrabMetadata at a properties file containing the following line:
+
+```
+com.h2database:h2=1.4.186
+```
+
+> __Using the Spring IO platform__
+
+> One way you might want to use @GrabMetadata is to work with dependency versions defined in the Spring IO platform (http://platform.spring.io/platform/). The Spring IO platform offers a curated set of dependencies and versions aimed to give confidence in knowing which versions of Spring and other libraries will work well together. The dependencies and versions specified by the Spring IO platform is a superset of Spring Boot’s set of known dependency libraries, and it includes several third-party libraries that are frequently used in Spring applications.
+
+> If you’d like to build Spring Boot CLI applications on the Spring IO platform, you’ll just need to annotate one of your Groovy scripts with the following @GrabMetadata:
+```
+@GrabMetadata('io.spring.platform:platform-versions:1.0.4.RELEASE')
+```
+> This overrides the CLI’s set of default dependency versions with those defined by the Spring IO platform.
+
+One question you might have is where Grape fetches all of its dependencies from? And is that configurable? Let’s see how you can manage the set of repositories that Grape draws dependencies from.
