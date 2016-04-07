@@ -349,47 +349,60 @@ The @Grab annotation is an easy way to add dependencies that the CLI isn’t abl
 ## 5.2 Grabbing dependencies
 ## 5.2 获取依赖
 
-In the case of Spring MVC and JdbcTemplate, Groovy compilation errors triggered the Spring Boot CLI to go fetch the necessary dependencies and add them to the classpath. But what if a dependency is required but there’s no failing code to trigger automatic dependency resolution? Or what if the required dependency isn’t among the ones the CLI knows about?
+In the case of Spring MVC and JdbcTemplate, Groovy compilation errors triggered the Spring Boot CLI to go fetch the necessary dependencies and add them to the classpath. But what if a dependency is required but there’s no failing code to trigger automatic dependency resolution? Or what if the required dependency isn’t among the ones the CLI knows about?  
+在Spring MVC和`JdbcTemplate`的例子中，Groovy编译错误触发了Spring Boot CLI去获取必要的依赖，并将它们添加到Classpath里。但如果需要一个依赖，但是并没有失败代码来触发自动依赖解析，又或者所需的依赖不在CLI知道的依赖中该怎么办？
 
-In the reading-list example, we needed Thymeleaf libraries so that we could write our views using Thymeleaf templates. And we needed the H2 database library so that we could have an embedded H2 database. But because none of the Groovy code directly referenced Thymeleaf or H2 classes, there were no compilation failures to trigger them to be resolved automatically. Therefore, we had to help the CLI out a bit by adding the @Grab dependencies in the Grabs class.
+In the reading-list example, we needed Thymeleaf libraries so that we could write our views using Thymeleaf templates. And we needed the H2 database library so that we could have an embedded H2 database. But because none of the Groovy code directly referenced Thymeleaf or H2 classes, there were no compilation failures to trigger them to be resolved automatically. Therefore, we had to help the CLI out a bit by adding the @Grab dependencies in the Grabs class.  
+在阅读列表应用程序中，我们需要Thymeleaf库，这样才能编写使用了Thymeleaf模板的视图。我们还需要H2的库，这样才能拥有嵌入式的H2数据库。但因为没有Groovy代码会直接引用Thymeleaf或H2的类，所以不会有编译错误来触发自动依赖解析。因此，我们要帮一帮CLI，在`Grabs`类上添加`@Grab`依赖。
 
-> __WHERE SHOULD YOU PLACE @GRAB?__ It’s not strictly necessary to put the @Grab annotations in a separate class as we have. They would still do their magic had we put them in ReadingListController or JdbcReadingListRepository. For organization’s sake, however, it’s useful to create an otherwise empty class definition that has all of the @Grab annotations. This makes it easy to view all of the explicitly declared library dependencies in one place.
+> __WHERE SHOULD YOU PLACE @GRAB?__ It’s not strictly necessary to put the @Grab annotations in a separate class as we have. They would still do their magic had we put them in ReadingListController or JdbcReadingListRepository. For organization’s sake, however, it’s useful to create an otherwise empty class definition that has all of the @Grab annotations. This makes it easy to view all of the explicitly declared library dependencies in one place.  
+__该把`@Grab`注解放在哪里？__ 并不需要像我们这样，严格地将`@Grab`注解放在一个单独的类上。把它们放在`ReadingListController`或`JdbcReadingListRepository`上，它们也同样有效。然而，为了便于组织管理，最好是创建一个空类，把所有`@Grab`注解放在一起。这样方便在一个地方看到所有显式声明的依赖。
 
-The @Grab annotation comes from Groovy’s Grape (Groovy Adaptable Packaging Engine or Groovy Advanced Packaging Engine) facility. In a nutshell, Grape enables Groovy scripts to download dependency libraries at runtime without using a build tool like Maven or Gradle. In addition to providing the functionality behind the @Grab annotation, Grape is also used by the Spring Boot CLI to fetch dependencies deduced from the code.
+The @Grab annotation comes from Groovy’s Grape (Groovy Adaptable Packaging Engine or Groovy Advanced Packaging Engine) facility. In a nutshell, Grape enables Groovy scripts to download dependency libraries at runtime without using a build tool like Maven or Gradle. In addition to providing the functionality behind the @Grab annotation, Grape is also used by the Spring Boot CLI to fetch dependencies deduced from the code.  
+`@Grab`注解源自Groovy Grape（Groovy Adaptable Packaging Engine或Groovy Advanced Packaging Engine）。从本质上来说，Grape允许Groovy脚本在运行时下载依赖，无需Maven或Gradle这样的构建工具介入。除了支持`@Grab`注解，Spring Boot CLI还用Grape来获取代码中推断出的依赖。
 
-Using @Grab is as simple as expressing the dependency coordinates. For example, suppose you want to add the H2 database to your project. Adding the following @Grab to one of the project’s Groovy scripts will do just that:
+Using @Grab is as simple as expressing the dependency coordinates. For example, suppose you want to add the H2 database to your project. Adding the following @Grab to one of the project’s Groovy scripts will do just that:  
+使用`@Grab`就和描述依赖一样简单，举例来说，假设你想往项目里添加H2数据库，可以往项目的一个Groovy脚本上添加如下`@Grab`注解：
 
 ```
 @Grab(group="com.h2database", module="h2", version="1.4.190")
 ```
 
-Used this way, the group, module, and version attributes explicitly specify the dependency. Alternatively, you can express the same dependency more succinctly using a colon-separated form similar to how dependencies can be expressed in a Gradle build specification:
+Used this way, the group, module, and version attributes explicitly specify the dependency. Alternatively, you can express the same dependency more succinctly using a colon-separated form similar to how dependencies can be expressed in a Gradle build specification:  
+这样能明确地声明依赖的组、模块和版本号。或者，你也可以用更简洁的冒号分割的方式来表示依赖，这和Gradle构建说明里的表示方式很类似：
 
 ```
 @Grab("com.h2database:h2:1.4.185")
 ```
 
-These are two textbook examples of using @Grab. But the Spring Boot CLI extends @Grab in a couple of ways to make working with @Grab even easier.
+These are two textbook examples of using @Grab. But the Spring Boot CLI extends @Grab in a couple of ways to make working with @Grab even easier.  
+这是两个教科书式的例子，但Spring Boot CLI对`@Grab`做了几处扩展，用起来更简单了。
 
-First, for many dependencies it’s unnecessary to specify the version. Applying this to the example of the H2 database dependency, it’s possible to express the dependency with the following @Grab:
+First, for many dependencies it’s unnecessary to specify the version. Applying this to the example of the H2 database dependency, it’s possible to express the dependency with the following @Grab:  
+首先，对于很多依赖而言，不再需要指定版本号。可以通过下面的的方式，用`@Grab`来添加H2数据库依赖：
 
 ```
 @Grab("com.h2database:h2")
 ```
 
-The specific version of the dependency is determined by the version of the CLI that you’re using. In the case of Spring Boot CLI 1.3.0.RELEASE, the H2 dependency resolved will be 1.4.190.
+The specific version of the dependency is determined by the version of the CLI that you’re using. In the case of Spring Boot CLI 1.3.0.RELEASE, the H2 dependency resolved will be 1.4.190.  
+确切的版本号是由你所使用的CLI的版本来决定的。如果用的是Spring Boot CLI 1.3.0.RELEASE，那么H2依赖的版本会解析为1.4.190。
 
-But that’s not all. For many commonly used dependencies, it’s also possible to leave out the group ID, expressing the dependency by only giving the module ID to @Grab. This is what enabled us to express the following @Grab for H2 in the previous section:
+But that’s not all. For many commonly used dependencies, it’s also possible to leave out the group ID, expressing the dependency by only giving the module ID to @Grab. This is what enabled us to express the following @Grab for H2 in the previous section:  
+这还不算完，对于很多常用依赖而言，还可以省去Group ID，直接在`@Grab`里写上模块的ID就好了。正是这个特性才让上文中的`@Grab`注解成功加载了H2：
 
 ```
 @Grab("h2")
 ```
 
-How can you know which dependencies require a group ID and version and which you can grab using only the module ID? I’ve included a complete list of all the dependencies the Spring Boot CLI knows about in appendix D. But generally speaking, it’s easy enough to try @Grab dependencies with only a module ID first and then only express the group ID and version if the module ID alone doesn’t work.
+How can you know which dependencies require a group ID and version and which you can grab using only the module ID? I’ve included a complete list of all the dependencies the Spring Boot CLI knows about in appendix D. But generally speaking, it’s easy enough to try @Grab dependencies with only a module ID first and then only express the group ID and version if the module ID alone doesn’t work.  
+那你该如何获知某个依赖是需要Group ID和版本号呢，还是只需要模块ID就够了呢？我在附录D中提供了一个完整的列表，包含了Spring Boot CLI知道的全部依赖。通常而言，可以先试一下只写模块ID，如果这样不行，再加上Group ID和版本号。
 
-Although it’s very convenient to express dependencies giving only their module IDs, what if you disagree with the version chosen by Spring Boot? What if one of Spring Boot’s starters transitively pulls in a certain version of a library, but you’d prefer to use a newer version that contains a bug fix?
+Although it’s very convenient to express dependencies giving only their module IDs, what if you disagree with the version chosen by Spring Boot? What if one of Spring Boot’s starters transitively pulls in a certain version of a library, but you’d prefer to use a newer version that contains a bug fix?  
+虽然只用模块ID来表示依赖很方便，但如果你并不认可Spring Boot选择的版本号该怎么办？如果Spring Boot的起步依赖传递引入了一个库的某个版本，但你想要使用包含Bugfix的新版本又该如何呢？
 
 ### 5.2.1 Overriding default dependency versions
+### 5.2.1 覆盖默认依赖版本
 
 Spring Boot brings a new @GrabMetadata annotation that can be used with @Grab to override the default dependency versions in a properties file.
 
