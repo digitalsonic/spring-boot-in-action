@@ -396,36 +396,63 @@ But that’s not all. For many commonly used dependencies, it’s also possible 
 ```
 
 How can you know which dependencies require a group ID and version and which you can grab using only the module ID? I’ve included a complete list of all the dependencies the Spring Boot CLI knows about in appendix D. But generally speaking, it’s easy enough to try @Grab dependencies with only a module ID first and then only express the group ID and version if the module ID alone doesn’t work.  
-那你该如何获知某个依赖是需要Group ID和版本号呢，还是只需要模块ID就够了呢？我在附录D中提供了一个完整的列表，包含了Spring Boot CLI知道的全部依赖。通常而言，可以先试一下只写模块ID，如果这样不行，再加上Group ID和版本号。
+那你该如何获知某个依赖是需要Group ID和版本号呢，还是只需要Module ID就够了呢？我在附录D中提供了一个完整的列表，包含了Spring Boot CLI知道的全部依赖。通常而言，可以先试一下只写Module ID，如果这样不行，再加上Group ID和版本号。
 
 Although it’s very convenient to express dependencies giving only their module IDs, what if you disagree with the version chosen by Spring Boot? What if one of Spring Boot’s starters transitively pulls in a certain version of a library, but you’d prefer to use a newer version that contains a bug fix?  
-虽然只用模块ID来表示依赖很方便，但如果你并不认可Spring Boot选择的版本号该怎么办？如果Spring Boot的起步依赖传递引入了一个库的某个版本，但你想要使用包含Bugfix的新版本又该如何呢？
+虽然只用Module ID来表示依赖很方便，但如果你并不认可Spring Boot选择的版本号该怎么办？如果Spring Boot的起步依赖传递引入了一个库的某个版本，但你想要使用包含Bugfix的新版本又该如何呢？
 
 ### 5.2.1 Overriding default dependency versions
 ### 5.2.1 覆盖默认依赖版本
 
-Spring Boot brings a new @GrabMetadata annotation that can be used with @Grab to override the default dependency versions in a properties file.
+Spring Boot brings a new @GrabMetadata annotation that can be used with @Grab to override the default dependency versions in a properties file.  
+Spring Boot引入了新的`@GrabMetadata`注解，可以和`@Grab`搭配使用，用属性文件里的内容来覆盖默认的依赖版本。
 
-To use @GrabMetadata, add it to one of the Groovy script files giving it the coordinates for a properties file with the overriding dependency metadata:
+To use @GrabMetadata, add it to one of the Groovy script files giving it the coordinates for a properties file with the overriding dependency metadata:  
+要用`@GrabMetadata`，把它加到某个Groovy脚本文件里，提供相应的属性文件来覆盖依赖元数据：
 
 ```
 @GrabMetadata(“com.myorg:custom-versions:1.0.0”)
 ```
 
-This will load a properties file named custom-versions.properties from a Maven repository in the com/myorg directory. Each line in the properties file should have a group ID and module ID as the key, and the version as the value. For example, to override the default version for H2 with 1.4.186, you can point @GrabMetadata at a properties file containing the following line:
+This will load a properties file named custom-versions.properties from a Maven repository in the com/myorg directory. Each line in the properties file should have a group ID and module ID as the key, and the version as the value. For example, to override the default version for H2 with 1.4.186, you can point @GrabMetadata at a properties file containing the following line:  
+这会从Maven仓库的com/myorg目录里加载一个名为custom-versions.properties的文件，文件里的每一行都应该有Group ID和Module ID，这两个东西作为键名，属性则是值。例如，要把H2的默认版本覆盖为1.4.186，可以把`@GrabMetadata`指向一个包含如下内容的属性文件：
 
 ```
 com.h2database:h2=1.4.186
 ```
 
-> __Using the Spring IO platform__
+> __Using the Spring IO platform__  
+__使用Spring IO平台__
 
-> One way you might want to use @GrabMetadata is to work with dependency versions defined in the Spring IO platform (http://platform.spring.io/platform/). The Spring IO platform offers a curated set of dependencies and versions aimed to give confidence in knowing which versions of Spring and other libraries will work well together. The dependencies and versions specified by the Spring IO platform is a superset of Spring Boot’s set of known dependency libraries, and it includes several third-party libraries that are frequently used in Spring applications.
+> One way you might want to use @GrabMetadata is to work with dependency versions defined in the Spring IO platform (http://platform.spring.io/platform/). The Spring IO platform offers a curated set of dependencies and versions aimed to give confidence in knowing which versions of Spring and other libraries will work well together. The dependencies and versions specified by the Spring IO platform is a superset of Spring Boot’s set of known dependency libraries, and it includes several third-party libraries that are frequently used in Spring applications.  
+你可能会希望让`@GrabMetadata`使用Spring IO平台（[http://platform.spring.io/platform/](http://platform.spring.io/platform/)）上定义的依赖版本。该平台提供了一套依赖和版本，明确哪个版本的Spring能和其他库的什么版本搭配使用。Spring IO平台提供的依赖和版本是Spring Boot已知依赖库的一个超集，包含了很多Spring应用程序经常用到的第三方库。
 
-> If you’d like to build Spring Boot CLI applications on the Spring IO platform, you’ll just need to annotate one of your Groovy scripts with the following @GrabMetadata:
+> If you’d like to build Spring Boot CLI applications on the Spring IO platform, you’ll just need to annotate one of your Groovy scripts with the following @GrabMetadata:  
+如果你想在Spring IO平台上构建Spring Boot CLI应用程序，只需要添加如下`@GrabMetadata`即可：
+
 ```
 @GrabMetadata('io.spring.platform:platform-versions:1.0.4.RELEASE')
 ```
-> This overrides the CLI’s set of default dependency versions with those defined by the Spring IO platform.
 
-One question you might have is where Grape fetches all of its dependencies from? And is that configurable? Let’s see how you can manage the set of repositories that Grape draws dependencies from.
+> This overrides the CLI’s set of default dependency versions with those defined by the Spring IO platform.  
+这会覆盖CLI的默认依赖版本，使用Spring IO平台定义的版本取而代之。
+
+One question you might have is where Grape fetches all of its dependencies from? And is that configurable? Let’s see how you can manage the set of repositories that Grape draws dependencies from.  
+你可能会有疑问，Grape又是从哪里获取到所有这些依赖的呢？这是可配置的么？让我们来看看你该如何管理Grape获取依赖的仓库集的。
+
+### 5.2.2 Adding dependency repositories
+
+By default, @Grab-declared dependencies are fetched from the Maven Central repository (http://repo1.maven.org/maven2/). In addition, Spring Boot also registers Spring’s milestone and snapshot repositories to be able to fetch pre-released dependencies for Spring projects. For many projects, this is perfectly sufficient. But what if your project needs a library that isn’t in Central or the Spring repositories? Or what if you’re working within a corporate firewall and must use an internal repository?
+
+No problem. The @GrabResolver annotation enables you to specify additional repositories from which dependencies can be fetched.
+
+For example, suppose you want to use the latest Hibernate release. Recent Hibernate releases can only be found in the JBoss repository, so you’ll need to add that repository via @GrabResolver:
+
+```
+@GrabResolver(name='jboss', root=
+  'https://repository.jboss.org/nexus/content/groups/public-jboss')
+```
+
+Here the resolver is named “jboss” with the name attribute. The URL to the repository is specified in the root attribute.
+
+You’ve seen how Spring Boot’s CLI compiles your code and automatically resolves several known dependency libraries as needed. And with support for @Grab to resolve any dependencies that the CLI isn’t able to resolve automatically, CLI-based applications have no need for a Maven or Gradle build specification (as is required by traditionally developed Java applications). But resolving dependencies and compiling code aren’t the only things that build processes do. Project builds also usually execute automated tests. If there’s no build specification, how do the tests run?
