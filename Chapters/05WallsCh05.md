@@ -441,18 +441,164 @@ One question you might have is where Grape fetches all of its dependencies from?
 你可能会有疑问，Grape又是从哪里获取到所有这些依赖的呢？这是可配置的么？让我们来看看你该如何管理Grape获取依赖的仓库集的。
 
 ### 5.2.2 Adding dependency repositories
+### 5.2.2 添加依赖仓库
 
-By default, @Grab-declared dependencies are fetched from the Maven Central repository (http://repo1.maven.org/maven2/). In addition, Spring Boot also registers Spring’s milestone and snapshot repositories to be able to fetch pre-released dependencies for Spring projects. For many projects, this is perfectly sufficient. But what if your project needs a library that isn’t in Central or the Spring repositories? Or what if you’re working within a corporate firewall and must use an internal repository?
+By default, @Grab-declared dependencies are fetched from the Maven Central repository (http://repo1.maven.org/maven2/). In addition, Spring Boot also registers Spring’s milestone and snapshot repositories to be able to fetch pre-released dependencies for Spring projects. For many projects, this is perfectly sufficient. But what if your project needs a library that isn’t in Central or the Spring repositories? Or what if you’re working within a corporate firewall and must use an internal repository?  
+默认情况下，`@Grab`声明的依赖是从Maven中心仓库（[http://repo1.maven.org/maven2/](http://repo1.maven.org/maven2/)）拉取的。此外，Spring Boot还注册了Spring的里程碑及快照仓库，以便能够获取Spring项目的预发布版本依赖。对很多项目而言，这就足够了。但要是你的项目需要的库不在这两者之中该怎么办呢？或者你的工作环境在公司防火墙内，必须使用内部仓库又该如何？
 
-No problem. The @GrabResolver annotation enables you to specify additional repositories from which dependencies can be fetched.
+No problem. The @GrabResolver annotation enables you to specify additional repositories from which dependencies can be fetched.  
+没有问题。`@GrabResolver`注解可以让你指定额外的仓库，用来获取依赖。
 
-For example, suppose you want to use the latest Hibernate release. Recent Hibernate releases can only be found in the JBoss repository, so you’ll need to add that repository via @GrabResolver:
+For example, suppose you want to use the latest Hibernate release. Recent Hibernate releases can only be found in the JBoss repository, so you’ll need to add that repository via @GrabResolver:  
+举个例子，假设你想使用最新的Hibernate，而最新的Hibernate版本只能从JBoss的仓库里获取到，因此你需要通过`@GrabResolver`来添加仓库：
 
 ```
 @GrabResolver(name='jboss', root=
   'https://repository.jboss.org/nexus/content/groups/public-jboss')
 ```
 
-Here the resolver is named “jboss” with the name attribute. The URL to the repository is specified in the root attribute.
+Here the resolver is named “jboss” with the name attribute. The URL to the repository is specified in the root attribute.  
+这里通过`name`属性将该解析器命名为“jboss”，通过`root`属性来指定仓库的URL。
 
-You’ve seen how Spring Boot’s CLI compiles your code and automatically resolves several known dependency libraries as needed. And with support for @Grab to resolve any dependencies that the CLI isn’t able to resolve automatically, CLI-based applications have no need for a Maven or Gradle build specification (as is required by traditionally developed Java applications). But resolving dependencies and compiling code aren’t the only things that build processes do. Project builds also usually execute automated tests. If there’s no build specification, how do the tests run?
+You’ve seen how Spring Boot’s CLI compiles your code and automatically resolves several known dependency libraries as needed. And with support for @Grab to resolve any dependencies that the CLI isn’t able to resolve automatically, CLI-based applications have no need for a Maven or Gradle build specification (as is required by traditionally developed Java applications). But resolving dependencies and compiling code aren’t the only things that build processes do. Project builds also usually execute automated tests. If there’s no build specification, how do the tests run?  
+你已经了解到了Spring Boot CLI是如何编译你的代码以及自动按需解析已知依赖库的。在`@Grab`的支持下，CLI可以解析各种它无法自动解析的依赖，基于CLI的应用程序无需Maven或Gradle构建说明文件（传统方式开发的Java应用程序需要这个文件）。但解析依赖和编译代码并不是构建过程的全部，项目的构建通常还要执行自动化测试，要是没有构建说明文件，又该如何运行测试呢？
+
+## 5.3 Running tests with the CLI
+## 5.3 用CLI运行测试
+
+Tests are an important part of any software project, and they aren’t overlooked by the Spring Boot CLI. Because CLI-based applications don’t involve a traditional build system, the CLI offers a test command for running tests.  
+测试是软件项目中的重要组成部分，Spring Boot CLI当然没有忽略测试。由于基于CLI的应用程序并未涉及传统的构建系统，所以CLI提供了一个`test`命令来运行测试。
+
+Before you can try out the test command, you need to write a test. Tests can reside anywhere in the project, but I recommend keeping them separate from the main components of the project by putting them in a subdirectory. You can name the subdirectory anything you want, but I chose to name it “tests”:  
+在试验`test`命令前，你先要写一个测试。测试可以放于项目中的任何位置，但我建议将其与主要组件分开放置，最好放在一个子目录里。这个子目录的名字随意，但我在这里将其命名为“tests”：
+
+```
+$ mkdir tests
+```
+
+Within the tests directory, create a new Groovy script named ReadingListControllerTest.groovy and write a test for the ReadingListController. To get started, listing 5.3 has a single test method for testing that the controller handles HTTP GET requests properly.  
+在tests目录里，创建一个名为ReadingListControllerTest.groovy的新Groovy脚本，编写针对ReadingListController的测试。代码5.3是个简单的测试，测试控制器能否正确处理HTTP GET请求。
+
+__Listing 5.3 A Groovy test for ReadingListController__  
+__代码5.3 ReadingListController的Groovy测试__
+
+```
+import org.springframework.test.web.servlet.MockMvc
+import static
+    org.springframework.test.web.servlet.setup.MockMvcBuilders.*
+import static org.springframework.test.web.servlet.request.
+                                             MockMvcRequestBuilders.*
+import static org.springframework.test.web.servlet.result.
+                                             MockMvcResultMatchers.*
+
+import static org.mockito.Mockito.*
+
+class ReadingListControllerTest {
+
+  @Test
+  void shouldReturnReadingListFromRepository() {
+    List<Book> expectedList = new ArrayList<Book>()
+    expectedList.add(new Book(
+      id: 1,
+      reader: "Craig",
+      isbn: "9781617292545",
+      title: "Spring Boot in Action",
+      author: "Craig Walls",
+      description: "Spring Boot in Action is ..."
+    ))
+
+    def mockRepo = mock(ReadingListRepository.class)
+    when(mockRepo.findByReader("Craig")).thenReturn(expectedList)
+
+    def controller =
+        new ReadingListController(readingListRepository: mockRepo)
+
+    MockMvc mvc = standaloneSetup(controller).build()
+    mvc.perform(get("/"))
+      .andExpect(view().name("readingList"))
+      .andExpect(model().attribute("books", expectedList))
+  }
+
+}
+```
+
+Mock ReadingListRepository  
+模拟ReadingListRepository
+
+Perform and test GET request  
+执行并测试GET请求
+
+As you can see, this is a simple JUnit test that uses Spring’s support for mock MVC testing to fire a GET request at the controller. It starts by setting up a mock implementation of ReadingListRepository that will return a single-entry list of Book. Then it creates an instance of ReadingListController, injecting the mock repository into the readingListRepository property. Finally, it sets up a MockMvc object, performs a GET request, and asserts expectations with regard to the view name and model contents.
+
+But the specifics of the test aren’t as important here as how you run the test. Using the CLI’s test command, you can execute the test from the command line like this:
+
+```
+$ spring test tests/ReadingListControllerTest.groovy
+```
+
+In this case, I’m explicitly selecting ReadingListControllerTest as the test to run. If you have several tests within the tests/ directory and want to run them all, you can give the directory name to the test command:
+
+```
+$ spring test tests
+```
+
+If you’re inclined to write Spock specifications instead of JUnit tests, you may be pleased to know that the CLI’s test command can also execute Spock specifications, as demonstrated by ReadingListControllerSpec in the following listing.
+
+__Listing 5.4 A Spock specification to test ReadingListController__
+
+```
+import org.springframework.test.web.servlet.MockMvc
+import static
+    org.springframework.test.web.servlet.setup.MockMvcBuilders.*
+import static org.springframework.test.web.servlet.request.
+                                             MockMvcRequestBuilders.*
+import static org.springframework.test.web.servlet.result.
+                                             MockMvcResultMatchers.*
+import static org.mockito.Mockito.*
+
+class ReadingListControllerSpec extends Specification {
+
+  MockMvc mockMvc
+  List<Book> expectedList
+
+  def setup() {
+    expectedList = new ArrayList<Book>()
+    expectedList.add(new Book(
+      id: 1,
+      reader: "Craig",
+      isbn: "9781617292545",
+      title: "Spring Boot in Action",
+      author: "Craig Walls",
+      description: "Spring Boot in Action is ..."
+    ))
+
+    def mockRepo = mock(ReadingListRepository.class)
+    when(mockRepo.findByReader("Craig")).thenReturn(expectedList)
+    def controller =
+        new ReadingListController(readingListRepository: mockRepo)
+    mockMvc = standaloneSetup(controller).build()
+  }
+
+  def "Should put list returned from repository into model"() {
+    when:
+      def response = mockMvc.perform(get("/"))
+
+    then:
+      response.andExpect(view().name("readingList"))
+              .andExpect(model().attribute("books", expectedList))
+  }
+
+}
+```
+
+Mock ReadingListRepository
+
+Perform GET request
+
+Test results
+
+ReadingListControllerSpec is a simple translation of ReadingListControllerTest from a JUnit test into a Spock specification. As you can see, its one test very plainly states that when a GET request is performed against “/”, then the response should have a view named readingList and the expected list of books should be in the model at the key books.
+
+Even though it’s a Spock specification, ReadingListControllerSpec can be run with spring test tests the same way as a JUnit-based test.
+
+Once the code is written and the tests are all passing, you might want to deploy your project. Let’s see how the Spring Boot CLI can help produce a deployable artifact.
