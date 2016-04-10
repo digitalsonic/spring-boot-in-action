@@ -477,7 +477,7 @@ $ mkdir tests
 ```
 
 Within the tests directory, create a new Groovy script named ReadingListControllerTest.groovy and write a test for the ReadingListController. To get started, listing 5.3 has a single test method for testing that the controller handles HTTP GET requests properly.  
-在tests目录里，创建一个名为ReadingListControllerTest.groovy的新Groovy脚本，编写针对ReadingListController的测试。代码5.3是个简单的测试，测试控制器能否正确处理HTTP GET请求。
+在tests目录里，创建一个名为ReadingListControllerTest.groovy的新Groovy脚本，编写针对`ReadingListController`的测试。代码5.3是个简单的测试，测试控制器能否正确处理HTTP `GET`请求。
 
 __Listing 5.3 A Groovy test for ReadingListController__  
 __代码5.3 ReadingListController的Groovy测试__
@@ -528,23 +528,28 @@ Mock ReadingListRepository
 Perform and test GET request  
 执行并测试GET请求
 
-As you can see, this is a simple JUnit test that uses Spring’s support for mock MVC testing to fire a GET request at the controller. It starts by setting up a mock implementation of ReadingListRepository that will return a single-entry list of Book. Then it creates an instance of ReadingListController, injecting the mock repository into the readingListRepository property. Finally, it sets up a MockMvc object, performs a GET request, and asserts expectations with regard to the view name and model contents.
+As you can see, this is a simple JUnit test that uses Spring’s support for mock MVC testing to fire a GET request at the controller. It starts by setting up a mock implementation of ReadingListRepository that will return a single-entry list of Book. Then it creates an instance of ReadingListController, injecting the mock repository into the readingListRepository property. Finally, it sets up a MockMvc object, performs a GET request, and asserts expectations with regard to the view name and model contents.  
+如你所见，这就是个简单的JUnit测试，使用了Spring的模拟MVC测试支持功能对控制器发起了`GET`请求。首先，设置了一个`ReadingListRepository`的模拟实现，它会返回一个包含单一`Book`项的列表。随后，测试创建了一个`ReadingListController`实例，将模拟仓库注入到`readingListRepository`属性里。最后，配置了一个`MockMvc`对象，发起GET请求，对期望的视图名称和模型内容进行断言。
 
-But the specifics of the test aren’t as important here as how you run the test. Using the CLI’s test command, you can execute the test from the command line like this:
+But the specifics of the test aren’t as important here as how you run the test. Using the CLI’s test command, you can execute the test from the command line like this:  
+但是，此处如何运行测试要比测试的说明更重要。使用CLI的`test`命令，可以像下面这样在命令行里执行测试：
 
 ```
 $ spring test tests/ReadingListControllerTest.groovy
 ```
 
-In this case, I’m explicitly selecting ReadingListControllerTest as the test to run. If you have several tests within the tests/ directory and want to run them all, you can give the directory name to the test command:
+In this case, I’m explicitly selecting ReadingListControllerTest as the test to run. If you have several tests within the tests/ directory and want to run them all, you can give the directory name to the test command:  
+本例中，我明确选中了`ReadingListControllerTest`作为要运行的测试。如果在tests/目录里有多个测试，你想要运行全部测试，可以在`test`命令中指定目录名：
 
 ```
 $ spring test tests
 ```
 
-If you’re inclined to write Spock specifications instead of JUnit tests, you may be pleased to know that the CLI’s test command can also execute Spock specifications, as demonstrated by ReadingListControllerSpec in the following listing.
+If you’re inclined to write Spock specifications instead of JUnit tests, you may be pleased to know that the CLI’s test command can also execute Spock specifications, as demonstrated by ReadingListControllerSpec in the following listing.  
+如果你倾向于编写Spock说明而非JUnit测试，那么你一定会很高兴，因为CLI的`test`命令也可以运行Spock说明，下面的`ReadingListControllerSpec`就演示了这一功能。
 
-__Listing 5.4 A Spock specification to test ReadingListController__
+__Listing 5.4 A Spock specification to test ReadingListController__  
+__代码5.4 测试`ReadingListController`的Spock说明__
 
 ```
 import org.springframework.test.web.servlet.MockMvc
@@ -591,14 +596,64 @@ class ReadingListControllerSpec extends Specification {
 }
 ```
 
-Mock ReadingListRepository
+Mock ReadingListRepository  
+模拟的`ReadingListRepository`
 
-Perform GET request
+Perform GET request  
+执行GET请求
 
-Test results
+Test results  
+测试结果
 
-ReadingListControllerSpec is a simple translation of ReadingListControllerTest from a JUnit test into a Spock specification. As you can see, its one test very plainly states that when a GET request is performed against “/”, then the response should have a view named readingList and the expected list of books should be in the model at the key books.
+ReadingListControllerSpec is a simple translation of ReadingListControllerTest from a JUnit test into a Spock specification. As you can see, its one test very plainly states that when a GET request is performed against “/”, then the response should have a view named readingList and the expected list of books should be in the model at the key books.  
+`ReadingListControllerSpec`只是简单的把`ReadingListControllerTest`从JUnit测试翻译成了Spock说明。如你所见，它只是直白地表述了这么一个过程，当有对“/”的`GET`请求时，响应中应该包含名为`readingList`的视图，模型里的`books`键所对应的就是期待的图书列表。
 
-Even though it’s a Spock specification, ReadingListControllerSpec can be run with spring test tests the same way as a JUnit-based test.
+Even though it’s a Spock specification, ReadingListControllerSpec can be run with spring test tests the same way as a JUnit-based test.  
+就算是Spock说明，也可以通过`spring test tests`来运行`ReadingListControllerSpec`，运行方式和基于JUnit的测试如出一辙。
 
-Once the code is written and the tests are all passing, you might want to deploy your project. Let’s see how the Spring Boot CLI can help produce a deployable artifact.
+Once the code is written and the tests are all passing, you might want to deploy your project. Let’s see how the Spring Boot CLI can help produce a deployable artifact.  
+一旦写好代码，通过了全部测试，你就该部署项目了。让我们来看看Spring Boot CLI是如何帮助产生一个可部署的产物的。
+
+## 5.4 Creating a deployable artifact
+## 5.4 创建可部署的产物
+
+In conventional Java projects based on Maven or Gradle, the build system is responsible for producing a deployment unit; typically a JAR file or a WAR file. With Spring Boot CLI, however, we’ve simply been running our application from the command line with the spring command.  
+在基于Maven和Gradle的传统Java项目中，构建系统负责产生部署单元——一般是JAR文件或WAR文件。然而，有了Spring Boot CLI，我们可以简单地通过`spring`命令在命令行里运行应用程序。
+
+Does that mean that if you want to deploy a Spring Boot CLI application you must install the CLI on your server and fire up the application manually from the command line? That seems awfully inconvenient (not to mention risky) when deploying to production environments.  
+这是否就意味着如果你想要部署一个Spring Boot CLI应用程序就必须在服务器上安装CLI，并手工在命令行里启动应用程序呢？在部署生产环境时，这看起来相当不方便（不用说，这还很危险）。
+
+We’ll talk more about options for deploying Spring Boot applications in chapter 8. For now, though, let me show you one more trick that the CLI has up its sleeve. From within the CLI-based reading-list application, issue the following at the command line:  
+在第8章里我们会讨论更多部署Spring Boot应用程序的方法。此刻，让我告诉你另一个CLI的窍门。针对基于CLI的阅读列表应用程序，在命令行执行如下命令：
+
+```
+$ spring jar ReadingList.jar .
+```
+
+This will package up the entire project, including all dependencies, Groovy, and an embedded Tomcat, into a single executable JAR file. Once complete, you’ll be able to run the app at the command line (without the CLI) like this:  
+这会将整个项目打包成一个可执行的JAR文件，包含所有依赖、Groovy和一个嵌入式Tomcat。打包完成后，就可以像下面这样在命令行里运行了（无需CLI）：
+
+```
+$ java -jar ReadingList.jar
+```
+
+In addition to being run at the command line, the executable JAR can be deployed to several Platform-as-a-Service (PaaS) cloud platforms including Pivotal Cloud Foundry and Heroku. You’ll see how in chapter 8.  
+除了可以在命令行里运行外，可执行的JAR文件也能被部署到多个Platform-as-a-Service（PaaS）云平台里，包括Pivotal Cloud Foundry和Heroku，在第8章里你会看到相关内容。
+
+## 5.5 Summary
+## 5.5 小结
+
+The Spring Boot CLI takes the simplicity offered by Spring Boot auto-configuration and starter dependencies and turns it up a notch. Using the elegance of the Groovy language, the CLI makes it possible to develop Spring applications with minimal code noise.  
+Spring Boot CLI利用了Spring Boot自动配置和起步依赖的便利，将其发扬光大。籍由Groovy语言的优雅，CLI让我们能在最少的代码噪声下开发Spring应用程序。
+
+In this chapter we completely rewrote the reading-list application from chapter 2. But this time we developed it in Groovy as a Spring Boot CLI application. You saw how the CLI makes Groovy even more elegant by automatically adding import statements for many commonly used packages and types. And the CLI is also able to automatically resolve several dependency libraries.  
+本章中我们彻底重写了第2章里的阅读列表应用程序，只是这次我们用Groovy把它写成了Spring Boot CLI应用程序。通过自动添加很多常用包和类的`import`语句，CLI让Groovy更优雅了，它还可以自动解析很多依赖库。
+
+For libraries that the CLI is unable to automatically resolve, CLI-based applications can take advantage of the Grape @Grab annotation to explicitly declare dependencies without a build specification. Spring Boot’s CLI extends @Grab so that, for many commonly needed library dependencies, you only need to declare the module ID.  
+对于CLI无法自动解析的库，基于CLI的应用程序可以利用Grape的`@Grab`注解，不用构建说明也能显式地声明依赖。Spring Boot的CLI扩展了`@Grab`注解，针对很多常用库依赖，你只需声明Module ID就可以了。
+
+Finally, you also saw how to execute tests and build deployable artifacts, tasks commonly handled by build systems, with the Spring Boot CLI.  
+最后，你还了解了如何用Spring Boot CLI来执行测试和构建可部署产物，这些通常都是由构建系统来负责的。
+
+Spring Boot and Groovy go well together, each boosting the other’s simplicity. We’re going to take another look at how Spring Boot and Groovy play well together in the next chapter as we explore how Spring Boot is at the core of the latest version of Grails.  
+Spring Boot和Groovy结合得很好，两者的简便性相辅相成。在下一章里，我们还会看到Spring Boot和Groovy是如何协同的——Spring Boot是Grails最新版本的核心。
