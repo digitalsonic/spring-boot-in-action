@@ -30,10 +30,13 @@ In this chapter, we’re going to look at the connection between Grails and Spri
 在本章中，我们会看到Grails和Spring Boot之前的联系。首先是在Spring Boot里能用到的GORM和Groovy Server Pages（GSP）这样的Grails特性，接下来再看看Grails 3是如何基于Spring Boot被重写的。
 
 ## 6.1 Using GORM for data persistence
+## 6.1 使用GORM进行数据持久化
 
-Probably one of the most intriguing pieces of Grails is GORM (Grails object-relational mapping). GORM makes database work as simple as declaring the entities that will be persisted. For example, listing 6.1 shows how the Book entity from the reading-list example could be written in Groovy as a GORM entity.
+Probably one of the most intriguing pieces of Grails is GORM (Grails object-relational mapping). GORM makes database work as simple as declaring the entities that will be persisted. For example, listing 6.1 shows how the Book entity from the reading-list example could be written in Groovy as a GORM entity.  
+Grails里最让人着迷的恐怕就是GORM了（Grails的对象关系映射）。GORM能简化数据库相关的工作，就和声明要持久化的实体一样容易。例如，代码6.1演示了阅读列表里的`Book`该如何用Groovy写成GORM实体。
 
-__Listing 6.1 A GORM Book entity__
+__Listing 6.1 A GORM Book entity__  
+__代码6.1 GORM `Book`实体__
 
 ```
 package readinglist
@@ -52,11 +55,14 @@ class Book {
 }
 ```
 
-This is a GORM entity
+This is a GORM entity  
+这是一个GORM实体
 
-Just like its Java equivalent, this Book class has a handful of properties that describe a book. Unlike the Java version, however, it’s not littered with semicolons, public or private modifiers, setter and getter methods, or any of the other noise that’s common in Java. But what makes it a GORM entity is that it’s annotated with the @Entity annotation from Grails. This simple entity does a lot, including mapping the object to the database and enabling Book with persistence methods through which it can be saved and retrieved.
+Just like its Java equivalent, this Book class has a handful of properties that describe a book. Unlike the Java version, however, it’s not littered with semicolons, public or private modifiers, setter and getter methods, or any of the other noise that’s common in Java. But what makes it a GORM entity is that it’s annotated with the @Entity annotation from Grails. This simple entity does a lot, including mapping the object to the database and enabling Book with persistence methods through which it can be saved and retrieved.  
+就和`Book`的Java版本一样，这个类里有很多描述图书的属性。但又与Java版本不一样，没有分号、`public`或`private`修饰符、setter和getter方法或其他Java中常见的代码噪声。是Grails的`@Entity`注解让这个类变成了GORM实例。这个简单的实体可干了不少事，包括将对象映射到数据库，为`Book`添加持久化方法，通过这些方法可以存取图书。
 
-To use GORM with a Spring Boot project, all you must do is add the GORM dependency to your build. In Maven, the <dependency> looks like this:
+To use GORM with a Spring Boot project, all you must do is add the GORM dependency to your build. In Maven, the <dependency> looks like this:  
+要在Spring Boot项目里使用GORM，必须在项目里添加GORM依赖。在Maven中，`<dependency>`看起来是这样的：
 
 ```
 <dependency>
@@ -66,19 +72,24 @@ To use GORM with a Spring Boot project, all you must do is add the GORM dependen
 </dependency>
 ```
 
-The same dependency can be expressed in a Gradle build like this:
+The same dependency can be expressed in a Gradle build like this:  
+一样的依赖，在Gradle里是这样的：
 
 ```
 compile("org.grails:gorm-hibernate4-spring-boot:1.1.0.RELEASE")
 ```
 
-This library carries some Spring Boot auto-configuration with it that will automatically configure all of the necessary beans to support working with GORM. All you need to do is start writing the code.
+This library carries some Spring Boot auto-configuration with it that will automatically configure all of the necessary beans to support working with GORM. All you need to do is start writing the code.  
+这个库自带了一些Spring Boot自动配置，会自动配置所有支持GORM所需的Bean。你只管写代码就好了。
 
-> __Another GORM option for Spring Boot__
+> __Another GORM option for Spring Boot__  
+__GORM在Spring Boot里的另一个选择__
 
-> As its name suggests, the gorm-hibernate4-spring-boot dependency enables GORM for data persistence via Hibernate. For many projects, this will be fine. If, however, you’re interested in working with the MongoDB document database, you’ll be pleased to know that GORM for MongoDB is also available for Spring Boot.
+> As its name suggests, the gorm-hibernate4-spring-boot dependency enables GORM for data persistence via Hibernate. For many projects, this will be fine. If, however, you’re interested in working with the MongoDB document database, you’ll be pleased to know that GORM for MongoDB is also available for Spring Boot.  
+正如其名，`gorm-hibernate4-spring-boot`是通过Hibernate开启GORM数据持久化的。对很多项目而言，这挺好的。但如果你想用MongoDB，那会Spring Boot里的MongoDB GORM支持很感兴趣。
 
-> The Maven dependency looks like this:
+> The Maven dependency looks like this:  
+它的Maven依赖是这样的：
 
 >
 ```
@@ -89,14 +100,17 @@ This library carries some Spring Boot auto-configuration with it that will autom
 </dependency>
 ```
 
-> Likewise, the Gradle dependency is as follows:
+> Likewise, the Gradle dependency is as follows:  
+同样的，下面是Gradle依赖：
 ```
 compile("org.grails:gorm-mongodb-spring-boot:1.1.0.RELEASE")
 ```
 
-Due to the nature of how GORM works, it requires that at least the entity class be written in Groovy. We’ve already written the Book entity in listing 6.1. As for the Reader entity, it’s shown in the following listing.
+Due to the nature of how GORM works, it requires that at least the entity class be written in Groovy. We’ve already written the Book entity in listing 6.1. As for the Reader entity, it’s shown in the following listing.  
+鉴于GORM的本质，它要求实体类必须用Groovy来编写。我们已经在代码6.1里写了一个`Book`实体，下面再写一个`Reader`实体。
 
-__Listing 6.2 A GORM Reader entity__
+__Listing 6.2 A GORM Reader entity__  
+__代码6.2 GORM `Reader`实体__
 
 ```
 package readinglist
@@ -137,15 +151,20 @@ class Reader implements UserDetails {
 }
 ```
 
-This is an entity
+This is an entity  
+这是一个实体
 
-Implement UserDetails
+Implement UserDetails  
+实现了`UserDetails`
 
-Now that we’ve written the two GORM entities for the reading-list application, we’ll need to rewrite the rest of the app to use them. Because working with Groovy is such a pleasant experience (and very Grails-like), we’ll continue writing the other classes in Groovy as well.
+Now that we’ve written the two GORM entities for the reading-list application, we’ll need to rewrite the rest of the app to use them. Because working with Groovy is such a pleasant experience (and very Grails-like), we’ll continue writing the other classes in Groovy as well.  
+现在，我们的阅读列表应用程序里有了两个GORM实体，我们需要重写剩下的应用程序来使用这两个实体。因为使用Groovy是如此的令人愉悦（和Grails很像），所以其他类我们也会用Groovy来编写。
 
-First up is ReadingListController, as shown next.
+First up is ReadingListController, as shown next.  
+首先是`ReadingListController`，就像下面这样。
 
-__Listing 6.3 A Groovy reading-list controller__
+__Listing 6.3 A Groovy reading-list controller__  
+__代码6.3 Groovy的`ReadingListController`__
 
 ```
 package readinglist
@@ -197,9 +216,11 @@ class ReadingListController {
 }  
 ```
 
-Find all reader books
+Find all reader books  
+查找读者的全部图书
 
-Save a book
+Save a book  
+保存一本书
 
 
 The most obvious difference between this version of ReadingListController and the one from chapter 3 is that it’s written in Groovy and lacks much of the code noise from Java. But the most significant difference is that it doesn’t work with an injected ReadingListRepository anymore. Instead, it works directly with the Book type for persistence.
