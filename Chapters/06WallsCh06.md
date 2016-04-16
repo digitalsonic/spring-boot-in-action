@@ -223,17 +223,23 @@ Save a book
 保存一本书
 
 
-The most obvious difference between this version of ReadingListController and the one from chapter 3 is that it’s written in Groovy and lacks much of the code noise from Java. But the most significant difference is that it doesn’t work with an injected ReadingListRepository anymore. Instead, it works directly with the Book type for persistence.
+The most obvious difference between this version of ReadingListController and the one from chapter 3 is that it’s written in Groovy and lacks much of the code noise from Java. But the most significant difference is that it doesn’t work with an injected ReadingListRepository anymore. Instead, it works directly with the Book type for persistence.  
+这个版本的`ReadingListController`和第3章里的相比，最明显的区别在于它是用Groovy写的，没有Java的那些代码噪声。但最重要的不同还是无需再注入`ReadingListRepository`了，它直接通过`Book`类型做持久化。
 
-In the readersBooks() method, it calls the static findAllByReader() method on Book to fetch all books for the given reader. Although we didn’t write a findAllByReader() method in listing 6.1, this will work because GORM will implement it for us.
+In the readersBooks() method, it calls the static findAllByReader() method on Book to fetch all books for the given reader. Although we didn’t write a findAllByReader() method in listing 6.1, this will work because GORM will implement it for us.  
+在`readersBooks()`方法里，它调用了`Book`的`findAllByReader()`静态方法，传入了指定的读者信息。虽然在代码6.1里没有提供`findAllByReader()`方法，但这段代码仍然可以执行，因为GORM会为我们实现这个方法的。
 
-Likewise, the addToReadingList() method uses the static withTransaction() and the instance save() methods, both provided by GORM, to save a Book to the database.
+Likewise, the addToReadingList() method uses the static withTransaction() and the instance save() methods, both provided by GORM, to save a Book to the database.  
+类似的，`addToReadingList()`方法使用了静态方法`withTransaction()`和实例方法`save()`，这两个方法也是GORM提供的，用于将`Book`保存到数据库里。
 
-And all we had to do was declare a few properties and annotate Book with @Entity. A pretty good payoff, if you ask me.
+And all we had to do was declare a few properties and annotate Book with @Entity. A pretty good payoff, if you ask me.  
+我们所要做的就是声明一些属性，在`Book`上添加`@Entity`注解。如果你问我，我觉得这笔买卖很划算。
 
-A similar change must be made to SecurityConfig to fetch a Reader via GORM rather than using ReadingListRepository. The following listing shows the new Groovy SecurityConfig.
+A similar change must be made to SecurityConfig to fetch a Reader via GORM rather than using ReadingListRepository. The following listing shows the new Groovy SecurityConfig.  
+`SecurityConfig`也要做类似的修改，通过GORM而非`ReadingListRepository`来获取`Reader`。下面的代码就是新的`SecurityConfig`。
 
-__Listing 6.4 SecurityConfig in Groovy__
+__Listing 6.4 SecurityConfig in Groovy__  
+__代码6.4 Groovy版本的`SecurityConfig`__
 
 ```
 package readinglist
@@ -271,7 +277,8 @@ class SecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ```
 
-Find a reader by username
+Find a reader by username  
+根据用户名查找读者
 
 Aside from being rewritten in Groovy, the most significant change in SecurityConfig is the second configure() method. As you can see, it uses a closure (as the implementation of UserDetailsService) that looks up a Reader by calling the static findByUsername() method, which is provided by GORM.
 
