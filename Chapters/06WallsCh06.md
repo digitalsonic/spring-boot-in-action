@@ -280,12 +280,161 @@ class SecurityConfig extends WebSecurityConfigurerAdapter {
 Find a reader by username  
 根据用户名查找读者
 
-Aside from being rewritten in Groovy, the most significant change in SecurityConfig is the second configure() method. As you can see, it uses a closure (as the implementation of UserDetailsService) that looks up a Reader by calling the static findByUsername() method, which is provided by GORM.
+Aside from being rewritten in Groovy, the most significant change in SecurityConfig is the second configure() method. As you can see, it uses a closure (as the implementation of UserDetailsService) that looks up a Reader by calling the static findByUsername() method, which is provided by GORM.  
+除了用Groovy重写，`SecurityConfig`里最明显的变化无疑就是第二个`configure()`方法了。如你所见，它用了一个闭包（`UserDetailsService`的实现类），其中调用静态方法`findByUsername()`来查找`Reader`，这个功能是GORM提供的。
 
-You may be wondering what becomes of ReadingListRepository in this GORMenabled application. With GORM handling all of the persistence for us, ReadingListRepository is no longer needed. Neither are any of its implementations. I think you’ll agree that less code is a good thing.
+You may be wondering what becomes of ReadingListRepository in this GORMenabled application. With GORM handling all of the persistence for us, ReadingListRepository is no longer needed. Neither are any of its implementations. I think you’ll agree that less code is a good thing.  
+你也许会好奇，在这个GORM版本的应用程序里，`ReadingListRepository`变成什么了。GORM替我们处理了所有的持久化工作，已经不再需要`ReadingListRepository`了，什么实现都不需要了。我想你会同意代码越烧越好这个观点的。
 
-As for the remaining code in the application, it should also be rewritten in Groovy to match the classes we’ve changed thus far. But none of it deals with GORM and is therefore out of scope for this chapter. The complete Groovy application is available in the example code download.
+As for the remaining code in the application, it should also be rewritten in Groovy to match the classes we’ve changed thus far. But none of it deals with GORM and is therefore out of scope for this chapter. The complete Groovy application is available in the example code download.  
+应用程序中剩余的代码也应该要用Groovy重写，这样才能和我们的变更相匹配。但它们和GORM没什么关系，也不在本章的讨论范围内。如果想要完整的代码，可以到示范代码页面里去下载。
 
-At this point, you can fire up the reading-list application using any of the ways we’ve already discussed for running Spring Boot applications. Once it starts, the application should work as it always has. Only you and I know that the persistence mechanism has been changed.
+At this point, you can fire up the reading-list application using any of the ways we’ve already discussed for running Spring Boot applications. Once it starts, the application should work as it always has. Only you and I know that the persistence mechanism has been changed.  
+此刻，你可以通过各种运行Spring Boot应用程序的方法来启动阅读列表应用程序。启动后，应用程序应该能一如既往地工作。只有你我知道持久化机制已经被改变了。
 
-In addition to GORM, Grails apps usually use Groovy Server Pages to render model data as HTML served to the browser. The Grails-ification of our application continues in the next section, where we’ll replace the Thymeleaf templates with equivalent GSP.
+In addition to GORM, Grails apps usually use Groovy Server Pages to render model data as HTML served to the browser. The Grails-ification of our application continues in the next section, where we’ll replace the Thymeleaf templates with equivalent GSP.  
+除了GORM，Grails应用程序通常还会用Groovy Server Pages将模型数据以HTML的方式呈现给浏览器。下一节里我们应用程序的Grails化还会继续，我们会把Thymeleaf替换为等价的GSP。
+
+## 6.2 Defining views with Groovy Server Pages
+## 6.2 使用Groovy Server Pages来定义视图
+
+Up until now, we’ve been using Thymeleaf templates to define the view for the readinglist application. In addition to Thymeleaf, Spring Boot also offers Freemarker, Velocity, and Groovy-based templates. For any of those choices, all you must do is add the appropriate starter to your build and start writing templates in the templates/ directory at the root of the classpath. Auto-configuration takes care of the rest.  
+到目前为止，我们都在用Thymeleaf模板来定义阅读列表应用程序的视图。除了Thymeleaf，Spring Boot还支持Freemarker、Velocity和基于Groovy的模板。无论选择哪种模板，你要做的就是添加合适的起步依赖，在Classpath根部的templates/目录里编写模板。自动配置会处理剩下的事情的。
+
+The Grails project also offers auto-configuration for Groovy Server Pages (GSP). If you want to use GSP in your Spring Boot application, all you must do is add the GSP for Spring Boot library to your build:  
+Grails项目也提供Groovy Server Pages（GSP）的自动配置，如果你想在Spring Boot应用程序里使用GSP，必须向项目里添加Spring Boot的GSP库：
+
+```
+compile("org.grails:grails-gsp-spring-boot:1.0.0")
+```
+
+Just like the other view template options offered by Spring Boot, simply having this library in your classpath triggers auto-configuration that sets up the view resolvers necessary for GSP to work as the view layer of Spring MVC.  
+就和Spring Boot提供的其他视图模板一样，只要把库放在Classpath里就会触发自动配置，设置所需的视图解析器，以便能在Spring MVC的视图层里使用GSP。
+
+All that’s left is to write the GSP templates for your application. For the reading-list application, we’ll need to rewrite the Thymeleaf readingList.html file in GSP form as readingList.gsp (in src/main/resources/templates). The following listing shows the new GSP-enabled reading-list template.  
+剩下的就是为应用程序编写GSP模板了。在阅读列表应用程序里，我们要把Thymeleaf的readingList.html文件用GSP的形式重写，放在readingList.gsp文件（位于src/main/resources/templates）里。下面就是新的GSP模板的代码。
+
+__Listing 6.5 The reading-list app’s main view written in GSP__  
+__代码6.5 GSP编写的阅读列表应用程序主视图__
+
+```
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Reading List</title>
+    <link rel="stylesheet" href="/style.css"></link>
+  </head>
+
+  <body>
+    <h2>Your Reading List</h2>
+
+    <g:if test="${books}">
+      <g:each in="${books}" var="book">
+        <dl>
+          <dt class="bookHeadline">
+            ${book.title} by ${book.author}
+            (ISBN: ${book.isbn}")
+          </dt>
+          <dd class="bookDescription">
+            <g:if test="book.description">
+              ${book.description}
+            </g:if>
+            <g:else>
+              No description available
+            </g:else>
+          </dd>
+        </dl>
+      </g:each>
+    </g:if>
+    <g:else>
+      <p>You have no books in your book list</p>
+    </g:else>
+
+    <hr/>
+
+    <h3>Add a book</h3>
+
+    <form method="POST">
+      <label for="title">Title:</label>
+      <input type="text" name="title"
+                         value="${book?.title}"/><br/>
+      <label for="author">Author:</label>
+      <input type="text" name="author"
+                         value="${book?.author}"/><br/>
+      <label for="isbn">ISBN:</label>
+      <input type="text" name="isbn"
+                         value="${book?.isbn}"/><br/>
+      <label for="description">Description:</label><br/>
+      <textarea name="description" rows="5" cols="80">
+        ${book?.description}
+      </textarea>
+      <input type="hidden" name="${_csrf.parameterName}"
+           value="${_csrf.token}" />
+      <input type="submit" value="Add Book" />
+    </form>
+  </body>
+</html>
+```
+
+List the books  
+罗列图书
+
+The book form  
+图书表单
+
+The CSRF token  
+CSRF令牌
+
+As you can see, the GSP template is sprinkled with expression language references (the parts wrapped in ${}) and tags from the GSP tag library such as <g:if> and <g:each>. It’s not quite pure HTML as is the case with Thymeleaf, but it’s a familiar and comfortable option if you’re used to working with JSP.  
+如你所见，GSP模板中使用了表达式语言引用（用`${}`包围的部分）以及GSP标签库（例如`<g:if>`和`<g:each>`）。并不是像Thymeleaf这样的纯HTML，但如果你用过JSP，会很熟悉这种方式。
+
+For the most part, it’s rather straightforward to map the elements on this GSP template with the corresponding Thymeleaf templates from chapters 2 and 3. One thing to note, however, is that you have to put in a hidden field to carry the CSRF (Cross-Site Request Forgery) token. Spring Security requires this token on POST requests, and Thymeleaf is able to automatically include it in the rendered HTML. With GSP, however, you must explicitly include the CSRF token in a hidden field.  
+代码里的绝大部分内容和第2章与第3章的Thymeleaf模板类似，映射GSP模板上的元素。但是有一点要注意，你必须要放一个隐藏域，其中包含CSRF（Cross-Site Request Forgery）令牌。Spring Security在提交POST请求时要求带有这个令牌，Thymeleaf在呈现HTML时会自动包含这个令牌，但在GSP里你必须显式地包含它。
+
+Figure 6.1 shows the results of the GSP rendered as HTML in the browser after a few books have been entered.  
+图6.1是GSP模板的显示效果，其中添加了一些图书。
+
+Although Grails features like GORM and GSP are appealing and go a long way toward making a Spring Boot application even simpler, it’s not quite the complete Grails experience. We’ve seen how to put a little Grails chocolate in the Spring Boot peanut butter. Now we’ll turn it around and see how Grails 3 gives you the best of both worlds: a development experience that’s both fully Spring Boot and fully Grails.  
+虽然GORM和GSP这样的Grails特性很吸引人，让Spring Boot应用程序更简单了，但这种Grails的体验并不完整。让我们再往Spring Boot的花生酱里放一点Grails巧克力。现在让我们来看看Grails 3是如何将两者合二为一的：带来了完整的Spring Boot和Grails开发体验。
+
+
+![图6.1](../Figures/figure-6.1.png)
+
+__Figure 6.1 The reading list rendered from a GSP template__  
+__图6.1 使用了GSP模板的阅读列表__
+
+## 6.3 Mixing Spring Boot with Grails 3
+
+Grails has always been a higher-level framework built upon the giants of Spring, Groovy, Hibernate, and others. With Grails 3, Grails is now built upon Spring Boot, enabling a very compelling developer experience that makes both Grails developers and Spring Boot developers feel at home.
+
+The first step toward working with Grails 3 is to install it. On Mac OS X and most Unix systems, the easiest way to install Grails is to use SDKMAN at the command line:
+
+```
+$ sdk install grails
+```
+
+If you’re using Windows or otherwise can’t use SDKMAN, you’ll need to download the binary distribution, unzip it, and add the bin directory to your system path.
+
+Whichever installation choice you use, you can verify the installation by checking the Grails version at the command line:
+
+```
+$ grails -version
+```
+
+Assuming the installation went well, you’re now ready to start creating a Grails project.
+
+### 6.3.1 Creating a new Grails project
+
+The grails command-line tool is what you’ll use to perform many tasks with a Grails project, including the initial creation of the project. To kick off the reading-list application project, use grails like this:
+
+```
+$ grails create-app readinglist
+```
+
+As its name suggests, the create-app command creates a new application project. In this case, the name of the project is “readinglist”.
+
+Once the grails tool has created the application, cd into the readinglist directory and take a look at what was created. Figure 6.2 shows a high-level view of what the project structure should look like.
+
+You should recognize a few familiar entries in the project’s directory structure. There’s a Gradle build specification and configuration (build.gradle and gradle.properties). There’s also a standard Gradle project structure under the src directory. But grails-app is the most interesting directory in the project. If you’ve ever worked with any previous version of Grails, you’ll know what this directory is for. It’s where you’ll write the controllers, domain types, and other code that makes up the Grails project.
+
+If you dig a little deeper and open up the build.gradle file, you’ll find a few more familiar items. To start with, the build specification uses the Spring Boot plugin for Gradle:
