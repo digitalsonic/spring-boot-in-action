@@ -404,37 +404,90 @@ __Figure 6.1 The reading list rendered from a GSP template__
 __图6.1 使用了GSP模板的阅读列表__
 
 ## 6.3 Mixing Spring Boot with Grails 3
+## 6.3 结合Spring Boot与Grails 3
 
-Grails has always been a higher-level framework built upon the giants of Spring, Groovy, Hibernate, and others. With Grails 3, Grails is now built upon Spring Boot, enabling a very compelling developer experience that makes both Grails developers and Spring Boot developers feel at home.
+Grails has always been a higher-level framework built upon the giants of Spring, Groovy, Hibernate, and others. With Grails 3, Grails is now built upon Spring Boot, enabling a very compelling developer experience that makes both Grails developers and Spring Boot developers feel at home.  
+Grails一直都是构建于Spring、Groovy、Hibernate和其他巨人肩膀之上的高阶框架。到了Grails 3，Grails已经基于Spring Boot了，带来了令人愉悦的开发体验，让Grails开发者和Spring Boot开发者都能驾轻就熟。
 
-The first step toward working with Grails 3 is to install it. On Mac OS X and most Unix systems, the easiest way to install Grails is to use SDKMAN at the command line:
+The first step toward working with Grails 3 is to install it. On Mac OS X and most Unix systems, the easiest way to install Grails is to use SDKMAN at the command line:  
+要使用Grails 3，首先就是安装。再Mac OS X和大部分Unix系统上，最简单的安装方法是在命令行里使用SDKMAN：
 
 ```
 $ sdk install grails
 ```
 
-If you’re using Windows or otherwise can’t use SDKMAN, you’ll need to download the binary distribution, unzip it, and add the bin directory to your system path.
+If you’re using Windows or otherwise can’t use SDKMAN, you’ll need to download the binary distribution, unzip it, and add the bin directory to your system path.  
+如果你用的是Windows，或者无法使用SDKMAN，就需要下载二进制发布包，解压后将bin目录添加到系统路径里去。
 
-Whichever installation choice you use, you can verify the installation by checking the Grails version at the command line:
+Whichever installation choice you use, you can verify the installation by checking the Grails version at the command line:  
+无论用哪种安装方式，都可以通过在命令行中查看Grails的版本来验证安装是否成功：
 
 ```
 $ grails -version
 ```
 
-Assuming the installation went well, you’re now ready to start creating a Grails project.
+Assuming the installation went well, you’re now ready to start creating a Grails project.  
+假定安装成功，现在就可以创建Grails项目了。
 
-### 6.3.1 Creating a new Grails project
+### 6.3.1 Creating a new Grails project  
+### 6.3.1 创建新的Grails项目
 
-The grails command-line tool is what you’ll use to perform many tasks with a Grails project, including the initial creation of the project. To kick off the reading-list application project, use grails like this:
+The grails command-line tool is what you’ll use to perform many tasks with a Grails project, including the initial creation of the project. To kick off the reading-list application project, use grails like this:  
+在Grails项目中你会使用`grails`命令行工具来执行很多任务，包括创建项目。要创建阅读列表项目，可以像这样来使用`grails`命令：
 
 ```
 $ grails create-app readinglist
 ```
 
-As its name suggests, the create-app command creates a new application project. In this case, the name of the project is “readinglist”.
+As its name suggests, the create-app command creates a new application project. In this case, the name of the project is “readinglist”.  
+正如这个命令的名字所示，`create-app`命令创建了一个新的应用程序项目。在这个例子里，项目名是“readinglist”。
 
-Once the grails tool has created the application, cd into the readinglist directory and take a look at what was created. Figure 6.2 shows a high-level view of what the project structure should look like.
+Once the grails tool has created the application, cd into the readinglist directory and take a look at what was created. Figure 6.2 shows a high-level view of what the project structure should look like.  
+一旦`grails`工具创建完应用程序，`cd`到`readinglist`目录里，看看所创建的内容。图6.2应该就是你看到的项目结构的概览。
 
-You should recognize a few familiar entries in the project’s directory structure. There’s a Gradle build specification and configuration (build.gradle and gradle.properties). There’s also a standard Gradle project structure under the src directory. But grails-app is the most interesting directory in the project. If you’ve ever worked with any previous version of Grails, you’ll know what this directory is for. It’s where you’ll write the controllers, domain types, and other code that makes up the Grails project.
+You should recognize a few familiar entries in the project’s directory structure. There’s a Gradle build specification and configuration (build.gradle and gradle.properties). There’s also a standard Gradle project structure under the src directory. But grails-app is the most interesting directory in the project. If you’ve ever worked with any previous version of Grails, you’ll know what this directory is for. It’s where you’ll write the controllers, domain types, and other code that makes up the Grails project.  
+在这个项目目录结构里你应该认出了一些熟悉的东西。其中有一个Gradle的构建说明文件和配置（build.gradle和gradle.properties），src目录里还有一个标准的Gradle项目结构，但是grails-app应该是里面最有趣的目录。如果你用过老版本的Grails，就会知道这个目录的作用，里面放的是你写的控制器、领域类和其他构成Grails项目的代码。
 
-If you dig a little deeper and open up the build.gradle file, you’ll find a few more familiar items. To start with, the build specification uses the Spring Boot plugin for Gradle:
+![图6.2](../Figures/figure-6.2.png)
+
+__Figure 6.2 The directory structure of a Grails 3 project__  
+__图6.2 Grails 3项目的目录结构__
+
+If you dig a little deeper and open up the build.gradle file, you’ll find a few more familiar items. To start with, the build specification uses the Spring Boot plugin for Gradle:  
+如果再深挖一下，打开build.gradle文件，会发现一些更熟悉的东西。首先，构建说明文件里使用了Spring Boot的Gradle插件：
+
+```
+apply plugin: "spring-boot"
+```
+
+This means that you’ll be able to build and run the Grails application just as you would any other Spring Boot application.  
+这意味着你能像使用其他Spring Boot应用程序那样构建并运行这个Grails应用程序。
+
+You’ll also notice that there are a handful of Spring Boot libraries among the other dependencies:  
+你还应该注意到在依赖里有不少有用的Spring Boot库：
+
+```
+dependencies {
+  compile 'org.springframework.boot:spring-boot-starter-logging'
+  compile("org.springframework.boot:spring-boot-starter-actuator")
+  compile "org.springframework.boot:spring-boot-autoconfigure"
+  compile "org.springframework.boot:spring-boot-starter-tomcat"
+  ...
+}
+```
+
+This provides your Grails application with Spring Boot auto-configuration and logging, as well as the Actuator and an embedded Tomcat to serve the application when run as an executable JAR.  
+这些库为Grails应用程序提供了Spring Boot的自动配置、日志，还有Actuator及嵌入式Tomcat，在把应用当作可执行JAR运行时，这个Tomcat可以提供服务。
+
+Indeed, this is a Spring Boot project. It’s also a Grails project. As of Grails 3, Grails is built upon a foundation of Spring Boot.  
+实际上，这是一个Spring Boot项目，同时也是Grails项目。因为Grails 3就是构建在Spring Boot的基础上的。
+
+#### RUNNING THE APPLICATION
+
+The most straightforward way to run a Grails application is with the run-app command of the grails tool at the command line:
+
+```
+$ grails run-app
+```
+
+Even though we’ve not written a single line of code, we’re already able to run the application and view it in the browser. Once the application starts up, you can navigate to http://localhost:8080 in your web browser. You should see something similar to what’s shown in figure 6.3.
