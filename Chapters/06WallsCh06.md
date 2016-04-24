@@ -483,11 +483,285 @@ Indeed, this is a Spring Boot project. It’s also a Grails project. As of Grail
 实际上，这是一个Spring Boot项目，同时也是Grails项目。因为Grails 3就是构建在Spring Boot的基础上的。
 
 #### RUNNING THE APPLICATION
+#### 运行应用程序
 
-The most straightforward way to run a Grails application is with the run-app command of the grails tool at the command line:
+The most straightforward way to run a Grails application is with the run-app command of the grails tool at the command line:  
+运行Grails应用程序最直接的方式是在命令行里使用`grails`工具的`run-app`命令：
 
 ```
 $ grails run-app
 ```
 
-Even though we’ve not written a single line of code, we’re already able to run the application and view it in the browser. Once the application starts up, you can navigate to http://localhost:8080 in your web browser. You should see something similar to what’s shown in figure 6.3.
+Even though we’ve not written a single line of code, we’re already able to run the application and view it in the browser. Once the application starts up, you can navigate to http://localhost:8080 in your web browser. You should see something similar to what’s shown in figure 6.3.  
+就算一行代码都还没写，我们也能运行应用程序，在浏览器里进行访问。一旦应用程序启动了，就可以在浏览器里访问[http://localhost:8080](http://localhost:8080)。你应该能看到类似图6.3的页面。
+
+![图6.3](../Figures/figure-6.3.png)
+
+__Figure 6.3 Running a freshly created Grails application__  
+__图6.3 全新的Grails应用程序__
+
+The run-app command is the Grails way of running the application and has been the way to run Grails applications for years, even in previous versions of Grails. But because this Grails 3 project’s Gradle specification uses the Spring Boot plugin for Gradle, you can also run the application using any of the means available to a Spring Boot project. This includes the bootRun task via Gradle:  
+`run-app`命令是Grails里运行应用程序的方法，这种方式已经用了好多年了，上个版本的Grails里也是这样。因为Grails 3项目的Gradle说明里使用了Spring Boot的Gradle插件，你还可以用各种运行Spring Boot项目的方式来运行这个应用程序。此处通过Gradle引入了`bootRun`任务：
+
+```
+$ gradle bootRun
+```
+
+You can also build the project and run the resulting executable JAR file:  
+你还可以构建项目，运行生成的可执行JAR文件：
+
+```
+$ gradle build
+...
+$ java -jar build/lib/readingList-0.1.jar
+```
+
+Of course, the WAR file produced by the build can also be deployed to a servlet 3.0 container of your choice.  
+当然，构建产生的WAR文件还可以被部署到各种你喜欢的Servlet 3.0容器里。
+
+It’s very convenient to be able to run the application this early in the development process. It helps you know that the project has been properly initialized. But the application doesn’t do much interesting yet. It’s up to us to build upon the initial project. We’ll start by defining the domain.  
+在开发的早期阶段就能运行应用程序，这一点是十分方便的，它能帮你了解到应用程序已被正确初始化了。但是这时应用程序还没做什么有意思的事情，在初始化后的项目上做什么完全取决于我们。接下来，开始定义领域模型吧。
+
+### 6.3.2 Defining the domain
+### 6.3.2 定义领域模型
+
+The central domain type in the reading-list application is the Book class. Although we could manually create a Book.groovy file, it’s usually better to use the grails tool to create domain types. That’s because it knows where the source files go and it’s also able to generate any related artifacts for us at the same time.  
+阅读列表应用程序里的核心领域模型是`Book`类。虽然我们可以手工创建Book.groovy文件，但通常还是用`grails`工具来创建领域模型类比较好。因为它知道该把文件放到哪里，并在同一时间生成各种相关的内容。
+
+To create the Book class, we’ll use the create-domain-class command of the grails tool:  
+要创建`Book`类，我们会使用`grails`工具的`create-domain-class`命令：
+
+```
+$ grails create-domain-class Book
+```
+
+This will generate two source files: a Book.groovy file and a BookSpec.groovy file. The latter is a Spock specification for testing the Book class. It’s initially empty, but you can fill it with any tests you need to verify the functionality of a Book.  
+这条命令会生成两个源文件：一个Book.groovy文件和一个BookSpec.groovy文件。后者是一个Spock说明，用来测试`Book`类的。一开始这个文件是空的，你可以填入各种测试内容来验证`Book`的各种功能。
+
+The Book.groovy file defines the Book class itself. You’ll find it in grails-app/ domain/readingList. Initially, it’s rather empty and looks like this:  
+Book.groovy文件里定义了`Book`类，你可以在grails-app/domain/readingList里找到这个文件。一开始也基本没什么内容，基本是这样的：
+
+```
+package readinglist
+class Book {
+
+  static constraints = {
+  }
+}
+```
+
+We’ll need to add the fields that define a book, such as the title, author, and ISBN. After adding the fields, Book.groovy looks like this:  
+我们需要添加一些字段来定义一本书，比如书名、作者和ISBN。在添加了这些字段后，Book.groovy看起来是这样的：
+
+```
+package readinglist
+class Book {
+  static constraints = {
+  }
+
+  String reader
+  String isbn
+  String title
+  String author
+  String description
+
+}
+```
+
+The static constraints variable is where you can define any validation constraints to be enforced on instances of Book. In this chapter, we’re primarily interested in building out the reading-list application to see how it’s built upon Spring Boot and not so much on validation. Therefore, we’ll leave the constraints empty. Feel free to add constraints if you wish, though. Have a look at Grails in Action, Second Edition, by Glen Smith and Peter Ledbrook (Manning, 2014) for more information.1  
+静态的`constraints`变量里可以定义各种附加在`Book`实例上的验证约束。本章中，我们的关注点主要集中在构建阅读列表应用程序，看看如何基于Spring Boot构建应用程序，不会太关注验证的问题。因此，这里的`constraints`内容为空。当然，如果有需要的话，你可以随意添加约束。可以参考一下《Grails in Action第二版》，作者是Glen Smith和Peter Ledbrook（Manning，2014）。<sup>[1][]</sup>
+
+For the purpose of working with Grails, we’re going to keep the reading-list application simple and in line with what we wrote in chapter 2. Therefore, we’ll forego creating a Reader domain and go ahead and create the controller.  
+为了使用Grails，我们要保持阅读列表应用程序的简单性，和第2章里的基本持平。因此，接下来我们要创建`Reader`领域模型，还有控制器。
+
+[1]: # "Although Grails in Action, Second Edition, covers Grails 2, much of what you learn about Grails 2 applies to Grails 3.  虽然《Grails in Action第二版》主要是讲Grails 2，但你在Grails 2里了解到的大部分内容都适用于Grails 3。"
+
+### 6.3.3 Writing a Grails controller
+### 6.3.3 开发Grails控制器
+
+As with domain types, it’s easy to create controllers using the grails tool. In the case of controllers, you have a few choices of commands, however:  
+有了领域模型，就很容易通过`grails`工具创建出控制器。关于控制器，有几个命令可供选择：
+
+* create-controller—Creates an empty controller, leaving it to the developer to write the controller’s functionality
+* generate-controller—Generates a controller with scaffolded CRUD operations for a given domain type
+* generate-all—Generates a scaffolded CRUD controller and associated views for a given domain type
+* `create-controller`——创建空控制器，让开发者来编写控制器的功能。
+* `generate-controller`——生成一个控制器，其中包含特定领域模型类的基本CRUD操作。
+* `generate-all`——生成针对特定领域模型类的基本CRUD控制器，及其视图。
+
+Although scaffolded controllers are very handy and are certainly one of the most well-known features of Grails, we’re going to keep it simple and write a controller that has just enough functionality to mimic the behavior of the application we created in chapter 2. Therefore, we’ll use the create-controller command to create a bare-bones controller and then fill it in with the methods we need:  
+虽然脚手架控制器很好用，它们也是Grails中比较知名的特性，我们会保持简单，写一个仅包含必要功能的控制器，能匹配第2章里的应用程序功能就好。因此，我们用`create-controller`命令来创建原始的控制器，然后填入所需的方法：
+
+```
+$ grails create-controller ReadingList
+```
+
+This command creates a controller named ReadingListController in grails-app/controllers/readingList that looks like this:  
+这个命令会在grails-app/controllers/readingList里创建一个名为`ReadingListController`的控制器：
+
+```
+package readinglist
+class ReadingListController {
+
+  def index() { }
+}
+```
+
+Without making any changes, this controller is ready to run, although it won’t do much. At this point, it will handle requests whose path is /readingList and forward the request to the view defined at grails-app/views/readingList/index.gsp (which doesn’t yet exist, but we’ll create soon).  
+一行代码都不用改，这个控制器就能运行了，虽然它干不了什么事。此时，它能处理发往/readingList的请求，将请求转给grails-app/views/readingList/index.gsp里定义的视图（现在还没有，我们稍后会创建的）。
+
+But what we need our controller to do is display a list of books and a form to add a new book. We also need it to handle the form submission and save a book to the database. The following listing shows the ReadingListController that we need.  
+我们需要控制器来显示图书列表，还有一个添加新书的表单。我们还要能提交表单，将新书保存到数据库里。下面的代码就是我们所需要的`ReadingListController`：
+
+__Listing 6.6 Fleshing out the ReadingListController__  
+__代码6.6 改写`ReadingListController`__
+
+```
+package readinglist
+
+import static org.springframework.http.HttpStatus.*
+import grails.transaction.Transactional
+
+class ReadingListController {
+
+  def index() {
+    respond Book.list(params), model:[book: new Book()]
+  }
+
+  @Transactional
+  def save(Book book) {
+    book.reader = 'Craig'
+    book.save flush:true
+    redirect(action: "index")
+  }
+
+}
+```
+
+Fetch books into model  
+获取图书填充到模型里
+
+Save the book  
+保存图书
+
+Although it’s much shorter than the equivalent Java controller, this version of ReadingListController is almost completely functionally equivalent. It handles GET requests for /readingList and fetches a list of books to be displayed. And when the form is submitted, it handles the POST request, saves the book, then redirects to the index action (which is handled by the index() method).  
+虽然在代码长度上比等效的Java控制器短很多，但这个版本的`ReadingListController`的功能已经基本完整了。它可以处理发往/readingList的GET请求，获取并展示图书列表。在表单提交后，它还会处理POST请求，保存图书，随后重定向回index动作（由`index()`方法来处理）。
+
+Incredibly, we’re almost finished with the Grails version of the reading-list application. The only thing left is to create the view that displays the list of books and the form.  
+太不可思议了，我们基本已经完成了Grails版本的阅读列表应用程序了。剩下的就是创建一个视图，显示图书列表和表单。
+
+### 6.3.4 Creating the view
+### 6.3.4 创建视图
+
+Grails applications typically use GSP templates for their views. You’ve already seen how to use GSP in a Spring Boot application, so the template we need won’t be much different from the one in section 6.2.  
+Grails应用程序通常都用GSP模板来做视图。你已经看到过如何在Spring Boot应用程序里使用GSP了，因此，此处的模板并不会和6.2节里的模板有太多不同。
+
+What we might want to do, however, is take advantage of the layout facilities offered in Grails to apply a common design to all of the pages in the application. As you can see in listing 6.7, it’s a rather straightforward and simple change.  
+我们要做的是利用Grails提供的布局设施，将公共的设计风格运用到整个应用程序里。如代码6.7所示，这就是个很简单的修改。
+
+__Listing 6.7 A Grails-ready GSP template, including layout__  
+__代码6.7 一个适用于Grails的GSP模板，包含布局__
+
+```
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="layout" content="main"/>
+    <title>Reading List</title>
+    <link rel="stylesheet"
+          href="/assets/main.css?compile=false"  />
+    <link rel="stylesheet"
+          href="/assets/mobile.css?compile=false"  />
+    <link rel="stylesheet"
+          href="/assets/application.css?compile=false"  />
+  </head>
+
+  <body>
+    <h2>Your Reading List</h2>
+
+    <g:if test="${bookList && !bookList.isEmpty()}">
+      <g:each in="${bookList}" var="book">
+      <dl>
+        <dt class="bookHeadline">
+          ${book.title}</span> by ${book.author}
+          (ISBN: ${book.isbn}")
+        </dt>
+        <dd class="bookDescription">
+          <g:if test="${book.description}">
+          ${book.description}
+          </g:if>
+          <g:else>
+          No description available
+          </g:else>
+        </dd>
+      </dl>
+      </g:each>
+    </g:if>
+    <g:else>
+      <p>You have no books in your book list</p>
+    </g:else>
+
+    <hr/>
+
+    <h3>Add a book</h3>
+    <g:form action="save">
+    <fieldset class="form">
+      <label for="title">Title:</label>
+      <g:field type="text" name="title" value="${book?.title}"/><br/>
+      <label for="author">Author:</label>
+      <g:field type="text" name="author"
+                          value="${book?.author}"/><br/>
+      <label for="isbn">ISBN:</label>
+      <g:field type="text" name="isbn" value="${book?.isbn}"/><br/>
+      <label for="description">Description:</label><br/>
+      <g:textArea name="description" value="${book?.description}"
+                                     rows="5" cols="80"/>
+    </fieldset>
+    <fieldset class="buttons">
+      <g:submitButton name="create" class="save"
+        value="${message(code: 'default.button.create.label',
+                                              default: 'Create')}" />
+    </fieldset>
+    </g:form>
+
+  </body>
+</html>
+```
+
+Use the main layout  
+使用了`main`布局
+
+List the books  
+列出图书
+
+The book form  
+图书表单
+
+Within the <head> element we’ve removed the <link> tag that references our stylesheet. In its place, we’ve put in a <meta> tag that references the “main” layout of the Grails application. As a consequence, the application will take on the Grails look and feel, as shown in figure 6.4, when you run it.  
+在`<head>`元素里我们移除了引用样式表的`<link>`标签。这里放了一个`<meta>`标签，引入了Grails应用程序的“main”布局。这样一来，应用程序就能用上Grails的外观了，运行的效果如图6.4所示。
+
+![图6.4](../Figures/figure-6.4.png)
+
+__Figure 6.4 The reading-list application with the common Grails styling__  
+__图6.4 用了通用Grails风格的阅读列表应用程序__
+
+Although the Grails style is more eye-catching than the simple stylesheet we’ve been using, there is obviously still a little work to do to make the reading-list application look good. And we’ll probably want to start making the application look a little less like Grails and more like what we want our application to look like. Manipulating the application’s stylesheets is well outside of the scope of this book, but if you’re interested in tweaking the look and feel, you’ll find the stylesheets in the grails-app/assets/stylesheets directory.  
+虽然Grails风格比之前用的简单的样式表更吸引眼球，但很显然要让阅读列表应用程序更好看的话，还有一些工作要做，要让应用程序和Grails不那么像，和我们的想象更接近一点。修改应用程序的样式表在本书的讨论范围之外，但如果你对样式微调感兴趣，可以在grails-app/assets/stylesheets目录里找到样式表文件。
+
+## 6.4 Summary
+## 6.4 小结
+
+Both Grails and Spring Boot aim to make developers’ lives easy, providing a greatly simplified development model on top of Spring, so it may appear that these are competing frameworks. But in this chapter, we’ve seen how to get the best of both worlds by bringing Spring Boot and Grails together.  
+Grails和Spring Boot都旨在让开发者的生活更简单，大大简化基于Spring的开发模型，因此看起来两者是互相竞争的框架。但在本章中，我们看到了两者是如何结合在一起的。
+
+We looked at how to add GORM and GSP views, two well-known Grails features, to an otherwise typical Spring Boot application. GORM is an especially welcome feature in Spring Boot, enabling you to perform persistence directly with the domain and eliminating the need for a repository.  
+我们了解到了如何向典型的Spring Boot应用程序中添加GORM和GSP视图，这两个都是知名的Grails特性。GORM是Spring Boot里一个很受欢迎的特性，让你能直接针对领域模型执行持久化操作，消除了对模型仓库的需求。
+
+Then we looked at Grails 3, the latest incarnation of Grails, built upon Spring Boot. When developing a Grails 3 application, you’re also working with Spring Boot and are afforded all of the features of Spring Boot, including auto-configuration.  
+随后我们看了下Grails 3，即它的最新版本，构建于Spring Boot之上。在开发Grails 3应用程序时，你也是在使用Spring Boot，可以使用Spring Boot的全部特性，包括自动配置。
+
+In all cases, both in this and the previous chapter, you’ve seen how mixing Groovy and Spring Boot helps squelch the code noise that’s required in the Java language.  
+在这两章里，我们看到了如何结合Groovy和Spring Boot，消除Java语言所必须的那些代码噪音。
+
+Coming up in the next chapter, we’re going to shift our attention away from coding Spring Boot applications and look at the Spring Boot Actuator to see how it gives us insights into the inner workings of our running applications.  
+在接下来的章节里，我们要将关注点从开发Spring Boot应用程序转移到Spring Boot Actuator上，看看它是如何帮助我们了解应用程序的运行情况的。
