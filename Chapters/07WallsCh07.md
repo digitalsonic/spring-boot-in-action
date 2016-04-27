@@ -1,4 +1,5 @@
 # Taking a peek inside with the Actuator
+# 深入Actuator
 
 __This chapter covers__
 __本章内容涉及__
@@ -7,20 +8,31 @@ __本章内容涉及__
 * Adjusting the Actuator
 * Shelling into a running application
 * Securing the Actuator
+* Actuator Web端点
+* 调整Actuator
+* 通过Shell连入运行中的应用程序
+* 保护Actuator
 
-Have you ever tried to guess what’s inside a wrapped gift? You shake it, weigh it, and measure it. And you might even have a solid idea as to what’s inside. But until you open it up, there’s no way of knowing for sure.
+Have you ever tried to guess what’s inside a wrapped gift? You shake it, weigh it, and measure it. And you might even have a solid idea as to what’s inside. But until you open it up, there’s no way of knowing for sure.  
+你有没有猜过包好的礼物盒里装的是什么东西？你会摇一摇，掂一掂，量一量，你甚至会执着于里面到底有什么。但直到打开盒子那一刻前，你是没办法确认里面是什么的。
 
-A running application is kind of like a wrapped gift. You can poke at it and make reasonable guesses as to what’s going on under the covers. But how can you know for sure? If only there were some way that you could peek inside a running application, see how it’s behaving, check on its health, and maybe even trigger operations that influence how it runs?
+A running application is kind of like a wrapped gift. You can poke at it and make reasonable guesses as to what’s going on under the covers. But how can you know for sure? If only there were some way that you could peek inside a running application, see how it’s behaving, check on its health, and maybe even trigger operations that influence how it runs?  
+运行中的应用程序就像礼物盒。你可以刺探它，作出合理的推测，猜测它的运行情况。但如何了解真实的情况呢？有没有一种办法能让你深入应用程序内部一窥究竟，了解它的行为，检查它的健康状况，甚至触发一些操作来影响应用程序呢？
 
-In this chapter, we’re going to explore Spring Boot’s Actuator. The Actuator offers production-ready features such as monitoring and metrics to Spring Boot applications. The Actuator’s features are provided by way of several REST endpoints, a remote shell, and Java Management Extensions (JMX). We’ll start by looking at the Actuator’s REST endpoints, which offer the most complete and well-known way of working with the Actuator.
+In this chapter, we’re going to explore Spring Boot’s Actuator. The Actuator offers production-ready features such as monitoring and metrics to Spring Boot applications. The Actuator’s features are provided by way of several REST endpoints, a remote shell, and Java Management Extensions (JMX). We’ll start by looking at the Actuator’s REST endpoints, which offer the most complete and well-known way of working with the Actuator.  
+在本章中，我们将了解到Spring Boot的Actuator，它提供了很多生产级的特性，比如监控和度量Spring Boot应用程序。可以通过众多REST端点、远程Shell和Java Management Extensions（JMX）来获得Actuator的这些特性。我们会先来看看Actuator的REST端点，这种最为人所知的使用方式提供的功能也最完整。
 
 ## 7.1 Exploring the Actuator’s endpoints
+## 7.1 揭秘Actuator的端点
 
-The key feature of Spring Boot’s Actuator is that it provides several web endpoints in your application through which you can view the internals of your running application. Through the Actuator, you can find out how beans are wired together in the Spring application context, determine what environment properties are available to your application, get a snapshot of runtime metrics, and more.
+The key feature of Spring Boot’s Actuator is that it provides several web endpoints in your application through which you can view the internals of your running application. Through the Actuator, you can find out how beans are wired together in the Spring application context, determine what environment properties are available to your application, get a snapshot of runtime metrics, and more.  
+Spring Boot Actuator的关键特性是在应用程序里提供了众多Web端点，通过它们可以了解应用程序运行时的内部状况。有了Actuator，你可以了解到Bean在Spring应用程序上下文里是如何组装在一起的，掌握应用程序可以获取的环境属性信息，获取运行时度量信息的快照……
 
-The Actuator offers a baker’s dozen of endpoints, as described in table 7.1.
+The Actuator offers a baker’s dozen of endpoints, as described in table 7.1.  
+Actuator提供了13个端点，具体如表7.1所示。
 
 __Table 7.1 Actuator endpoints__
+__表7.1 Actuator的端点__
 
 | HTTP method  | Path            | Description                                                                                           |
 |--------------|-----------------|-------------------------------------------------------------------------------------------------------|
@@ -38,13 +50,31 @@ __Table 7.1 Actuator endpoints__
 |GET           | /shutdown       | Shuts down the application; requires that endpoints.shutdown.enabled be set to true.                  |
 |GET           | /trace          | Provides basic trace information (timestamp, headers, and so on) for HTTP requests.                   |
 
-To enable the Actuator endpoints, all you must do is add the Actuator starter to your build. In a Gradle build specification, that dependency looks like this:
+| HTTP方法 | 路径              | 描述                                                           |
+|----------|-------------------|---------------------------------------------------------------|
+| GET      | `/autoconfig`     | 提供了一份自动配置报告，记录了哪些自动配置条件通过了，哪些没通过。  |
+| GET      | `/configprops`    | 描述了配置属性（包含默认值）是如何注入到Bean里的。                |
+| GET      | `/beans`          | 描述了应用程序上下文里全部的Bean，以及它们的相互关系。             |
+| GET      | `/dump`           | 获取线程活动的快照。                                            |
+| GET      | `/env`            | 获取全部环境属性。                                              |
+| GET      | `/env/{name}`     | 根据名称获取特定的环境属性值。                                   |
+| GET      | `/health`         | 报告应用程序的健康指标，这些值由`HealthIndicator`的实现类提供。    |
+| GET      | `/info`           | 获取应用程序的定制信息，这些信息由`info`打头的属性提供。           |
+| GET      | `/mappings`       | 描述全部的URI路径，以及它们和控制器的映射关系（包含Actuator端点）。 |
+| GET      | `/metrics`        | 报告各种应用程序度量信息，比如内存用量和HTTP请求计数。             |
+| GET      | `/metrics/{name}` | 报告指定名称的应用程序度量值。                                    |
+| GET      | `/shutdown`       | 关闭应用程序，要求`endpoints.shutdown.enabled`设置为`true`。     |
+| GET      | `/trace`          | 提供基本的HTTP请求跟踪信息（时间戳、HTTP头等）。                   |
+
+To enable the Actuator endpoints, all you must do is add the Actuator starter to your build. In a Gradle build specification, that dependency looks like this:  
+要启用Actuator的端点，只需在项目中引入Actuator的起步依赖即可。在Gradle构建说明文件里，这个依赖是这样的：
 
 ```
 compile 'org.springframework.boot:spring-boot-starter-actuator'
 ```
 
-For a Maven build, the required dependency is as follows:
+For a Maven build, the required dependency is as follows:  
+对于Maven项目，引入的依赖是这样的：
 
 ```
 <dependency>
@@ -53,17 +83,21 @@ For a Maven build, the required dependency is as follows:
 </dependency>
 ```
 
-Or, if you’re using the Spring Boot CLI, the following @Grab should do the trick:
+Or, if you’re using the Spring Boot CLI, the following @Grab should do the trick:  
+亦或者，如果你在用Spring Boot CLI，可以使用如下`@Grab`注解：
 
 ```
 @Grab('spring-boot-starter-actuator')
 ```
 
-No matter which technique you use to add the Actuator to your build, auto-configuration will kick in when the application is running and you enable the Actuator.
+No matter which technique you use to add the Actuator to your build, auto-configuration will kick in when the application is running and you enable the Actuator.  
+无论你是如何添加Actuator的，在应用程序运行时自动配置都会生效，开启Actuator。
 
-The endpoints in table 7.1 can be organized into three distinct categories: configuration endpoints, metrics endpoints, and miscellaneous endpoints. Let’s take a look at each of these endpoints, starting with the endpoints that provide insight into the configuration of your application.
+The endpoints in table 7.1 can be organized into three distinct categories: configuration endpoints, metrics endpoints, and miscellaneous endpoints. Let’s take a look at each of these endpoints, starting with the endpoints that provide insight into the configuration of your application.  
+表7.1中的端点可以分为三大类：配置端点、度量端点和其他端点。让我们分别了解一下这些端点，从提供应用程序配置信息的端点看起吧。
 
 ### 7.1.1 Viewing configuration details
+### 7.1.1 查看配置明细
 
 One of the most common complaints lodged against Spring component-scanning and autowiring is that it’s hard to see how all of the components in an application are wired together. Spring Boot auto-configuration makes this problem even worse, as there’s even less Spring configuration. At least with explicit configuration, you could look at the XML file or the configuration class and get an idea of the relationships between the beans in the Spring application context.
 
