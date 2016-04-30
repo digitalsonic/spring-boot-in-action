@@ -521,3 +521,301 @@ As you can see, a lot of information is provided by the /metrics endpoint. Rathe
 
 __Table 7.2 Gauges and counters reported by the /metrics endpoint__  
 __表7.2 `/metrics`端点报告的度量值和计数器__
+
+| Category | Prefix            | What it reports                                   |
+|----------|-------------------|---------------------------------------------------|
+| Garbage collector | gc.* | The count of garbage collections that have occurred and the elapsed garbage collection time for both the mark-sweep and scavenge garbage collectors (from java.lang .management.GarbageCollectorMXBean) |
+| Memory | mem.* | The amount of memory allotted to the application and the amount of memory that is free (from java.lang.Runtime) |
+| Heap | heap.* | The current memory usage (from java.lang .management.MemoryUsage) |
+| Class loader | classes.* | The number of classes that have been loaded and unloaded by the JVM class loader (from java.lang.management .ClassLoadingMXBean) |
+| System | processors  uptime  instance.uptime  systemload.average | System information such as the number of processors (from java.lang.Runtime), uptime (from java.lang .management.RuntimeMXBean), and average system load (from java.lang.management .OperatingSystemMXBean) |
+| Thread pool | threads.* | The number of threads, daemon threads, and the peak count of threads since the JVM started (from java.lang .management.ThreadMXBean) |
+| Data source | datasource.* | The number of data source connections (from the data source’s metadata and only available if there are one or more DataSource beans in the Spring application context) |
+| Tomcat sessions | httpsessions.* | The active and maximum number of sessions in Tomcat (from the embedded Tomcat bean and only available if the application is served via an embedded Tomcat server) |
+| HTTP | counter.status.*  gauge.response.* | Various gauges and counters for HTTP requests that the application has served |
+
+| 分类      | 前缀              | 报告内容                                            |
+|----------|-------------------|---------------------------------------------------|
+| 垃圾收集器 | `gc.*` | 已经发生过的垃圾收集次数，以及垃圾收集所耗费的时间，适用于标记-清理垃圾收集器和并行垃圾收集器（数据源自`java.lang.management.GarbageCollectorMXBean`） |
+| 内存 | `mem.*` | 分配给应用程序的内存数量和空闲的内存数量（数据源自`java.lang.Runtime`） |
+| 堆 | `heap.*` | 当前内存用量（数据源自`java.lang.management.MemoryUsage`） |
+| 类加载器 | `classes.*` | JVM类加载器加载与卸载的类的数量（数据源自`java.lang.management.ClassLoadingMXBean`） |
+| 系统 | `processors`  `uptime`  `instance.uptime`  `systemload.average` | 系统信息，例如处理器数量（数据源自`java.lang.Runtime`）、运行时间（数据源自`java.lang.management.RuntimeMXBean`）、平均负载（数据源自`java.lang.management.OperatingSystemMXBean`） |
+| 线程池 | `threads.*` | 线程、守护线程的数量，以及JVM启动后的线程数量峰值（数据源自`java.lang .management.ThreadMXBean`） |
+| 数据源 | `datasource.*` | 数据源连接的数量（数据源自数据源的元数据，仅当Spring应用程序上下文里存在`DataSource` Bean的时候才会有这个信息） |
+| Tomcat会话 | `httpsessions.*` | Tomcat的活跃会话数和最大会话数（数据源自嵌入式Tomcat的Bean，仅在使用嵌入式Tomcat服务器运行应用程序时才有这个信息） |
+| HTTP | `counter.status.*`  `gauge.response.*` | 多种应用程序服务的HTTP请求的度量值与计数器 |
+
+Notice that some of these metrics, such as the data source and Tomcat session metrics, are only available if the necessary components are in play in the running application. You can also register your own custom application metrics, as you’ll see in section 7.4.3.  
+请注意，这里的一些度量值，比如数据源和Tomcat会话，仅在应用程序中存在特定组件时才有数据。你还可以注册自己的度量信息，7.4.3节里会提到的。
+
+The HTTP counters and gauges demand a bit more explanation. The number following the counter.status prefix is the HTTP status code. What follows that is the path requested. For instance, the metric named counter.status.200.metrics indicates the number of times that the /metrics endpoint was served with an HTTP status of 200 (OK).  
+HTTP的计数器和度量值需要做一点说明。`counter.status`后的值是HTTP状态码，随后是所请求的路径。举个例子，`counter.status.200.metrics`表明了`/metrics`端点返回200（OK）状态码的次数。
+
+The HTTP gauges are similarly structured but report a different kind of metrics. They’re all prefixed with gauge.response, indicating that they are gauges for HTTP responses. Following that prefix is the path that the gauge refers to. The value of the metric indicates the time in milliseconds that it took to serve that path the most recent time it was served. For instance, the gauge.response.beans metric in table 7.6 indicates that it took 169 milliseconds to serve that request the last time it was served.  
+HTTP的度量值在结构上也差不多，但是却在报告另一类信息。它们全部用`gauge.response`开头，表明这是HTTP响应的度量信息。前缀后是对应的路径，度量值是以毫秒为单位的时间，反映了最近处理该路径请求的耗时。举个例子，代码7.6里的`gauge.response.beans`说明上一次请求耗时169毫秒。
+
+You’ll notice that there are a few special cases for the counter and gauge paths. The root path refers to the root path or /. And star-star is a catchall that refers to any path that Spring determines is a static resource, including images, JavaScript, and stylesheets. It also includes any resource that can’t be found, which is why you’ll often see a counter.status.404.star-star metric indicating the count of requests that were met with HTTP 404 (NOT FOUND) status.  
+这里还有几个特殊的值需要注意。`root`路径指向的是根路径或`/`。`star-star`代表了那些Spring认为是静态资源的路径，包括图片、JavaScript和样式表，其中还包含了那些找不到的资源，这就是为什么你经常会看到`counter.status.404.star-star`，这是返回了HTTP 404（NOT FOUND）状态的请求数。
+
+Whereas the /metrics endpoint fetches a full set of all available metrics, you may only be interested in a single metric. To fetch only one metric value, append the metric’s key to the URL path when making the request. For example, to fetch only the amount of free memory, perform a GET request for /metrics/mem.free:  
+`/metrics`端点会返回所有的可用度量值，但你也可能只对某个值感兴趣。要获取单个值，可以在URL后加上对应的键名。例如，要查看空闲内存大小，可以向`/metrics/mem.free`发一个GET请求：
+
+```
+$ curl localhost:8080/metrics/mem.free
+144029
+```
+
+It may be useful to know that even though the result from /metrics/{name} appears to be plain text, the Content-Type header in the response is set to “application/json;charset=UTF-8”. Therefore, it can be processed as JSON if you need to do so.  
+虽然响应里的`Content-Type`头设置为“application/json;charset=UTF-8”，但实际`/metrics/{name}`的结果是文本格式的。因此，如果需要的话，你也可以把它视为JSON来处理。
+
+#### TRACING WEB REQUESTS
+#### 追踪Web请求
+
+Although the /metrics endpoint gives you some basic counters and timers for web requests, those metrics lack any details. Sometimes it can be helpful, especially when debugging, to know more about the requests that were handled. That’s where the /trace endpoint can be handy.  
+尽管`/metrics`端点提供了一些针对Web请求的基本计数器和计时器，但那些度量值缺少详细信息。知道所处理的请求的更多信息是很有帮助的，尤其是在调试时，所以就有了`/trace`这个端点。
+
+The /trace endpoint reports details of all web requests, including details such as the request method, path, timestamp, and request and response headers. Listing 7.7 shows an excerpt of the /trace endpoint’s output containing a single request trace entry.  
+`/trace`端点能报告所有Web请求的详细信息，包含请求方法、路径、时间戳以及请求和响应的头信息。代码7.7是`/trace`输出的一个片段，其中包含了一整个请求跟踪项。
+
+__Listing 7.7 The /trace endpoint records web request details__  
+__代码7.7 `/trace`端点会记录下Web请求的细节__
+
+```
+[
+  ...
+  {
+    "timestamp": 1426378239775,
+    "info": {
+      "method": "GET",
+      "path": "/metrics",
+      "headers": {
+        "request": {
+          "accept": "*/*",
+          "host": "localhost:8080",
+          "user-agent": "curl/7.37.1"
+        },
+        "response": {
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "1; mode=block",
+          "Cache-Control":
+                    "no-cache, no-store, max-age=0, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "X-Frame-Options": "DENY",
+          "X-Application-Context": "application",
+          "Content-Type": "application/json;charset=UTF-8",
+          "Transfer-Encoding": "chunked",
+          "Date": "Sun, 15 Mar 2015 00:10:39 GMT",
+          "status": "200"
+        }
+      }
+    }
+  }
+]
+```
+
+As indicated by the method and path properties, you can see that this trace entry is for a /metrics request. The timestamp property (as well as the Date header in the response) tells you when the request was handled. The headers property carries header details for both the request and the response.  
+正如`method`和`path`属性所示，你可以看到这个跟踪项是一个针对`/metrics`的请求。`timestamp`属性（以及响应中的`Date`头）告诉了你请求的处理时间。`headers`属性的内容是请求和响应中所携带的头信息。
+
+Although listing 7.7 only shows a single trace entry, the /trace endpoint will report trace details for the 100 most recent requests, including requests for the /trace endpoint itself. It maintains the trace data in an in-memory trace repository. Later, in section 7.4.4, you’ll see how to create a custom trace repository implementation for a more permanent tracing of requests.  
+虽然代码7.7里只显示了一条跟踪项，但`/trace`端点实际能显示最近100个请求的信息，包含对`/trace`自己的请求，它在内存里维护了一个跟踪库。稍后在7.4.4节里，你会看到如何创建一个自定义的跟踪库实现，以便持久化请求的跟踪信息。
+
+#### DUMPING THREAD ACTIVITY
+#### 导出线程活动
+
+In addition to request tracing, thread activity can also be useful in determining what’s going on in a running application. The /dump endpoint produces a snapshot of current thread activity.  
+在确认应用程序运行情况时，除了跟踪请求，了解线程活动也会很有帮助。`/dump`端点会生成当前线程活动的快照。
+
+__Listing 7.8 The /dump endpoint provides a snapshot of an application’s threads__  
+__代码7.8 `/dump`端点提供了应用程序线程的快照__
+
+```
+[
+  {
+    "threadName": "container-0",
+    "threadId": 19,
+    "blockedTime": -1,
+    "blockedCount": 0,
+    "waitedTime": -1,
+    "waitedCount": 64,
+    "lockName": null,
+    "lockOwnerId": -1,
+    "lockOwnerName": null,
+    "inNative": false,
+    "suspended": false,
+    "threadState": "TIMED_WAITING",
+    "stackTrace": [
+      {
+        "className": "java.lang.Thread",
+        "fileName": "Thread.java",
+        "lineNumber": -2,
+        "methodName": "sleep",
+        "nativeMethod": true
+      },
+      {
+        "nativeMethod": false
+      },
+      {
+        "className": "org.springframework.boot.context.embedded.
+                            tomcat.TomcatEmbeddedServletContainer$1",
+        "fileName": "TomcatEmbeddedServletContainer.java",
+        "lineNumber": 139,
+        "methodName": "run",
+        "nativeMethod": false
+      }
+    ],
+    "lockedMonitors": [],
+    "lockedSynchronizers": [],
+    "lockInfo": null
+  },
+  ...
+]
+```
+
+The complete thread dump report includes every thread in the running application. To save space, listing 7.8 shows an abridged entry for a single thread. As you can see, it includes details regarding the blocking and locking status of the thread, among other thread specifics. There’s also a stack trace that, in this case, indicates the thread is a Tomcat container thread.  
+完整的线程导出报告里会包含应用程序的每个线程，为了节省空间，代码7.8里只放了一个线程的内容片段。如你所见，其中包含了很多线程的特定信息，还有线程相关的阻塞和锁状态。本例中，还有一个跟踪栈（stack trace），表明这是一个Tomcat容器线程。
+
+#### MONITORING APPLICATION HEALTH
+#### 监控应用程序健康情况
+
+If you’re ever wondering if your application is up and running or not, you can easily find out by requesting the /health endpoint. In the simplest case, the /health endpoint reports a simple JSON structure like this:  
+如果你想知道自己的应用程序是否在运行，可以直接访问`/health`端点。在最简单的情况下，该端点会显示一个简单的JSON，内容如下：
+
+```
+{"status":"UP"}
+```
+
+The status property reports that the application is up. Of course it is. It doesn’t really matter what the response is; any response at all is an indication that the application is running. But the /health endpoint has more information than a simple “UP” status.  
+`status`属性显示了应用程序在运行中。当然，它的确在运行，此处的响应无关紧要，任何输出都说明这个应用程序在运行。但`/health`端点可以输出的信息远远不止简单的“UP”状态。
+
+Some of the information offered by the /health endpoint can be sensitive, so unauthenticated requests are only given the simple health status response. If the request is authenticated (for example, if you’re logged in), more health information is exposed. Here’s some sample health information reported for the reading-list application:  
+`/health`端点输出的某些信息可能涉及内容，因此未经授权的请求只能提供简单的健康状态。如果是经过身份验证的（比如你已经登录了），则可以提供更多信息。下面是一些阅读列表应用程序的健康信息示例：
+
+```
+{
+  "status":"UP",
+  "diskSpace": {
+    "status":"UP",
+    "free":377423302656,
+    "threshold":10485760
+  },
+  "db":{
+    "status":"UP",
+    "database":"H2",
+    "hello":1
+  }
+}
+```
+
+Along with the basic health status, you’re also given information regarding the amount of available disk space and the status of the database that the application is using.  
+除了基本的健康状态，还可以看到可用的磁盘空间以及应用程序正在使用的数据库状态。
+
+All of the information reported by the /health endpoints is provided by one or more health indicators, including those listed in table 7.3, that come with Spring Boot.  
+`/health`端点所提供的所有信息都是由一个或多个健康指示器提供的，表7.3列出了Spring Boot自带的健康指示器。
+
+__Table 7.3 Spring Boot’s out-of-the-box health indicators__  
+__表7.3 Spring Boot自带的健康指示器__
+
+| Health indicator | Key | Reports |
+|------------------|-----|---------|
+| `ApplicationHealthIndicator` | none | Always “UP” |
+| `DataSourceHealthIndicator` | db | “UP” and database type if the database can be contacted; “DOWN” status otherwise |
+| `DiskSpaceHealthIndicator` | diskSpace | “UP” and available disk space, and “UP” if avail- able space is above a threshold; “DOWN” if there isn’t enough disk space |
+| `JmsHealthIndicator` | jms | “UP” and JMS provider name if the message bro- ker can be contacted; “DOWN” otherwise |
+| `MailHealthIndicator` | mail | “UP” and the mail server host and port if the mail server can be contacted; “DOWN” otherwise |
+| `MongoHealthIndicator` | mongo | “UP” and the MongoDB server version; “DOWN” otherwise |
+| `RabbitHealthIndicator` | rabbit | “UP” and the RabbitMQ broker version; “DOWN” otherwise |
+| `RedisHealthIndicator` | redis | “UP” and the Redis server version; “DOWN” otherwise |
+| `SolrHealthIndicator` | solr | “UP” if the Solr server can be contacted; “DOWN” otherwise |
+
+| 健康指示器 | 键名 | 报告内容 |
+|----------|-----|---------|
+| ApplicationHealthIndicator | `status` | 永远是“UP” |
+| DataSourceHealthIndicator | `db` | 如果数据库能连上，则内容是“UP”和数据库类型；否则是“DOWN” |
+| DiskSpaceHealthIndicator | `diskSpace` | 如果可用空间大于阈值，则内容为“UP”和可用磁盘空间；如果空间不足则为“DOWN” |
+| JmsHealthIndicator | `jms` | 如果能连上消息代理，则内容为“UP”和JMS提供方的名称；否则为“DOWN” |
+| MailHealthIndicator | `mail` | 如果能连上邮件服务器，则内容为“UP”和邮件服务器主机和端口；否则为“DOWN” |
+| MongoHealthIndicator | `mongo` | 如果能连上MongoDB服务器，则内容为“UP”和MongoDB服务器版本；否则为“DOWN” |
+| RabbitHealthIndicator | `rabbit` | 如果能连上RabbitMQ服务器，则内容为“UP”和版本号；否则为“DOWN” |
+| RedisHealthIndicator | `redis` | 如果能连上服务器，则内容为“UP”和Redis服务器版本；否则为“DOWN” |
+| SolrHealthIndicator | `solr` | 如果能连上Solr服务器，则内容为“UP”；否则为“DOWN” |
+
+These health indicators will be automatically configured as needed. For example, DataSourceHealthIndicator will be automatically configured if javax.sql.DataSource is available in the classpath. ApplicationHealthIndicator and DiskSpaceHealthIndicator will always be configured.  
+这些健康指示器会按需自动配置。举例来说，如果Classpath里有`javax.sql.DataSource`则会自动配置`DataSourceHealthIndicator`。`ApplicationHealthIndicator`和`DiskSpaceHealthIndicator`则一直会被配置。
+
+In addition to these out-of-the-box health indicators, you’ll see how to create custom health indicators in section 7.4.5.  
+除了这些自带的健康指示器，在7.4.5节里你还会看到如何创建自定义健康指示器。
+
+### 7.1.3 Shutting down the application
+### 7.1.3 关闭应用程序
+
+Suppose you need to kill your running application. In a microservice architecture, for instance, you might have multiple instances of a microservice application running in the cloud. If one of those instances starts misbehaving, you might decide to shut it down and let the cloud provider restart the failed application for you. In that scenario, the Actuator’s /shutdown endpoint will prove useful.
+
+In order to shut down your application, you can send a POST request to /shutdown. For example, you can shut down your application using the curl command-line tool like this:
+
+```
+$ curl -X POST http://localhost:8080/shutdown
+```
+
+Obviously, the ability to shut down a running application is a dangerous thing, so it’s disabled by default. Unless you’ve explicitly enabled it, you’ll get the following response from the POST request:
+
+```
+{"message":"This endpoint is disabled"}
+```
+
+To enable the /shutdown endpoint, configure the endpoints.shutdown.enabled property to true. For example, add the following lines to application.yml to enable the /shutdown endpoint:
+
+```
+endpoints:
+  shutdown:
+    enabled: true
+```
+
+Once the /shutdown endpoint is enabled, you want to make sure that not just anybody can kill your application. You should secure the /shutdown endpoint, requiring that only authorized users are allowed to bring the application down. You’ll see how to secure Actuator endpoints in section 7.5.
+
+### 7.1.4 Fetching application information
+
+Spring Boot’s Actuator has one more endpoint you might find useful. The /info end- point reports any information about your application that you might want to expose to callers. The default response to a GET request to /info looks like this:
+
+```
+{}
+```
+
+Obviously, an empty JSON object isn’t very useful. But you can add any information to the /info endpoint’s response by simply configuring properties prefixed with info. For example, suppose you want to provide a contact email in the /info endpoint response. You could set a property named info.contactEmail like this in application.yml:
+
+```
+info:
+  contactEmail: support@myreadinglist.com
+```
+
+Now if you request the /info endpoint, you’ll get the following response:
+
+```
+{
+  "contactEmail":"support@myreadinglist.com"
+}
+```
+
+Properties in the /info response can also be nested. For example, suppose that you want to provide both a support email and a support phone number. In application.yml, you might configure the following properties:
+
+```
+info:
+  contact:
+    email: support@myreadinglist.com
+    phone: 1-888-555-1971
+```
+
+The JSON returned from the /info endpoint will include a contact property that
+itself has email and phone properties:
+
+```
+{
+  "contact":{
+    "email":"support@myreadinglist.com",
+    "phone":"1-888-555-1971"
+  }
+}
+```
+
+Adding properties to the /info endpoint is just one of many ways you can customize Actuator behavior. Later in section 7.4, we’ll look at other ways that you can configure and extend the Actuator. But first, let’s see how to secure the Actuator’s endpoints.
