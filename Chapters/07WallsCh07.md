@@ -936,70 +936,111 @@ The less command is much like the same-named command in Unix shells; it enables 
 `less`命令和Unix Shell里的同名命令很像；能让你穿梭于文件中。`autoconfig`的输出很长，但通过`less`命令会让它更容易查阅。
 
 ### 7.2.2 Listing application beans
+### 7.2.2 列出应用程序的Bean
 
-The output from the autoconfig shell command and the /autoconfig endpoint were similar but different. In contrast, you’ll find that the results from the beans command are exactly the same as those from the /beans endpoint, as the screenshot in figure 7.2 shows.
+The output from the autoconfig shell command and the /autoconfig endpoint were similar but different. In contrast, you’ll find that the results from the beans command are exactly the same as those from the /beans endpoint, as the screenshot in figure 7.2 shows.  
+`autoconfig`命令的输出和`/autoconfig`端点的输出很类似，但也有不同。对比之下，你会发现`beans`命令的输出则和`/beans`端点的输出一样，截屏如图7.2所示。
 
 ![图7.2](../Figures/figure-7.2.png)
 
-__Figure 7.2 Output of beans command__
+__Figure 7.2 Output of beans command__  
+__图7.2 `beans`命令的输出__
 
 Just like the /beans endpoint, the beans command produces a list of all beans in the
-Spring application context, along with any dependency beans, in JSON format.
+Spring application context, along with any dependency beans, in JSON format.  
+和`/beans`端点一样，`beans`命令会以JSON格式列出Spring应用程序上下文里所有的Bean，包括所依赖的Bean。
 
 ### 7.2.3 Watching application metrics
+### 7.2.3 查看应用程序的度量信息
 
-The metrics shell command produces the same information as the Actuator /metrics endpoint. But unlike the /metrics endpoint, which produces a snapshot of the current metrics in JSON format, the metrics command takes over the shell and displays its results in a live dashboard. Figure 7.3 shows what the metrics dashboard looks like.
+The metrics shell command produces the same information as the Actuator /metrics endpoint. But unlike the /metrics endpoint, which produces a snapshot of the current metrics in JSON format, the metrics command takes over the shell and displays its results in a live dashboard. Figure 7.3 shows what the metrics dashboard looks like.  
+`metrics`命令会输出与Actuator `/metrics`端点一样的信息。`/metrics`端点是以JSON格式输出当前度量信息的快照，而`metrics`命令则会接管Shell，以实时仪表盘的形式来显示结果。图7.3就是`metrics`命令的仪表盘。
 
 ![图7.3](../Figures/figure-7.3.png)
 
-__Figure 7.3 The metrics dashboard__
+__Figure 7.3 The metrics dashboard__  
+__图7.3 `metrics`命令的仪表盘__
 
-It’s difficult to demonstrate the live dashboard behavior of the metrics command with a static figure in a book. But try to imagine that as memory, heap, and threads are consumed and released and as classes are loaded, the numbers shown in the dashboard will change to reflect the current values.
+It’s difficult to demonstrate the live dashboard behavior of the metrics command with a static figure in a book. But try to imagine that as memory, heap, and threads are consumed and released and as classes are loaded, the numbers shown in the dashboard will change to reflect the current values.  
+很难在书里的一张静态图片里演示`metrics`命令的实时仪表盘。但你可以试着想象一下，内存、堆、线程在不断被消耗和释放，随着类的加载，仪表盘里显示的数量也会随之变化。
 
-Once you’re finished looking at the metrics offered by the metrics command, press Ctrl-C to return to the shell.
+Once you’re finished looking at the metrics offered by the metrics command, press Ctrl-C to return to the shell.  
+一旦看完了`metrics`命令提供的度量信息，按Ctrl-C就能回到Shell了。
 
 ### 7.2.4 Invoking Actuator endpoints
+### 7.2.4 调用Actuator端点
 
-You’ve probably realized by now that not all of the Actuator’s endpoints have corresponding commands in the shell. Does that mean that the shell can’t be a full replacement for the Actuator endpoints? Will you still have to query the endpoints directly for some of the internals offered by the Actuator? Although the shell doesn’t pair a command up with each of the endpoints, the endpoint command enables you to invoke Actuator endpoints from within the shell.
+You’ve probably realized by now that not all of the Actuator’s endpoints have corresponding commands in the shell. Does that mean that the shell can’t be a full replacement for the Actuator endpoints? Will you still have to query the endpoints directly for some of the internals offered by the Actuator? Although the shell doesn’t pair a command up with each of the endpoints, the endpoint command enables you to invoke Actuator endpoints from within the shell.  
+你现在应该已经意识到了，并非所有的Actuator端点都有对应的Shell命令。那这是否意味着Shell不能完全代替Actuator端点呢？是否还是要直接查询这些端点来获取Actuator提供的内部信息呢？虽然Shell没能完全匹配上这些端点，但`endpoint`命令让你能在Shell里调用Actuator的端点。
 
-First, you need to know which endpoint you want to invoke. You can get a list of endpoints by issuing endpoint list at the shell prompt, as shown in figure 7.4. Notice that the endpoints listed are referred to by their bean names, not by their URL paths.
+First, you need to know which endpoint you want to invoke. You can get a list of endpoints by issuing endpoint list at the shell prompt, as shown in figure 7.4. Notice that the endpoints listed are referred to by their bean names, not by their URL paths.  
+首先，你要知道自己想调用哪个端点。在Shell提示符中键入`endpoint list`就能获得端点的列表，如图7.4所示。请注意，列表中的端点用的是它们的Bean名称，而非URL路径。
 
 ![图7.4](../Figures/figure-7.4.png)
 
-__Figure 7.4 Getting a list of endpoints__
+__Figure 7.4 Getting a list of endpoints__  
+__图7.4 获得端点列表__
 
-When you want to call one of the endpoints from the shell, you’ll use the endpoint invoke command, giving it the endpoint’s bean name without the “Endpoint” suffix. For example, to invoke the health endpoint, you’d issue endpoint invoke health at the shell prompt, as shown in figure 7.5.
+When you want to call one of the endpoints from the shell, you’ll use the endpoint invoke command, giving it the endpoint’s bean name without the “Endpoint” suffix. For example, to invoke the health endpoint, you’d issue endpoint invoke health at the shell prompt, as shown in figure 7.5.  
+当你想在Shell里调用其中的某个端点时，可以使用`endpoint invoke`命令，传入不带“Endpoint”后缀的Bean名称。举例来说，要调用健康检查端点，在Shell提示符里键入`endpoint invoke health`，如图7.5所示。
 
 ![图7.5](../Figures/figure-7.5.png)
 
-__Figure 7.5 Invoking the health endpoint__
+__Figure 7.5 Invoking the health endpoint__  
+__图7.5 调用健康检查端点__
 
-Notice that the results coming back from the endpoint are in the form of a raw, unformatted JSON document. Although it may be nice to be able to invoke the Actuator’s endpoints from within the shell, the results can be a bit difficult to read. Out of the box, there’s not much that can be done about that. But if you’re feeling adventurous, you can create a custom CRaSH shell command that accepts the unformatted JSON via a pipe and pretty-prints it. And you can always cut and paste it into a tool of your choosing for further review or formatting.
+Notice that the results coming back from the endpoint are in the form of a raw, unformatted JSON document. Although it may be nice to be able to invoke the Actuator’s endpoints from within the shell, the results can be a bit difficult to read. Out of the box, there’s not much that can be done about that. But if you’re feeling adventurous, you can create a custom CRaSH shell command that accepts the unformatted JSON via a pipe and pretty-prints it. And you can always cut and paste it into a tool of your choosing for further review or formatting.  
+请注意，这些端点返回的信息都是原始格式的，即未格式化过的JSON文档。虽然在Shell里调用Actuator的端点是不错，但输出结果很难阅读。就这个问题，自带的功能没什么能帮得上忙的。但如果你爱折腾，可以创建一个自定义的CRaSH Shell命令，通过管道接受未格式化过的JSON，然后美化输出。你总是可以剪切复制`endpoint`命令的输出，将其放入你喜欢的工具进行阅读或格式化。
 
 ## 7.3 Monitoring your application with JMX
+## 7.3 通过JMX来监控你的应用程序
 
-In addition to the endpoints and the remote shell, the Actuator also exposes its end- points as MBeans to be viewed and managed through JMX (Java Management Extensions). JMX is an attractive option for managing your Spring Boot application, especially if you’re already using JMX to manage other MBeans in your applications.
+In addition to the endpoints and the remote shell, the Actuator also exposes its endpoints as MBeans to be viewed and managed through JMX (Java Management Extensions). JMX is an attractive option for managing your Spring Boot application, especially if you’re already using JMX to manage other MBeans in your applications.  
+除了REST端点和远程Shell，Actuator还把它的端点以MBean的方式发布了出来，可以通过JMX（Java Management Extensions）来查看和管理。JMX是中不错的Spring Boot应用程序管理方式，尤其是当你已经在用JMX管理应用程序中的其他MBean的时候。
 
-All of the Actuator’s endpoints are exposed under the org.springframework.boot domain. For example, suppose you want to view the request mappings for your application. Figure 7.6 shows the request mapping endpoint as viewed in JConsole.
+All of the Actuator’s endpoints are exposed under the org.springframework.boot domain. For example, suppose you want to view the request mappings for your application. Figure 7.6 shows the request mapping endpoint as viewed in JConsole.  
+Actuator的端点都发布在org.springframework.boot域下，比如说，你想要查看应用程序的请求映射关系，图7.6就是通过JConsole来查看请求映射端点。
 
 ![图7.6](../Figures/figure-7.6.png)
 
-__Figure 7.6 Request mapping endpoint as viewed in JConsole__
+__Figure 7.6 Request mapping endpoint as viewed in JConsole__  
+__图7.6 通过JConsole查看请求映射端点__
 
-As you can see, the request mapping endpoint is found under requestMappingEndpoint, which is under Endpoint in the org.springframework.boot domain. The Data attribute contains the JSON reported by the endpoint.
+As you can see, the request mapping endpoint is found under requestMappingEndpoint, which is under Endpoint in the org.springframework.boot domain. The Data attribute contains the JSON reported by the endpoint.  
+如你所见，可以在`requestMappingEndpoint`下找到请求映射端点，位于org.springframework.boot域中的`Endpoint`下。`Data`属性中包含了该端点所要输出的JSON内容。
 
-As with any MBean, the endpoint MBeans have operations that you can invoke. Most of the endpoint MBeans only have accessor operations that return the value of one of their attributes. But the shutdown endpoint offers a slightly more interesting (and destructive!) operation, as shown in figure 7.7
+As with any MBean, the endpoint MBeans have operations that you can invoke. Most of the endpoint MBeans only have accessor operations that return the value of one of their attributes. But the shutdown endpoint offers a slightly more interesting (and destructive!) operation, as shown in figure 7.7  
+和其他MBean一样，端点MBean的有可供调用的操作。大部分端点MBean只有访问操作，返回其中的某个属性，但关闭端点提供了一些有趣（同时具有毁灭性）的操作，如图7.7所示。
 
 ![图7.7](../Figures/figure-7.7.png)
 
-__Figure 7.7 Shutdown button invokes the endpoint.__
+__Figure 7.7 Shutdown button invokes the endpoint.__  
+__图7.7 调用该端点的关闭按钮__
 
-If you ever need to shut down your application (or just like living dangerously), the shutdown endpoint is there for you. As shown in figure 7.7, it’s waiting for you to click the “shutdown” button to invoke the endpoint. Be careful, though—there’s no turn- ing back or “Are you sure?” prompt.
+If you ever need to shut down your application (or just like living dangerously), the shutdown endpoint is there for you. As shown in figure 7.7, it’s waiting for you to click the “shutdown” button to invoke the endpoint. Be careful, though—there’s no turning back or “Are you sure?” prompt.  
+如果你想要关闭应用程序（或者喜欢危险的生活），关闭应用的端点正合你意。如图7.7所示，这个界面就等着你点击“shutdown”按钮来调用该端点。请小心，这里没有“后悔药”，也没有“你确定吗？”之类的提示。
 
-The very next thing you’ll see is shown in figure 7.8.
-
-After that, your application will have been shut down. And because it’s dead, there’s no way it could possibly expose another MBean operation for restarting it. You’ll have to restart it yourself, the same way you started it in the first place.
+The very next thing you’ll see is shown in figure 7.8.  
+接下来你要看到的东西如图7.8所示。
 
 ![图7.8](../Figures/figure-7.8.png)
 
-__Figure 7.8 Application immediately shut__
+__Figure 7.8 Application immediately shut__  
+__图7.8 应用程序立马被关闭__
+
+After that, your application will have been shut down. And because it’s dead, there’s no way it could possibly expose another MBean operation for restarting it. You’ll have to restart it yourself, the same way you started it in the first place.  
+在那以后，你的应用程序就被关闭了。因为应用已经被关了，自然就没办法发布其他用来重启它的MBean操作了。你必须自己重启它，就和一开始的启动方式一样。
+
+## 7.4 Customizing the Actuator
+
+Although the Actuator offers a great deal of insight into the inner workings of a run- ning Spring Boot application, it may not be a perfect fit for your needs. Maybe you don’t need everything it offers and want to disable some of it. Or maybe you need to extend it with metrics custom-suited to your application.
+
+As it turns out, the Actuator can be customized in several ways, including the following:
+
+* Renaming endpoints
+* Enabling and disabling endpoints
+* Defining custom metrics and gauges
+* Creating a custom repository for storing trace data
+* Plugging in custom health indicators
+
+We’re going to see how to customize the Actuator, bending it to meet our needs. We'll start with one of the simplest customizations: renaming the Actuator's endpoints.
