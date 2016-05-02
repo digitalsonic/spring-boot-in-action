@@ -750,21 +750,25 @@ In addition to these out-of-the-box health indicators, you’ll see how to creat
 ### 7.1.3 Shutting down the application
 ### 7.1.3 关闭应用程序
 
-Suppose you need to kill your running application. In a microservice architecture, for instance, you might have multiple instances of a microservice application running in the cloud. If one of those instances starts misbehaving, you might decide to shut it down and let the cloud provider restart the failed application for you. In that scenario, the Actuator’s /shutdown endpoint will prove useful.
+Suppose you need to kill your running application. In a microservice architecture, for instance, you might have multiple instances of a microservice application running in the cloud. If one of those instances starts misbehaving, you might decide to shut it down and let the cloud provider restart the failed application for you. In that scenario, the Actuator’s /shutdown endpoint will prove useful.  
+假设你要关闭运行中的应用程序。比方说，在微服务架构中，你有多个微服务应用的实例运行在云上，其中某个实例有问题了，你决定关闭该实例并让云服务提供商为你重启这个有问题的应用程序。在这个场景中，Actuator的`/shutdown`端点就很有用了。
 
-In order to shut down your application, you can send a POST request to /shutdown. For example, you can shut down your application using the curl command-line tool like this:
+In order to shut down your application, you can send a POST request to /shutdown. For example, you can shut down your application using the curl command-line tool like this:  
+为了关闭应用程序，你要往`/shutdown`发送一个POST请求。例如，可以用命令行工具curl来关闭应用程序：
 
 ```
 $ curl -X POST http://localhost:8080/shutdown
 ```
 
-Obviously, the ability to shut down a running application is a dangerous thing, so it’s disabled by default. Unless you’ve explicitly enabled it, you’ll get the following response from the POST request:
+Obviously, the ability to shut down a running application is a dangerous thing, so it’s disabled by default. Unless you’ve explicitly enabled it, you’ll get the following response from the POST request:  
+很显然，关闭运行中的应用程序是件危险的事情，因此这个端点默认是关闭的。如果没有显式地开启这个功能，那么POST请求的结果是这样的：
 
 ```
 {"message":"This endpoint is disabled"}
 ```
 
-To enable the /shutdown endpoint, configure the endpoints.shutdown.enabled property to true. For example, add the following lines to application.yml to enable the /shutdown endpoint:
+To enable the /shutdown endpoint, configure the endpoints.shutdown.enabled property to true. For example, add the following lines to application.yml to enable the /shutdown endpoint:  
+要开启该端点，可以将`endpoints.shutdown.enabled`设置为`true`。举例来说，可以把如下内容加入application.yml里，藉此开启`/shutdown`端点：
 
 ```
 endpoints:
@@ -772,24 +776,29 @@ endpoints:
     enabled: true
 ```
 
-Once the /shutdown endpoint is enabled, you want to make sure that not just anybody can kill your application. You should secure the /shutdown endpoint, requiring that only authorized users are allowed to bring the application down. You’ll see how to secure Actuator endpoints in section 7.5.
+Once the /shutdown endpoint is enabled, you want to make sure that not just anybody can kill your application. You should secure the /shutdown endpoint, requiring that only authorized users are allowed to bring the application down. You’ll see how to secure Actuator endpoints in section 7.5.  
+打开`/shutdown`端点后，你不会希望谁都能关闭应用程序的，这时就应该要保护`/shutdown`端点，只有经过授权的用户能关闭应用程序。在7.5节里你将看到如何保护Actuator端点。
 
 ### 7.1.4 Fetching application information
+### 7.1.4 获取应用信息
 
-Spring Boot’s Actuator has one more endpoint you might find useful. The /info end- point reports any information about your application that you might want to expose to callers. The default response to a GET request to /info looks like this:
+Spring Boot’s Actuator has one more endpoint you might find useful. The /info endpoint reports any information about your application that you might want to expose to callers. The default response to a GET request to /info looks like this:  
+Spring Boot Actuator还有一个有用的端点，`/info`端点能展示各种你希望发布的应用信息。针对该端点的GET请求的默认响应是这样的：
 
 ```
 {}
 ```
 
-Obviously, an empty JSON object isn’t very useful. But you can add any information to the /info endpoint’s response by simply configuring properties prefixed with info. For example, suppose you want to provide a contact email in the /info endpoint response. You could set a property named info.contactEmail like this in application.yml:
+Obviously, an empty JSON object isn’t very useful. But you can add any information to the /info endpoint’s response by simply configuring properties prefixed with info. For example, suppose you want to provide a contact email in the /info endpoint response. You could set a property named info.contactEmail like this in application.yml:  
+很显然，一个空的JSON对象没什么用。但你可以通过配置带有`info`前缀的属性向`/info`端点的响应中添加内容。例如，你希望在响应中添加联系邮箱。可以在application.yml里设置名为`info.contactEmail`的属性：
 
 ```
 info:
   contactEmail: support@myreadinglist.com
 ```
 
-Now if you request the /info endpoint, you’ll get the following response:
+Now if you request the /info endpoint, you’ll get the following response:  
+现在再访问`/info`端点，就能得到如下响应：
 
 ```
 {
@@ -797,7 +806,8 @@ Now if you request the /info endpoint, you’ll get the following response:
 }
 ```
 
-Properties in the /info response can also be nested. For example, suppose that you want to provide both a support email and a support phone number. In application.yml, you might configure the following properties:
+Properties in the /info response can also be nested. For example, suppose that you want to provide both a support email and a support phone number. In application.yml, you might configure the following properties:  
+这里的属性也能是嵌套的。例如，假设你希望提供联系邮箱和电话。在application.yml里可以配置如下属性：
 
 ```
 info:
@@ -806,8 +816,8 @@ info:
     phone: 1-888-555-1971
 ```
 
-The JSON returned from the /info endpoint will include a contact property that
-itself has email and phone properties:
+The JSON returned from the /info endpoint will include a contact property that itself has email and phone properties:  
+`/info`端点返回的JSON会包含一个`contact`属性，其中有`email`和`phone`属性：
 
 ```
 {
@@ -818,4 +828,178 @@ itself has email and phone properties:
 }
 ```
 
-Adding properties to the /info endpoint is just one of many ways you can customize Actuator behavior. Later in section 7.4, we’ll look at other ways that you can configure and extend the Actuator. But first, let’s see how to secure the Actuator’s endpoints.
+Adding properties to the /info endpoint is just one of many ways you can customize Actuator behavior. Later in section 7.4, we’ll look at other ways that you can configure and extend the Actuator. But first, let’s see how to secure the Actuator’s endpoints.  
+向`/info`端点添加属性只是众多定制Actuator行为的方式里的一种。稍后在7.4节里，我们还会看到其他配置与扩展Actuator的方式。但现在，先让我们来看看如何保护Actuator的端点。
+
+## 7.2 Connecting to the Actuator remote shell
+## 7.2 连接Actuator的远程Shell
+
+You’ve seen how the Actuator provides some very useful information over REST endpoints. An optional way to dig into the internals of a running application is by way of a remote shell. Spring Boot integrates with CRaSH, a shell that can be embedded into any Java application. Spring Boot also extends CRaSH with a handful of Spring Boot-specific commands that offer much of the same functionality as the Actuator’s endpoints.  
+Actuator通过REST端点提供了不少非常有用的信息。另一个深入运行中应用程序内部的方式是使用远程Shell。Spring Boot集成了CRaSH，一种能嵌入任意Java应用程序的Shell。Spring Boot还扩展了CRaSH，添加了不少Spring Boot特有的命令，提供了与Actuator端点类似的功能。
+
+In order to use the remote shell, you’ll need to add the remote shell starter as a dependency. The Gradle dependency you’ll need looks like this:  
+要使用远程Shell，只需加入远程Shell的起步依赖即可。
+
+```
+compile("org.springframework.boot:spring-boot-starter-remote-shell")
+```
+
+If you’re building your project with Maven, you’ll need the following dependency in your pom.xml file:  
+如果你是用Maven来构建项目的，需要在pom.xml文件里添加如下依赖：
+
+```
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-remote-shell</artifactId>
+</dependency>
+```
+
+And if you’re developing an application to run with the Spring Boot CLI, the following @Grab is what you’ll need:  
+如果你要用Spring Boot CLI来运行你所开发的应用程序，则需要如下的`@Grab`注解：
+
+```
+@Grab("spring-boot-starter-remote-shell")
+```
+
+With the remote shell added as a dependency, you can now build and run the application. As it’s starting up, watch for the password to be written to the log in a line that looks something like this:  
+添加了远程Shell依赖后，就可以构建并运行应用程序了。在启动的时候，可以看到日志里有一行密码，大概是这样的：
+
+```
+Using default security password: efe30c70-5bf0-43b1-9d50-c7a02dda7d79
+```
+
+The username that goes with that password is “user”. The password itself is randomly generated and will be different each time you run the application.  
+与这个密码搭配使用的用户名是“user”，密码本身是随机生成的，每次运行应用程序时都会有所变化。
+
+Now you can use an SSH utility to connect to the shell, which is listening for connections on port 2000. If you use the UNIX ssh command to connect to the shell, it might look something like this:  
+现在你可以通过SSH工具连接Shell了，它监听的端口号是2000。如果你用的是UNIX的ssh命令，看起来大概是这样的：
+
+```
+~% ssh user@localhost -p 2000
+Password authentication
+Password:
+. ____ _ ____ /\\/___'_____(_)___ ___\\\\ ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+\\/ ___)||_)|||||||(_|| )))) ' |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::  (v1.3.0.RELEASE) on habuma.local
+>
+```
+
+Great! You’re connected to the shell. Now what?  
+太棒了！你已经连上Shell了。现在该干什么？
+
+The remote shell offers almost two dozen commands that you can execute within the context of the running application. Most of those commands come out of the box with CRaSH, but Spring Boot adds a handful of commands. These Spring Boot-specific commands are listed in table 7.4.  
+远程Shell提供了二十四个可以在应用程序上下文中执行的命令，其中的大部分命令都是CRaSH自带的，但Spring Boot也添加了一些。表7.4列出了这些Spring Boot特有的命令。
+
+__Table 7.4 CRaSH shell commands provided by Spring Boot__  
+__表7.4 Spring Boot提供的CRaSH Shell命令__
+
+| Command | Description |
+|---------|-------------|
+| autoconfig | Produces an auto-configuration explanation report. Similar to the /autoconfig end- point, except that the results are plain text instead of JSON. |
+| beans | Displays the beans in the Spring application context. Similar to the /beans endpoint. |
+| endpoint | Invokes an Actuator endpoint. |
+| metrics | Displays Spring Boot metrics. Similar to the /metrics endpoint, except presented as a live list of metrics that’s updated as the values change. |
+
+| 命令 | 描述 |
+|-----|-----|
+| `autoconfig` | 生成自动配置说明报告，和`/autoconfig`端点输出的内容类似，只是把JSON换成了纯文本。 |
+| `beans` | 列出Spring应用程序上下文里的Bean。与`/beans`端点输出的内容类似。 |
+| `endpoint` | 调用Actuator端点。 |
+| `metrics` | 显示Spring Boot的度量信息。与`/metrics`端点类似，但显示的是实时更新的数据。 |
+
+Let’s take a look at how to use each of the shell commands added by Spring Boot.  
+让我们看看如何使用这些Spring Boot添加的Shell命令。
+
+### 7.2.1 Viewing the autoconfig report
+### 7.2.1 查看`autoconfig`报告
+
+The autoconfig command produces a report that’s very similar to the report produced by the Actuator’s /autoconfig endpoint. Figure 7.1 shows an abridged screenshot of the output produced by the autoconfig command.  
+`autoconfig`命令生成了一个与Actuator `/autoconfig`端点类似的报告。图7.1是`autoconfig`命令输出的内容截屏片段。
+
+As you can see, the results are split into two groups—positive matches and negative matches—just like the results from the /autoconfig endpoint. In fact, the only significant difference is that the autoconfig command produces a textual report whereas the /autoconfig endpoint produces JSON output. Otherwise, they are the same.  
+如你所见，结果被分成两组——匹配和不匹配，就和`/autoconfig`端点的结果一样。实际上，唯一的显著区别就是`autoconfig`命令输出的是文本，而`/autoconfig`端点输出的是JSON，其他都是一样的。
+
+![图7.1](../Figures/figure-7.1.png)
+
+__Figure 7.1 Output of autoconfig command__
+__图7.1 `autoconfig`命令的输出__
+
+We’re not going to dwell on any of the shell commands provided natively by CRaSH, but you might want to consider piping the results of the autoconfig command to CRaSH’s less command:  
+我不打算去讲那些CRaSH自己提供的Shell命令，但你可能会想把`autoconfig`命令的输出和CRaSH的`less`命令用管道串起来：
+
+```
+> autoconfig | less
+```
+
+The less command is much like the same-named command in Unix shells; it enables you to page back and forth through a file. The autoconfig output is lengthy, but piping it to less will make it easier to read and navigate.  
+`less`命令和Unix Shell里的同名命令很像；能让你穿梭于文件中。`autoconfig`的输出很长，但通过`less`命令会让它更容易查阅。
+
+### 7.2.2 Listing application beans
+
+The output from the autoconfig shell command and the /autoconfig endpoint were similar but different. In contrast, you’ll find that the results from the beans command are exactly the same as those from the /beans endpoint, as the screenshot in figure 7.2 shows.
+
+![图7.2](../Figures/figure-7.2.png)
+
+__Figure 7.2 Output of beans command__
+
+Just like the /beans endpoint, the beans command produces a list of all beans in the
+Spring application context, along with any dependency beans, in JSON format.
+
+### 7.2.3 Watching application metrics
+
+The metrics shell command produces the same information as the Actuator /metrics endpoint. But unlike the /metrics endpoint, which produces a snapshot of the current metrics in JSON format, the metrics command takes over the shell and displays its results in a live dashboard. Figure 7.3 shows what the metrics dashboard looks like.
+
+![图7.3](../Figures/figure-7.3.png)
+
+__Figure 7.3 The metrics dashboard__
+
+It’s difficult to demonstrate the live dashboard behavior of the metrics command with a static figure in a book. But try to imagine that as memory, heap, and threads are consumed and released and as classes are loaded, the numbers shown in the dashboard will change to reflect the current values.
+
+Once you’re finished looking at the metrics offered by the metrics command, press Ctrl-C to return to the shell.
+
+### 7.2.4 Invoking Actuator endpoints
+
+You’ve probably realized by now that not all of the Actuator’s endpoints have corresponding commands in the shell. Does that mean that the shell can’t be a full replacement for the Actuator endpoints? Will you still have to query the endpoints directly for some of the internals offered by the Actuator? Although the shell doesn’t pair a command up with each of the endpoints, the endpoint command enables you to invoke Actuator endpoints from within the shell.
+
+First, you need to know which endpoint you want to invoke. You can get a list of endpoints by issuing endpoint list at the shell prompt, as shown in figure 7.4. Notice that the endpoints listed are referred to by their bean names, not by their URL paths.
+
+![图7.4](../Figures/figure-7.4.png)
+
+__Figure 7.4 Getting a list of endpoints__
+
+When you want to call one of the endpoints from the shell, you’ll use the endpoint invoke command, giving it the endpoint’s bean name without the “Endpoint” suffix. For example, to invoke the health endpoint, you’d issue endpoint invoke health at the shell prompt, as shown in figure 7.5.
+
+![图7.5](../Figures/figure-7.5.png)
+
+__Figure 7.5 Invoking the health endpoint__
+
+Notice that the results coming back from the endpoint are in the form of a raw, unformatted JSON document. Although it may be nice to be able to invoke the Actuator’s endpoints from within the shell, the results can be a bit difficult to read. Out of the box, there’s not much that can be done about that. But if you’re feeling adventurous, you can create a custom CRaSH shell command that accepts the unformatted JSON via a pipe and pretty-prints it. And you can always cut and paste it into a tool of your choosing for further review or formatting.
+
+## 7.3 Monitoring your application with JMX
+
+In addition to the endpoints and the remote shell, the Actuator also exposes its end- points as MBeans to be viewed and managed through JMX (Java Management Extensions). JMX is an attractive option for managing your Spring Boot application, especially if you’re already using JMX to manage other MBeans in your applications.
+
+All of the Actuator’s endpoints are exposed under the org.springframework.boot domain. For example, suppose you want to view the request mappings for your application. Figure 7.6 shows the request mapping endpoint as viewed in JConsole.
+
+![图7.6](../Figures/figure-7.6.png)
+
+__Figure 7.6 Request mapping endpoint as viewed in JConsole__
+
+As you can see, the request mapping endpoint is found under requestMappingEndpoint, which is under Endpoint in the org.springframework.boot domain. The Data attribute contains the JSON reported by the endpoint.
+
+As with any MBean, the endpoint MBeans have operations that you can invoke. Most of the endpoint MBeans only have accessor operations that return the value of one of their attributes. But the shutdown endpoint offers a slightly more interesting (and destructive!) operation, as shown in figure 7.7
+
+![图7.7](../Figures/figure-7.7.png)
+
+__Figure 7.7 Shutdown button invokes the endpoint.__
+
+If you ever need to shut down your application (or just like living dangerously), the shutdown endpoint is there for you. As shown in figure 7.7, it’s waiting for you to click the “shutdown” button to invoke the endpoint. Be careful, though—there’s no turn- ing back or “Are you sure?” prompt.
+
+The very next thing you’ll see is shown in figure 7.8.
+
+After that, your application will have been shut down. And because it’s dead, there’s no way it could possibly expose another MBean operation for restarting it. You’ll have to restart it yourself, the same way you started it in the first place.
+
+![图7.8](../Figures/figure-7.8.png)
+
+__Figure 7.8 Application immediately shut__
