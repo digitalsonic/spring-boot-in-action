@@ -1044,3 +1044,376 @@ As it turns out, the Actuator can be customized in several ways, including the f
 * Plugging in custom health indicators
 
 We’re going to see how to customize the Actuator, bending it to meet our needs. We'll start with one of the simplest customizations: renaming the Actuator's endpoints.
+
+### 7.4.1 Changing endpoint IDs
+
+Each of the Actuator endpoints has an ID that’s used to determine that endpoint’s path. For example, the /beans endpoint has beans as its default ID.
+
+If an endpoint’s path is determined by its ID, then it stands to reason that you can change an endpoint’s path by changing its ID. All you need to do is set a property whose name is endpoints.endpoint-id.id.
+
+To demonstrate how this works, consider the /shutdown endpoint. It responds to POST requests sent to /shutdown. Suppose, however, that you’d rather have it handle POST requests sent to /kill. The following YAML shows how you might assign a new ID, and therefore a new path, to the /shutdown endpoint:
+
+```
+endpoints:
+  shutdown:
+    id: kill
+```
+There are a couple of reasons you might want to rename an endpoint and change its path. The most obvious is that you might simply want to name the endpoints to match the terminology used by your team. But you might also think that renaming an endpoint will hide it from anyone who might be familiar with the default names, thus creating a sense of security by obscurity.
+
+Unfortunately, renaming an endpoint doesn’t really secure it. At best, it will only slow down a hacker looking to gain access to an endpoint. We’ll look at how you can secure Actuator endpoints in section 7.5. For now, let’s see how to completely disable any (or all) endpoints that you don’t want anyone to have access to.
+
+### 7.4.2 Enabling and disabling endpoints
+
+Although all of the Actuator endpoints are useful, you may not want or need all of them. By default, all of the endpoints (except for /shutdown) are enabled. We’ve already seen how to enable the /shutdown endpoint by setting endpoints.shutdown.enabled to true (in section 7.1.1). In the same way, you can disable any of the other endpoints by setting endpoints._endpoint-id.enabled to false.  __
+
+For example, suppose you want to disable the /metrics endpoint. All you need to do is set the endpoints.metrics.enabled property to false. In application.yml, that would look like this:
+
+```
+endpoints:
+  metrics:
+    enabled: false
+```
+
+If you find that you only want to leave one or two of the endpoints enabled, it might be easier to disable them all and then opt in to the ones you want to enable. For example, consider the following snippet from application.yml:
+
+```
+endpoints:
+  enabled: false
+  metrics:
+    enabled: true
+```
+
+As shown here, all of the Actuator’s endpoints are disabled by setting endpoints.enabled to false. Then the /metrics endpoint is re-enabled by setting endpoints.metrics.enabled to true.
+
+### 7.4.3 Adding custom metrics and gauges
+
+In section 7.1.2, you saw how to use the /metrics endpoint to fetch information about the internal metrics of a running application, including memory, garbage collection, and thread metrics. Although these are certainly useful and informative metrics, you may want to define custom metrics to capture information specific to your application.
+
+Suppose, for instance, that we want a metric that reports how many times a user has saved a book to their reading list. The easiest way to capture this number is to increment a counter every time the addToReadingList() method is called on ReadingListController. A counter is simple enough to implement, but how would you expose the running total along with the other metrics exposed by the /metrics endpoint?
+
+Let’s also suppose that we want to capture a timestamp for the last time a book was saved. We could easily capture that by calling System.currentTimeMillis(), but how could we report that time in the /metrics endpoint?
+
+As it turns out, the auto-configuration that enables the Actuator also creates an instance of CounterService and registers it as a bean in the Spring application context. CounterService is an interface that defines three methods for incrementing, decrementing, or resetting a named metric, as shown here:
+
+```
+package org.springframework.boot.actuate.metrics;
+
+public interface CounterService {
+  void increment(String metricName);
+  void decrement(String metricName);
+  void reset(String metricName);
+}
+```
+
+Actuator auto-configuration will also configure a bean of type GaugeService, an interface similar to CounterService that lets you record a single value to a named gauge metric. GaugeService looks like this:
+
+```
+package org.springframework.boot.actuate.metrics;
+
+public interface GaugeService {
+  void submit(String metricName, double value);
+}
+```
+
+We don’t need to implement either of these interfaces; Spring Boot already provides implementations for them both. All we must do is inject the CounterService and GaugeService instances into any other bean where they’re needed, and call the methods to update whichever metrics we want.
+
+For the metrics we want, we’ll need to inject the CounterService and GaugeService beans into ReadingListController and call their methods from the addToReadingList() method. Listing 7.9 shows the necessary changes to ReadingListController.
+
+__Listing 7.9 Using injected gauge and counter services__
+
+```
+@Controller
+@RequestMapping("/")
+@ConfigurationProperties("amazon")
+public class ReadingListController {
+  ...
+  private CounterService counterService;
+
+  @Autowired
+  public ReadingListController(
+      ReadingListRepository readingListRepository,
+      AmazonProperties amazonProperties,
+      CounterService counterService,
+      GaugeService gaugeService) {
+    this.readingListRepository = readingListRepository;
+    this.amazonProperties = amazonProperties;
+    this.counterService = counterService;
+    this.gaugeService = gaugeService;
+  }
+
+  ...
+
+  @RequestMapping(method=RequestMethod.POST)
+  public String addToReadingList(Reader reader, Book book) {
+    book.setReader(reader);
+    readingListRepository.save(book);
+    counterService.increment("books.saved");
+    gaugeService.submit(
+      "books.last.saved", System.currentTimeMillis());
+    return "redirect:/";
+  }
+}
+```
+
+Inject the counter and gauge services
+
+Increment “books.saved”
+
+Record “books.last.saved”
+
+This change to ReadingListController uses autowiring to inject the CounterService and GaugeService beans via the controller’s constructor, which then stores them in instance variables. Then, each time that the addToReadingList() method handles a request, it will call counterService.increment("books.saved") and gaugeService .submit("books.last.saved") to adjust our custom metrics.
+
+Although CounterService and GaugeService are simple to use, there are some metrics that are hard to capture by incrementing a counter or recording a gauge value. For those cases, we can implement the PublicMetrics interface and provide as many custom metrics as we want. The PublicMetrics interface defines a single metrics() method that returns a collection of Metric objects:
+
+```
+package org.springframework.boot.actuate.endpoint;
+
+public interface PublicMetrics {
+  Collection<Metric<?>> metrics();
+}
+```
+
+To put PublicMetrics to work, suppose that we want to be able to report some metrics from the Spring application context. The time when the application context was started and the number of beans and bean definitions might be interesting metrics to include. And, just for grins, let’s also report the number of beans that are annotated as @Controller. Listing 7.10 shows the implementation of PublicMetrics that will do the job.
+
+__Listing 7.10 Publishing custom metrics__
+
+```
+package readinglist;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.endpoint.PublicMetrics;
+import org.springframework.boot.actuate.metrics.Metric;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+
+@Component
+public class ApplicationContextMetrics implements PublicMetrics {
+  private ApplicationContext context;
+
+  @Autowired
+  public ApplicationContextMetrics(ApplicationContext context) {
+    this.context = context;
+  }
+
+  @Override
+  public Collection<Metric<?>> metrics() {
+    List<Metric<?>> metrics = new ArrayList<Metric<?>>();
+    metrics.add(new Metric<Long>("spring.context.startup-date",
+        context.getStartupDate()));
+
+    metrics.add(new Metric<Integer>("spring.beans.definitions",
+        context.getBeanDefinitionCount()));
+
+    metrics.add(new Metric<Integer>("spring.beans",
+        context.getBeanNamesForType(Object.class).length));
+
+    metrics.add(new Metric<Integer>("spring.controllers",
+        context.getBeanNamesForAnnotation(Controller.class).length));
+
+    return metrics;
+  }
+}
+```
+
+Record startup date
+
+Record bean definition count
+
+Record bean count
+
+Record controller bean count
+
+The metrics() method will be called by the Actuator to get any custom metrics that ApplicationContextMetrics provides. It makes a handful of calls to methods on the injected ApplicationContext to fetch the numbers we want to report as metrics. For each one, it creates an instance of Metric, specifying the metric’s name and the value, and adds the Metric to the list to be returned.
+
+As a consequence of creating ApplicationContextMetrics as well as using CounterService and GaugeService in ReadingListController, we get the following entries in the response from the /metrics endpoint:
+
+```
+{
+  ...
+  spring.context.startup-date: 1429398980443,
+  spring.beans.definitions: 261,
+  spring.beans: 272,
+  spring.controllers: 2,
+  books.count: 1,
+  gauge.books.save.time: 1429399793260,
+  ...
+}
+```
+
+Of course, the actual values for these metrics will vary, depending on how many books you’ve added and the times when you started the application and last saved a book. In case you’re wondering, spring.controllers is 2 because it’s counting ReadingListController as well as the Spring Boot–provided BasicErrorController.
+
+### 7.4.4 Creating a custom trace repository
+
+By default, the traces reported by the /trace endpoint are stored in an in-memory repository that’s capped at 100 entries. Once it’s full, it starts rolling off older trace entries to make room for new ones. This is fine for development purposes, but in a production application the higher traffic may result in traces being discarded before you ever get a chance to see them.
+
+One way to remedy that problem is to declare your own InMemoryTraceRepository bean and set its capacity to some value higher than 100. The following configuration class should increase the capacity to 1000 entries:
+
+```
+package readinglist;
+import org.springframework.boot.actuate.trace.InMemoryTraceRepository;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class ActuatorConfig {
+  @Bean
+  public InMemoryTraceRepository traceRepository() {
+    InMemoryTraceRepository traceRepo = new InMemoryTraceRepository();
+    traceRepo.setCapacity(1000);
+    return traceRepo;
+  }
+}
+```
+
+Although a tenfold increase in the repository’s capacity should keep a few of those trace entries around a bit longer, a sufficiently busy application might still discard traces before you get a chance to review them. And because this is an in-memory trace repository, we should be careful about increasing the capacity too much, as it will have an impact on our application’s memory footprint.
+
+Alternatively, we could store those trace entries elsewhere—somewhere that’s not consuming memory and that will be more permanent. All we need to do is implement Spring Boot’s TraceRepository interface:
+
+```
+package org.springframework.boot.actuate.trace;
+import java.util.List;
+import java.util.Map;
+
+public interface TraceRepository {
+  List<Trace> findAll();
+  void add(Map<String, Object> traceInfo);
+}
+```
+
+As you can see, TraceRepository only requires that we implement two methods: one that finds all stored Trace objects and another that saves a Trace given a Map containing trace information.
+
+For demonstration purposes, perhaps we could create an instance of TraceRepository that stores trace entries in a MongoDB database. Listing 7.11 shows such an implementation of TraceRepository.
+
+__Listing 7.11 Saving trace data to Mongo__
+
+```
+package readinglist;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.trace.Trace;
+import org.springframework.boot.actuate.trace.TraceRepository;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.stereotype.Service;
+
+@Service
+public class MongoTraceRepository implements TraceRepository {
+
+  private MongoOperations mongoOps;
+
+  @Autowired
+  public MongoTraceRepository(MongoOperations mongoOps) {
+    this.mongoOps = mongoOps;
+  }
+
+  @Override
+  public List<Trace> findAll() {
+    return mongoOps.findAll(Trace.class);
+  }
+
+  @Override
+  public void add(Map<String, Object> traceInfo) {
+    mongoOps.save(new Trace(new Date(), traceInfo));
+  }
+}
+```
+
+Inject MongoOperations
+
+Fetch all trace entries
+
+Save a trace entry
+
+The findAll() method is straightforward enough, asking the injected MongoOperations to find all Trace objects. The add() method is only slightly more interesting, instantiating a Trace object given the current date/time and the Map of trace info before saving it via MongoOperations.save(). The only question you might have is where MongoOperations comes from.
+
+In order for MongoTraceRepository to work, we’re going to need to make sure that we have a MongoOperations bean in the Spring application context. Thanks to Spring Boot starters and auto-configuration, that’s simply a matter of adding the MongoDB starter as a dependency. The Gradle dependency you need is as follows:
+
+```
+compile("org.springframework.boot:spring-boot-starter-data-mongodb")
+```
+
+If your project is built with Maven, this is the dependency you’ll need:
+
+```
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-data-mongodb</artifactId>
+</dependency>
+```
+
+By adding this starter, Spring Data MongoDB and supporting libraries will be added to the application’s classpath. And because those are in the classpath, Spring Boot will auto-configure the beans necessary to support working with a MongoDB database, including a MongoOperations bean. The only other thing you’ll need to do is be sure that there’s a MongoDB server running for MongoOperations to talk to.
+
+### 7.4.5 Plugging in custom health indicators
+
+As we’ve seen, the Actuator comes with a nice set of out-of-the-box health indicators for common needs such as reporting the health of a database or message broker that the application is using. But what if your application interacts with some system for which there’s no health indicator?
+
+Because our application includes links to Amazon for books in the reading list, it might be interesting to report whether or not Amazon is reachable. Sure, it’s not likely that Amazon will go down, but stranger things have happened. So let’s create a health indicator that reports whether Amazon is available. Listing 7.12 shows a HealthIndicator implementation that should do the job.
+
+__Listing 7.12 Defining a custom Amazon health indicator__
+
+```
+package readinglist;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+@Component
+public class AmazonHealth implements HealthIndicator {
+
+  @Override
+  public Health health() {
+    try {
+      RestTemplate rest = new RestTemplate();
+      rest.getForObject("http://www.amazon.com", String.class);
+      return Health.up().build();
+    } catch (Exception e) {
+      return Health.down().build();
+    }
+  }
+
+}
+```
+
+Send request to Amazon
+
+Report “down” health
+
+The AmazonHealth class isn’t terribly fancy. The health() method simply uses Spring’s RestTemplate to perform a GET request to Amazon’s home page. If it works, it returns a Health object indicating that Amazon is “UP”. On the other hand, if an exception is thrown while requesting Amazon’s home page, then health() returns a Health object indicating that Amazon is “DOWN”.
+
+The following excerpt from the /health endpoint’s response shows what you might see if Amazon is unreachable:
+
+```
+{
+  "amazonHealth": {
+    "status": "DOWN"
+  },
+  ...
+}
+```
+
+You wouldn’t believe how long I had to wait for Amazon to crash so that I could get that result!1
+
+If you’d like to add additional information to the health record beyond a simple status, you can do so by calling withDetail() on the Health builder. For example, to add the exception’s message as a reason field in the health record, the catch block could be changed to return a Health object created like this:
+
+```
+return Health.down().withDetail("reason", e.getMessage()).build();
+```
+
+As a result of this change, the health record might look like this when the request to Amazon fails:
+
+```
+"amazonHealth": {
+  "reason": "I/O error on GET request for
+             \"http://www.amazon.com\":www.amazon.com;
+             nested exception is java.net.UnknownHostException:
+             www.amazon.com",
+  "status": "DOWN"
+},
+```
+
+You can add as many additional details as you want by calling withDetail() for each additional field you want included in the health record.
