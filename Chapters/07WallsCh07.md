@@ -1046,7 +1046,7 @@ As it turns out, the Actuator can be customized in several ways, including the f
 * Creating a custom repository for storing trace data
 * Plugging in custom health indicators
 * 重命名端点
-* 打开和关闭端点
+* 启用和禁用端点
 * 自定义度量信息
 * 创建自定义仓库来存储跟踪数据
 * 插入自定义的健康指示器
@@ -1076,14 +1076,16 @@ There are a couple of reasons you might want to rename an endpoint and change it
 你可能会有很多理由重命名端点，修改它的路径。最明显的理由就是你希望端点的命名能和团队的术语保持一致，你也可能想重命名端点，以便让那些熟悉默认名称的人找不到它，藉此增加一些安全感。
 
 Unfortunately, renaming an endpoint doesn’t really secure it. At best, it will only slow down a hacker looking to gain access to an endpoint. We’ll look at how you can secure Actuator endpoints in section 7.5. For now, let’s see how to completely disable any (or all) endpoints that you don’t want anyone to have access to.  
-不幸的是重命名段带你并不能真的起到保护作用，顶多是让黑客慢点找到它们。在7.5节里我们会看到如何保护这些Actuator端点的，现在先让我们来看看如何关闭某个（或全部）不希望别人访问的端点。
+不幸的是重命名段带你并不能真的起到保护作用，顶多是让黑客慢点找到它们。在7.5节里我们会看到如何保护这些Actuator端点的，现在先让我们来看看如何禁用某个（或全部）不希望别人访问的端点。
 
 ### 7.4.2 Enabling and disabling endpoints
-### 7.4.2 打开和关闭端点
+### 7.4.2 启用和禁用端点
 
-Although all of the Actuator endpoints are useful, you may not want or need all of them. By default, all of the endpoints (except for /shutdown) are enabled. We’ve already seen how to enable the /shutdown endpoint by setting endpoints.shutdown.enabled to true (in section 7.1.1). In the same way, you can disable any of the other endpoints by setting endpoints.endpoint-id.enabled to false.
+Although all of the Actuator endpoints are useful, you may not want or need all of them. By default, all of the endpoints (except for /shutdown) are enabled. We’ve already seen how to enable the /shutdown endpoint by setting endpoints.shutdown.enabled to true (in section 7.1.1). In the same way, you can disable any of the other endpoints by setting endpoints.endpoint-id.enabled to false.  
+虽然Actuator的端点都很有用，但你不一定需要全部这些端点。默认情况下，所有端点（除了`/shutdown`）都是启用的。我们已经看过如何设置`endpoints.shutdown.enabled`为`true`，以此来开启`/shutdown`端点了（在7.1.1节）。用同样的方式，你可以禁用其他的端点，将`endpoints.endpoint-id.enabled `设置为`false`。
 
-For example, suppose you want to disable the /metrics endpoint. All you need to do is set the endpoints.metrics.enabled property to false. In application.yml, that would look like this:
+For example, suppose you want to disable the /metrics endpoint. All you need to do is set the endpoints.metrics.enabled property to false. In application.yml, that would look like this:  
+例如，假设你要禁用`/metrics`端点，你要做的就是将`endpoints.metrics.enabled`属性设置为`false`。在application.yml里做如下设置：
 
 ```
 endpoints:
@@ -1091,7 +1093,8 @@ endpoints:
     enabled: false
 ```
 
-If you find that you only want to leave one or two of the endpoints enabled, it might be easier to disable them all and then opt in to the ones you want to enable. For example, consider the following snippet from application.yml:
+If you find that you only want to leave one or two of the endpoints enabled, it might be easier to disable them all and then opt in to the ones you want to enable. For example, consider the following snippet from application.yml:  
+如果你只想打开一两个端点，先禁用全部端点，然后启用那几个你要的会更容易点。例如，考虑如下application.yml片段：
 
 ```
 endpoints:
@@ -1100,9 +1103,11 @@ endpoints:
     enabled: true
 ```
 
-As shown here, all of the Actuator’s endpoints are disabled by setting endpoints.enabled to false. Then the /metrics endpoint is re-enabled by setting endpoints.metrics.enabled to true.
+As shown here, all of the Actuator’s endpoints are disabled by setting endpoints.enabled to false. Then the /metrics endpoint is re-enabled by setting endpoints.metrics.enabled to true.  
+正如以上片段所示，`endpoints.enabled`设置为`false`就能禁用全部Actuator的端点，然后将`endpoints.metrics.enabled`设置为`true`重新启用`/metrics`端点。
 
 ### 7.4.3 Adding custom metrics and gauges
+### 7.4.3 添加自定义度量信息
 
 In section 7.1.2, you saw how to use the /metrics endpoint to fetch information about the internal metrics of a running application, including memory, garbage collection, and thread metrics. Although these are certainly useful and informative metrics, you may want to define custom metrics to capture information specific to your application.
 
