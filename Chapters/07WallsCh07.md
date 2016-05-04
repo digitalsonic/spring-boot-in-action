@@ -1032,39 +1032,56 @@ After that, your application will have been shut down. And because it’s dead, 
 在那以后，你的应用程序就被关闭了。因为应用已经被关了，自然就没办法发布其他用来重启它的MBean操作了。你必须自己重启它，就和一开始的启动方式一样。
 
 ## 7.4 Customizing the Actuator
+## 7.4 定制Actuator
 
-Although the Actuator offers a great deal of insight into the inner workings of a run- ning Spring Boot application, it may not be a perfect fit for your needs. Maybe you don’t need everything it offers and want to disable some of it. Or maybe you need to extend it with metrics custom-suited to your application.
+Although the Actuator offers a great deal of insight into the inner workings of a running Spring Boot application, it may not be a perfect fit for your needs. Maybe you don’t need everything it offers and want to disable some of it. Or maybe you need to extend it with metrics custom-suited to your application.  
+虽然Actuator提供了很多运行中的Spring Boot应用程序的内部工作细节，但难免还是会和你的需求有所偏差。也许你并不需要它提供的所有功能，想要关闭一些也说不定。或者你需要对Actuator稍作扩展，增加一些自定义的度量信息，以此满足你对应用程序的需求。
 
-As it turns out, the Actuator can be customized in several ways, including the following:
+As it turns out, the Actuator can be customized in several ways, including the following:  
+实际上，Actuator有多种定制方式，包括：
 
 * Renaming endpoints
 * Enabling and disabling endpoints
 * Defining custom metrics and gauges
 * Creating a custom repository for storing trace data
 * Plugging in custom health indicators
+* 重命名端点
+* 打开和关闭端点
+* 自定义度量信息
+* 创建自定义仓库来存储跟踪数据
+* 插入自定义的健康指示器
 
-We’re going to see how to customize the Actuator, bending it to meet our needs. We'll start with one of the simplest customizations: renaming the Actuator's endpoints.
+We’re going to see how to customize the Actuator, bending it to meet our needs. We'll start with one of the simplest customizations: renaming the Actuator's endpoints.  
+接下来，我们会了解到如何定制Actuator，让它满足我们的需要。先来看一个最简单的定制：重命名Actuator端点。
 
 ### 7.4.1 Changing endpoint IDs
+### 7.4.1 修改端点ID
 
-Each of the Actuator endpoints has an ID that’s used to determine that endpoint’s path. For example, the /beans endpoint has beans as its default ID.
+Each of the Actuator endpoints has an ID that’s used to determine that endpoint’s path. For example, the /beans endpoint has beans as its default ID.  
+每个Actuator端点都有一个ID用来决定端点的路径，比方说，`/beans`端点的默认ID就是`beans`。
 
-If an endpoint’s path is determined by its ID, then it stands to reason that you can change an endpoint’s path by changing its ID. All you need to do is set a property whose name is endpoints.endpoint-id.id.
+If an endpoint’s path is determined by its ID, then it stands to reason that you can change an endpoint’s path by changing its ID. All you need to do is set a property whose name is endpoints.endpoint-id.id.  
+如果端点的路径是由ID决定的，那么就可以通过修改ID来改变端点的路径。你要做的就是设置一个属性，属性名是`endpoints.endpoint-id.id`。
 
-To demonstrate how this works, consider the /shutdown endpoint. It responds to POST requests sent to /shutdown. Suppose, however, that you’d rather have it handle POST requests sent to /kill. The following YAML shows how you might assign a new ID, and therefore a new path, to the /shutdown endpoint:
+To demonstrate how this works, consider the /shutdown endpoint. It responds to POST requests sent to /shutdown. Suppose, however, that you’d rather have it handle POST requests sent to /kill. The following YAML shows how you might assign a new ID, and therefore a new path, to the /shutdown endpoint:  
+我们用`/shutdown`端点来做个演示，它会响应发往`/shutdown`的POST请求。假设你想让它处理发往`/kill`的POST请求，可以通过如下YAML为其赋予一个新的ID，也就是新的路径：
 
 ```
 endpoints:
   shutdown:
     id: kill
 ```
-There are a couple of reasons you might want to rename an endpoint and change its path. The most obvious is that you might simply want to name the endpoints to match the terminology used by your team. But you might also think that renaming an endpoint will hide it from anyone who might be familiar with the default names, thus creating a sense of security by obscurity.
 
-Unfortunately, renaming an endpoint doesn’t really secure it. At best, it will only slow down a hacker looking to gain access to an endpoint. We’ll look at how you can secure Actuator endpoints in section 7.5. For now, let’s see how to completely disable any (or all) endpoints that you don’t want anyone to have access to.
+There are a couple of reasons you might want to rename an endpoint and change its path. The most obvious is that you might simply want to name the endpoints to match the terminology used by your team. But you might also think that renaming an endpoint will hide it from anyone who might be familiar with the default names, thus creating a sense of security by obscurity.  
+你可能会有很多理由重命名端点，修改它的路径。最明显的理由就是你希望端点的命名能和团队的术语保持一致，你也可能想重命名端点，以便让那些熟悉默认名称的人找不到它，藉此增加一些安全感。
+
+Unfortunately, renaming an endpoint doesn’t really secure it. At best, it will only slow down a hacker looking to gain access to an endpoint. We’ll look at how you can secure Actuator endpoints in section 7.5. For now, let’s see how to completely disable any (or all) endpoints that you don’t want anyone to have access to.  
+不幸的是重命名段带你并不能真的起到保护作用，顶多是让黑客慢点找到它们。在7.5节里我们会看到如何保护这些Actuator端点的，现在先让我们来看看如何关闭某个（或全部）不希望别人访问的端点。
 
 ### 7.4.2 Enabling and disabling endpoints
+### 7.4.2 打开和关闭端点
 
-Although all of the Actuator endpoints are useful, you may not want or need all of them. By default, all of the endpoints (except for /shutdown) are enabled. We’ve already seen how to enable the /shutdown endpoint by setting endpoints.shutdown.enabled to true (in section 7.1.1). In the same way, you can disable any of the other endpoints by setting endpoints._endpoint-id.enabled to false.  __
+Although all of the Actuator endpoints are useful, you may not want or need all of them. By default, all of the endpoints (except for /shutdown) are enabled. We’ve already seen how to enable the /shutdown endpoint by setting endpoints.shutdown.enabled to true (in section 7.1.1). In the same way, you can disable any of the other endpoints by setting endpoints.endpoint-id.enabled to false.
 
 For example, suppose you want to disable the /metrics endpoint. All you need to do is set the endpoints.metrics.enabled property to false. In application.yml, that would look like this:
 
