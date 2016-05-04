@@ -1109,13 +1109,17 @@ As shown here, all of the Actuator’s endpoints are disabled by setting endpoin
 ### 7.4.3 Adding custom metrics and gauges
 ### 7.4.3 添加自定义度量信息
 
-In section 7.1.2, you saw how to use the /metrics endpoint to fetch information about the internal metrics of a running application, including memory, garbage collection, and thread metrics. Although these are certainly useful and informative metrics, you may want to define custom metrics to capture information specific to your application.
+In section 7.1.2, you saw how to use the /metrics endpoint to fetch information about the internal metrics of a running application, including memory, garbage collection, and thread metrics. Although these are certainly useful and informative metrics, you may want to define custom metrics to capture information specific to your application.  
+在7.1.2节中，你看到了如何从`/metrics`端点获得运行中应用程序的内部度量信息，包括内存、垃圾回收和线程信息。虽然这些都是非常有用且信息量很大的度量值，但你可能还想定义自己的度量，用来捕获应用程序中的特定信息。
 
-Suppose, for instance, that we want a metric that reports how many times a user has saved a book to their reading list. The easiest way to capture this number is to increment a counter every time the addToReadingList() method is called on ReadingListController. A counter is simple enough to implement, but how would you expose the running total along with the other metrics exposed by the /metrics endpoint?
+Suppose, for instance, that we want a metric that reports how many times a user has saved a book to their reading list. The easiest way to capture this number is to increment a counter every time the addToReadingList() method is called on ReadingListController. A counter is simple enough to implement, but how would you expose the running total along with the other metrics exposed by the /metrics endpoint?  
+比方说，我们想要知道用户往阅读列表里保存了多少次图书，最简单的方法就是在每次调用`ReadingListController`的`addToReadingList()`方法时增加计数器值。计数器太容易实现了，但如何同那些`/metrics`端点发布出的度量信息一起将这个不断变化的总计值发布出来呢？
 
-Let’s also suppose that we want to capture a timestamp for the last time a book was saved. We could easily capture that by calling System.currentTimeMillis(), but how could we report that time in the /metrics endpoint?
+Let’s also suppose that we want to capture a timestamp for the last time a book was saved. We could easily capture that by calling System.currentTimeMillis(), but how could we report that time in the /metrics endpoint?  
+再假设我们想要获得最后保存图书的时间戳。可以通过调用`System.currentTimeMillis()`来获取时间戳，但如何在`/metrics`端点里报告该时间戳呢？
 
-As it turns out, the auto-configuration that enables the Actuator also creates an instance of CounterService and registers it as a bean in the Spring application context. CounterService is an interface that defines three methods for incrementing, decrementing, or resetting a named metric, as shown here:
+As it turns out, the auto-configuration that enables the Actuator also creates an instance of CounterService and registers it as a bean in the Spring application context. CounterService is an interface that defines three methods for incrementing, decrementing, or resetting a named metric, as shown here:  
+实际上，自动配置允许Actuator创建`CounterService`的实例，并将其注册到Spring的应用程序上下文里。`CounterService`这个接口里定义了三个方法，分别用来增加、减少或重置特定名称的度量值，代码如下所示：
 
 ```
 package org.springframework.boot.actuate.metrics;
@@ -1127,7 +1131,8 @@ public interface CounterService {
 }
 ```
 
-Actuator auto-configuration will also configure a bean of type GaugeService, an interface similar to CounterService that lets you record a single value to a named gauge metric. GaugeService looks like this:
+Actuator auto-configuration will also configure a bean of type GaugeService, an interface similar to CounterService that lets you record a single value to a named gauge metric. GaugeService looks like this:  
+Actuator的自动配置还会配置一个`GaugeService`类型的Bean，该接口与`CounterService`类似，让你能将某个值记录到特定名称的度量值里。`GaugeService`看起来是这样的：
 
 ```
 package org.springframework.boot.actuate.metrics;
@@ -1137,11 +1142,14 @@ public interface GaugeService {
 }
 ```
 
-We don’t need to implement either of these interfaces; Spring Boot already provides implementations for them both. All we must do is inject the CounterService and GaugeService instances into any other bean where they’re needed, and call the methods to update whichever metrics we want.
+We don’t need to implement either of these interfaces; Spring Boot already provides implementations for them both. All we must do is inject the CounterService and GaugeService instances into any other bean where they’re needed, and call the methods to update whichever metrics we want.  
+你无需实现这些接口；Spring Boot已经为你提供了两者的实现。我们所要做的就是把它们的实例注入到所需的Bean里，在适当的时候调用其中的方法更新度量值就可以了。
 
-For the metrics we want, we’ll need to inject the CounterService and GaugeService beans into ReadingListController and call their methods from the addToReadingList() method. Listing 7.9 shows the necessary changes to ReadingListController.
+For the metrics we want, we’ll need to inject the CounterService and GaugeService beans into ReadingListController and call their methods from the addToReadingList() method. Listing 7.9 shows the necessary changes to ReadingListController.  
+针对上文提到的需求，我们需要把`CounterService`和`GaugeService` Bean注入到`ReadingListController`里，然后在`addToReadingList()`方法里调用其中的方法。代码7.9是`ReadingListController`里的相关变动：
 
 __Listing 7.9 Using injected gauge and counter services__
+__代码7.9 使用注入的`CounterService`和`GaugeService`__
 
 ```
 @Controller
@@ -1177,11 +1185,14 @@ public class ReadingListController {
 }
 ```
 
-Inject the counter and gauge services
+Inject the counter and gauge services  
+注入`CounterService`和`GaugeService`
 
-Increment “books.saved”
+Increment “books.saved”  
+增加“books.saved”的值
 
-Record “books.last.saved”
+Record “books.last.saved”  
+记录“books.last.saved”的值
 
 This change to ReadingListController uses autowiring to inject the CounterService and GaugeService beans via the controller’s constructor, which then stores them in instance variables. Then, each time that the addToReadingList() method handles a request, it will call counterService.increment("books.saved") and gaugeService .submit("books.last.saved") to adjust our custom metrics.
 
