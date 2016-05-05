@@ -1194,9 +1194,11 @@ Increment “books.saved”
 Record “books.last.saved”  
 记录“books.last.saved”的值
 
-This change to ReadingListController uses autowiring to inject the CounterService and GaugeService beans via the controller’s constructor, which then stores them in instance variables. Then, each time that the addToReadingList() method handles a request, it will call counterService.increment("books.saved") and gaugeService .submit("books.last.saved") to adjust our custom metrics.
+This change to ReadingListController uses autowiring to inject the CounterService and GaugeService beans via the controller’s constructor, which then stores them in instance variables. Then, each time that the addToReadingList() method handles a request, it will call counterService.increment("books.saved") and gaugeService.submit("books.last.saved") to adjust our custom metrics.  
+修改后的`ReadingListController`使用了自动织入机制，通过控制器的构造方法注入`CounterService`和`GaugeService`，随后把它们保存在实例变量里。后续在`addToReadingList()`方法每次处理请求时就会调用`counterService.increment("books.saved")`和`gaugeService.submit("books.last.saved")`来调整度量值。
 
-Although CounterService and GaugeService are simple to use, there are some metrics that are hard to capture by incrementing a counter or recording a gauge value. For those cases, we can implement the PublicMetrics interface and provide as many custom metrics as we want. The PublicMetrics interface defines a single metrics() method that returns a collection of Metric objects:
+Although CounterService and GaugeService are simple to use, there are some metrics that are hard to capture by incrementing a counter or recording a gauge value. For those cases, we can implement the PublicMetrics interface and provide as many custom metrics as we want. The PublicMetrics interface defines a single metrics() method that returns a collection of Metric objects:  
+尽管`CounterService`和`GaugeService`用起来很简单，但还是有一些度量值很难通过增加计数器或记录指标值来捕获。对于那些情况，我们可以实现`PublicMetrics`接口，提供自己需要的度量信息。该接口定义了一个`metrics()`方法，返回一个`Metric`对象的集合：
 
 ```
 package org.springframework.boot.actuate.endpoint;
@@ -1206,9 +1208,11 @@ public interface PublicMetrics {
 }
 ```
 
-To put PublicMetrics to work, suppose that we want to be able to report some metrics from the Spring application context. The time when the application context was started and the number of beans and bean definitions might be interesting metrics to include. And, just for grins, let’s also report the number of beans that are annotated as @Controller. Listing 7.10 shows the implementation of PublicMetrics that will do the job.
+To put PublicMetrics to work, suppose that we want to be able to report some metrics from the Spring application context. The time when the application context was started and the number of beans and bean definitions might be interesting metrics to include. And, just for grins, let’s also report the number of beans that are annotated as @Controller. Listing 7.10 shows the implementation of PublicMetrics that will do the job.  
+要了解`PublicMetrics`的使用方法，假设我们想报告一些源自Spring应用程序上下文里的度量值——应用程序上下文启动的时间、Bean及Bean定义的数量，还要报告添加了`@Controller`注解的Bean的数量。代码7.10给出了相应`PublicMetrics`实现的代码。
 
-__Listing 7.10 Publishing custom metrics__
+__Listing 7.10 Publishing custom metrics__  
+__代码7.10 发布自定义度量信息__
 
 ```
 package readinglist;
@@ -1251,17 +1255,23 @@ public class ApplicationContextMetrics implements PublicMetrics {
 }
 ```
 
-Record startup date
+Record startup date  
+记录启动时间
 
-Record bean definition count
+Record bean definition count  
+记录Bean定义数量
 
-Record bean count
+Record bean count  
+记录Bean数量
 
-Record controller bean count
+Record controller bean count  
+记录控制器类型的Bean数量
 
-The metrics() method will be called by the Actuator to get any custom metrics that ApplicationContextMetrics provides. It makes a handful of calls to methods on the injected ApplicationContext to fetch the numbers we want to report as metrics. For each one, it creates an instance of Metric, specifying the metric’s name and the value, and adds the Metric to the list to be returned.
+The metrics() method will be called by the Actuator to get any custom metrics that ApplicationContextMetrics provides. It makes a handful of calls to methods on the injected ApplicationContext to fetch the numbers we want to report as metrics. For each one, it creates an instance of Metric, specifying the metric’s name and the value, and adds the Metric to the list to be returned.  
+Actuator会调用`metrics()`方法来收集`ApplicationContextMetrics`提供的度量信息。该方法调用了所注入的`ApplicationContext`上的方法来获取我们想要报告的数量。每个度量值都会创建一个`Metrics`实例，指定度量的名称和值，将其加入要返回的列表里。
 
-As a consequence of creating ApplicationContextMetrics as well as using CounterService and GaugeService in ReadingListController, we get the following entries in the response from the /metrics endpoint:
+As a consequence of creating ApplicationContextMetrics as well as using CounterService and GaugeService in ReadingListController, we get the following entries in the response from the /metrics endpoint:  
+在创建了`ApplicationContextMetrics`，并在`ReadingListController`里使用了`CounterService`和`GaugeService`后，我们能在`/metrics`端点的响应中找到如下条目：
 
 ```
 {
@@ -1276,7 +1286,8 @@ As a consequence of creating ApplicationContextMetrics as well as using CounterS
 }
 ```
 
-Of course, the actual values for these metrics will vary, depending on how many books you’ve added and the times when you started the application and last saved a book. In case you’re wondering, spring.controllers is 2 because it’s counting ReadingListController as well as the Spring Boot–provided BasicErrorController.
+Of course, the actual values for these metrics will vary, depending on how many books you’ve added and the times when you started the application and last saved a book. In case you’re wondering, spring.controllers is 2 because it’s counting ReadingListController as well as the Spring Boot–provided BasicErrorController.  
+当然，这些度量的实际值会根据添加了多少书、何时启动应用程序及何时保存最后一本书而发生变化。在这个例子里，你一定会好奇，为什么`spring.controllers`是2。因为其中算上了`ReadingListController`以及Spring Boot提供的`BasicErrorController`。
 
 ### 7.4.4 Creating a custom trace repository
 
