@@ -1290,10 +1290,13 @@ Of course, the actual values for these metrics will vary, depending on how many 
 当然，这些度量的实际值会根据添加了多少书、何时启动应用程序及何时保存最后一本书而发生变化。在这个例子里，你一定会好奇，为什么`spring.controllers`是2。因为其中算上了`ReadingListController`以及Spring Boot提供的`BasicErrorController`。
 
 ### 7.4.4 Creating a custom trace repository
+### 7.4.4 创建自定义跟踪仓库
 
-By default, the traces reported by the /trace endpoint are stored in an in-memory repository that’s capped at 100 entries. Once it’s full, it starts rolling off older trace entries to make room for new ones. This is fine for development purposes, but in a production application the higher traffic may result in traces being discarded before you ever get a chance to see them.
+By default, the traces reported by the /trace endpoint are stored in an in-memory repository that’s capped at 100 entries. Once it’s full, it starts rolling off older trace entries to make room for new ones. This is fine for development purposes, but in a production application the higher traffic may result in traces being discarded before you ever get a chance to see them.  
+默认情况下，`/trace`端点报告的跟踪信息都是存储在内存仓库里的，封顶100个条目。一旦仓库满了，就开始移除老的条目，给新的条目腾出空间。在开发阶段这没什么问题，但在生产环境中，大流量会造成跟踪信息还没来得及看就被丢弃了。
 
-One way to remedy that problem is to declare your own InMemoryTraceRepository bean and set its capacity to some value higher than 100. The following configuration class should increase the capacity to 1000 entries:
+One way to remedy that problem is to declare your own InMemoryTraceRepository bean and set its capacity to some value higher than 100. The following configuration class should increase the capacity to 1000 entries:  
+为了避免这个问题，可以声明自己的`InMemoryTraceRepository` Bean，将它的容量调整至100以上。如下配置类可以将容量调整至1000个条目：
 
 ```
 package readinglist;
@@ -1312,9 +1315,11 @@ public class ActuatorConfig {
 }
 ```
 
-Although a tenfold increase in the repository’s capacity should keep a few of those trace entries around a bit longer, a sufficiently busy application might still discard traces before you get a chance to review them. And because this is an in-memory trace repository, we should be careful about increasing the capacity too much, as it will have an impact on our application’s memory footprint.
+Although a tenfold increase in the repository’s capacity should keep a few of those trace entries around a bit longer, a sufficiently busy application might still discard traces before you get a chance to review them. And because this is an in-memory trace repository, we should be careful about increasing the capacity too much, as it will have an impact on our application’s memory footprint.  
+仓库容量翻了十倍，应该能让跟踪信息保存的时间更久一点，但一个足够繁忙的应用程序可能还是会在你查看这些信息前将其丢弃。因为这是一个内存存储的仓库，还要避免容量增长太多，这会影响应用程序的内存使用情况。
 
-Alternatively, we could store those trace entries elsewhere—somewhere that’s not consuming memory and that will be more permanent. All we need to do is implement Spring Boot’s TraceRepository interface:
+Alternatively, we could store those trace entries elsewhere—somewhere that’s not consuming memory and that will be more permanent. All we need to do is implement Spring Boot’s TraceRepository interface:  
+除了上述方法，我们还可以将那些跟踪条目存储在其他地方——既不消耗内存，又能长久保存的地方。只需实现Spring Boot的`TraceRepository`接口即可：
 
 ```
 package org.springframework.boot.actuate.trace;
@@ -1327,11 +1332,14 @@ public interface TraceRepository {
 }
 ```
 
-As you can see, TraceRepository only requires that we implement two methods: one that finds all stored Trace objects and another that saves a Trace given a Map containing trace information.
+As you can see, TraceRepository only requires that we implement two methods: one that finds all stored Trace objects and another that saves a Trace given a Map containing trace information.  
+如你所见，`TraceRepository`只要求我们实现两个方法：一个是查找所有存储的`Trace`对象，另一个是保存包含了跟踪信息的`Map`对象。
 
-For demonstration purposes, perhaps we could create an instance of TraceRepository that stores trace entries in a MongoDB database. Listing 7.11 shows such an implementation of TraceRepository.
+For demonstration purposes, perhaps we could create an instance of TraceRepository that stores trace entries in a MongoDB database. Listing 7.11 shows such an implementation of TraceRepository.  
+为了进行演示，假设我们创建了一个使用MongoDB存储跟踪信息的`TraceRepository`实例。代码7.11演示了如何实现这个`TraceRepository`。
 
-__Listing 7.11 Saving trace data to Mongo__
+__Listing 7.11 Saving trace data to Mongo__  
+__代码7.11 往MongoDB保存跟踪数据__
 
 ```
 package readinglist;
@@ -1366,21 +1374,27 @@ public class MongoTraceRepository implements TraceRepository {
 }
 ```
 
-Inject MongoOperations
+Inject MongoOperations  
+注入`MongoOperations`
 
-Fetch all trace entries
+Fetch all trace entries  
+获取所有跟踪条目
 
-Save a trace entry
+Save a trace entry  
+保存一个跟踪条目
 
-The findAll() method is straightforward enough, asking the injected MongoOperations to find all Trace objects. The add() method is only slightly more interesting, instantiating a Trace object given the current date/time and the Map of trace info before saving it via MongoOperations.save(). The only question you might have is where MongoOperations comes from.
+The findAll() method is straightforward enough, asking the injected MongoOperations to find all Trace objects. The add() method is only slightly more interesting, instantiating a Trace object given the current date/time and the Map of trace info before saving it via MongoOperations.save(). The only question you might have is where MongoOperations comes from.  
+`findAll()`方法很直白，用注入的`MongoOperations`来查找全部`Trace`对象。`add()`方法稍微有趣一点，用当前时间和含有跟踪信息的`Map`创建了一个`Trace`对象，通过`MongoOperations.save()`将其保存了下来。唯一的问题是`MongoOperations`是哪里来的？
 
-In order for MongoTraceRepository to work, we’re going to need to make sure that we have a MongoOperations bean in the Spring application context. Thanks to Spring Boot starters and auto-configuration, that’s simply a matter of adding the MongoDB starter as a dependency. The Gradle dependency you need is as follows:
+In order for MongoTraceRepository to work, we’re going to need to make sure that we have a MongoOperations bean in the Spring application context. Thanks to Spring Boot starters and auto-configuration, that’s simply a matter of adding the MongoDB starter as a dependency. The Gradle dependency you need is as follows:  
+为了能使用`MongoTraceRepository`，我们需要保证Spring应用程序上下文里先有一个`MongoOperations` Bean。感谢Spring Boot的起步依赖和自动配置，这一切就只需简单地添加MongoDB起步依赖即可。你需要如下的Gradle依赖：
 
 ```
 compile("org.springframework.boot:spring-boot-starter-data-mongodb")
 ```
 
-If your project is built with Maven, this is the dependency you’ll need:
+If your project is built with Maven, this is the dependency you’ll need:  
+如果你用的是Maven，需要如下依赖：
 
 ```
 <dependency>
@@ -1389,9 +1403,11 @@ If your project is built with Maven, this is the dependency you’ll need:
 </dependency>
 ```
 
-By adding this starter, Spring Data MongoDB and supporting libraries will be added to the application’s classpath. And because those are in the classpath, Spring Boot will auto-configure the beans necessary to support working with a MongoDB database, including a MongoOperations bean. The only other thing you’ll need to do is be sure that there’s a MongoDB server running for MongoOperations to talk to.
+By adding this starter, Spring Data MongoDB and supporting libraries will be added to the application’s classpath. And because those are in the classpath, Spring Boot will auto-configure the beans necessary to support working with a MongoDB database, including a MongoOperations bean. The only other thing you’ll need to do is be sure that there’s a MongoDB server running for MongoOperations to talk to.  
+添加了这个起步依赖后，Spring Data MongoDB和所依赖的库会被添加到应用程序的Classpath里，Spring Boot会自动配置所需的Bean，以便能够使用MongoDB数据库，这些Bean里就包括了`MongoOperations`。另外，你需要确保和`MongoOperations`通讯的MongoDB服务器是正常运行的。
 
 ### 7.4.5 Plugging in custom health indicators
+### 7.4.5 插入自定义健康指示器
 
 As we’ve seen, the Actuator comes with a nice set of out-of-the-box health indicators for common needs such as reporting the health of a database or message broker that the application is using. But what if your application interacts with some system for which there’s no health indicator?
 
