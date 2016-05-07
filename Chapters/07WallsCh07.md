@@ -553,7 +553,7 @@ The HTTP counters and gauges demand a bit more explanation. The number following
 HTTP的计数器和度量值需要做一点说明。`counter.status`后的值是HTTP状态码，随后是所请求的路径。举个例子，`counter.status.200.metrics`表明了`/metrics`端点返回200（OK）状态码的次数。
 
 The HTTP gauges are similarly structured but report a different kind of metrics. They’re all prefixed with gauge.response, indicating that they are gauges for HTTP responses. Following that prefix is the path that the gauge refers to. The value of the metric indicates the time in milliseconds that it took to serve that path the most recent time it was served. For instance, the gauge.response.beans metric in table 7.6 indicates that it took 169 milliseconds to serve that request the last time it was served.  
-HTTP的度量值在结构上也差不多，但是却在报告另一类信息。它们全部用`gauge.response`开头，表明这是HTTP响应的度量信息。前缀后是对应的路径，度量值是以毫秒为单位的时间，反映了最近处理该路径请求的耗时。举个例子，代码7.6里的`gauge.response.beans`说明上一次请求耗时169毫秒。
+HTTP的度量信息在结构上也差不多，但是却在报告另一类信息。它们全部用`gauge.response`开头，表明这是HTTP响应的度量信息。前缀后是对应的路径，度量值是以毫秒为单位的时间，反映了最近处理该路径请求的耗时。举个例子，代码7.6里的`gauge.response.beans`说明上一次请求耗时169毫秒。
 
 You’ll notice that there are a few special cases for the counter and gauge paths. The root path refers to the root path or /. And star-star is a catchall that refers to any path that Spring determines is a static resource, including images, JavaScript, and stylesheets. It also includes any resource that can’t be found, which is why you’ll often see a counter.status.404.star-star metric indicating the count of requests that were met with HTTP 404 (NOT FOUND) status.  
 这里还有几个特殊的值需要注意。`root`路径指向的是根路径或`/`。`star-star`代表了那些Spring认为是静态资源的路径，包括图片、JavaScript和样式表，其中还包含了那些找不到的资源，这就是为什么你经常会看到`counter.status.404.star-star`，这是返回了HTTP 404（NOT FOUND）状态的请求数。
@@ -1491,19 +1491,26 @@ You can add as many additional details as you want by calling withDetail() for e
 
 [1]: # "Not really. I just disconnected my computer from the network. No network, no Amazon. 实际上我并没有等太久，我只是把电脑的网络断开了。没有网就没有Amazon。"
 
-## 7.5 Securing Actuator endpoints
+## 7.5 Securing Actuator endpoints  
+## 7.5 保护Actuator端点
 
-We’ve seen that many of the Actuator endpoints expose information that may be considered sensitive. And some, such as the /shutdown endpoint, are dangerous and can be used to bring your application down. Therefore, it’s very important to be able to secure these endpoints so that they’re only available to authorized clients.
+We’ve seen that many of the Actuator endpoints expose information that may be considered sensitive. And some, such as the /shutdown endpoint, are dangerous and can be used to bring your application down. Therefore, it’s very important to be able to secure these endpoints so that they’re only available to authorized clients.  
+很多Actuator端点发布的信息都可能涉及敏感数据，还有一些端点，比如`/shutdown`则非常危险，可以用来关闭应用程序。因此，保护这些端点就变得尤为重要了，能访问它们的就只能是那些经过授权的客户端。
 
-As it turns out, the Actuator endpoints can be secured the same way as any other URL path: with Spring Security. In a Spring Boot application, this means adding the Security starter as a build dependency and letting security auto-configuration take care of locking down the application, including the Actuator endpoints.
+As it turns out, the Actuator endpoints can be secured the same way as any other URL path: with Spring Security. In a Spring Boot application, this means adding the Security starter as a build dependency and letting security auto-configuration take care of locking down the application, including the Actuator endpoints.  
+实际上，可以用和其他URL路径一样的方式来保护Actuator的端点——使用Spring Security。在Spring Boot应用程序中，这意味着加入Security起步依赖，然后就让安全相关的自动配置来保护应用程序即可，其中当然也包括了Actuator端点。
 
-In chapter 3, we saw how the default security auto-configuration results in all URL paths being secured, requiring HTTP Basic authentication where the username is “user” and the password is randomly generated at startup and written to the log file. This was not how we wanted to secure the application, and it’s likely not how you want to secure the Actuator either.
+In chapter 3, we saw how the default security auto-configuration results in all URL paths being secured, requiring HTTP Basic authentication where the username is “user” and the password is randomly generated at startup and written to the log file. This was not how we wanted to secure the application, and it’s likely not how you want to secure the Actuator either.  
+在第3章里，我们看到了默认安全自动配置是如何把所有URL路径保护起来的，要求HTTP基本身份验证，用户名是“user”，密码是启动时随机生成并写到日志文件里去的。这不是我们希望的应用程序保护方式，也不是你所希望的Actuator保护方式。
 
-We’ve already added some custom security configuration to restrict the root URL path (/) to only authenticated users with READER access. To lock down Actuator endpoints, we’ll need to make a few changes to the configure() method in SecurityConfig.java.
+We’ve already added some custom security configuration to restrict the root URL path (/) to only authenticated users with READER access. To lock down Actuator endpoints, we’ll need to make a few changes to the configure() method in SecurityConfig.java.  
+我们已经添加了一些自定义安全配置，限制了根URL路径（/）的访问，只有带了READER权限的授权用户才能访问。要保护Actuator的端点，我们需要对`SecurityConfig.java`的`configure()`方法做些修改。
 
-Suppose, for instance, that we want to lock down the /shutdown endpoint, requiring that the user have ADMIN access. Listing 7.13 shows the changes required in the configure() method.
+Suppose, for instance, that we want to lock down the /shutdown endpoint, requiring that the user have ADMIN access. Listing 7.13 shows the changes required in the configure() method.  
+举例来说，你想要保护`/shutdown`端点，让拥有ADMIN权限的用户才能访问它。代码7.13就是新的`configure()`方法。
 
-__Listing 7.13 Securing the /shutdown endpoint__
+__Listing 7.13 Securing the /shutdown endpoint__  
+__代码7.13 保护`/shutdown`端点__
 
 ```
 @Override
@@ -1520,13 +1527,17 @@ protected void configure(HttpSecurity http) throws Exception {
 }
 ```
 
-Require ADMIN access
+Require ADMIN access  
+要求有ADMIN权限
 
-Now the only way to access the /shutdown endpoint is to authenticate as a user with ADMIN access.
+Now the only way to access the /shutdown endpoint is to authenticate as a user with ADMIN access.  
+现在要访问`/shutdown`端点，必须用一个带ADMIN权限的用户来做身份验证。
 
-The custom UserDetailsService we created in chapter 3, however, is coded to only apply READER access to users it looks up via the ReaderRepository. Therefore, you may want to create a smarter UserDetailsService implementation that is able to apply ADMIN access to some users. Optionally, you can configure an additional authentication implementation, such as the in-memory authentication shown in listing 7.14.
+The custom UserDetailsService we created in chapter 3, however, is coded to only apply READER access to users it looks up via the ReaderRepository. Therefore, you may want to create a smarter UserDetailsService implementation that is able to apply ADMIN access to some users. Optionally, you can configure an additional authentication implementation, such as the in-memory authentication shown in listing 7.14.  
+然而，第3章里的自定义`UserDetailsService`只对通过`ReaderRepository`加载上来的用户赋予了READER权限，因此你需要创建一个更聪明的`UserDetailsService`实现，对某些用户赋予ADMIN权限。为此，可以配置一个额外的身份验证实现，比如代码7.14里的内存实现。
 
-__Listing 7.14 Adding an in-memory admin authentication user__
+__Listing 7.14 Adding an in-memory admin authentication user__  
+__代码7.14 添加一个内存里的admin用户__
 
 ```
 @Override
@@ -1553,55 +1564,73 @@ protected void configure(
 ```
 
 Reader authentication
+Reader身份验证
 
 Admin authentication
+Admin身份验证
 
-With the in-memory authentication added, you can authenticate with “admin” as the username and “s3cr3t” as the password and be granted both ADMIN and READER access.
+With the in-memory authentication added, you can authenticate with “admin” as the username and “s3cr3t” as the password and be granted both ADMIN and READER access.  
+在新加的内存身份验证中，将用户名定义为“admin”，密码为“s3cr3t”，同时授予了ADMIN和READER权限。
 
-Now the /shutdown endpoint is locked down for everyone except users with ADMIN access. But what about the Actuator’s other endpoints? Assuming you want to lock them down with ADMIN access as for /shutdown, you can list each of them in the call to antMatchers(). For example, to lock down /metrics and /configprops as well as /shutdown, call antMatchers() like this:
+Now the /shutdown endpoint is locked down for everyone except users with ADMIN access. But what about the Actuator’s other endpoints? Assuming you want to lock them down with ADMIN access as for /shutdown, you can list each of them in the call to antMatchers(). For example, to lock down /metrics and /configprops as well as /shutdown, call antMatchers() like this:  
+现在谁都无法访问`/shutdown`端点，除了那些拥有ADMIN权限的用户。但Actuator的其他端点呢？假设你想像`/shutdown`一样只让有ADMIN的用户访问它们，可以在`antMatchers()`里列出这些URL。例如，要保护`/metrics`、`/confiprops`和`/shutdown`，可以像这样来调用`antMatchers()`：
 
 ```
 .antMatchers("/shutdown", "/metrics", "/configprops")
                           .access("hasRole('ADMIN')")
 ```
 
-Although this approach will work, it’s only suitable if you want to secure a small subset of the Actuator endpoints. It becomes unwieldy if you use it to lock down all of the Actuator’s endpoints.
+Although this approach will work, it’s only suitable if you want to secure a small subset of the Actuator endpoints. It becomes unwieldy if you use it to lock down all of the Actuator’s endpoints.  
+虽然这么做能奏效，但也只适用于保护少数Actuator端点的时候。如果要保护全部Actuator端点，这种做法就不太方便了。
 
-Rather than explicitly list all of the Actuator endpoints when calling antMatchers(), it’s much easier to use wildcards to match them all with a simple Ant-style expression. This is challenging, however, because there’s not a lot in common between the endpoint paths. And we can’t apply ADMIN access to “/\*\*” because then everything except for the root path (/) would require ADMIN access.
+Rather than explicitly list all of the Actuator endpoints when calling antMatchers(), it’s much easier to use wildcards to match them all with a simple Ant-style expression. This is challenging, however, because there’s not a lot in common between the endpoint paths. And we can’t apply ADMIN access to “/\*\*” because then everything except for the root path (/) would require ADMIN access.  
+比起在`antMatchers()`方法里显式地列出所有的Actuator端点，用通配符在一个简单的Ant风格表达式里匹配全部的Actuator端点则更容易一些。但是，这么做也有点小挑战，因为不同的端点之间没有什么共同点。我们也不能在“/\*\*”上运用ADMIN权限，因为这么一来除了根路径（/）之外都会要求有ADMIN权限。
 
-Instead, consider setting the endpoint’s context path by setting the management. context-path property. By default, this property is empty, which is why all of the Actuator’s endpoint paths are relative to the root path. But the following entry in application.yaml will prefix them all with /mgmt.
+Instead, consider setting the endpoint’s context path by setting the management.context-path property. By default, this property is empty, which is why all of the Actuator’s endpoint paths are relative to the root path. But the following entry in application.yaml will prefix them all with /mgmt.  
+为此，可以通过`management.context-path`属性来设置端点的上下文路径。默认情况下，这个属性是空的，所以Actuator的端点都是相对于根路径的。在application.yaml里增加如下内容，可以让这些端点都带上`/mgmt`前缀。
 
 ```
 management:
   context-path: /mgmt
 ```
 
-Optionally, you can set it in application.properties like this:
+Optionally, you can set it in application.properties like this:  
+你也可以在application.properties里做类似的事情：
 
 ```
 management.context-path=/mgmt
 ```
 
-With management.context-path set to /mgmt, all Actuator endpoints will be relative to the /mgmt path. For example, the /metrics endpoint will be at /mgmt/metrics.
+With management.context-path set to /mgmt, all Actuator endpoints will be relative to the /mgmt path. For example, the /metrics endpoint will be at /mgmt/metrics.  
+将`management.context-path`设置为`/mgmt`后，所有的Actuator端点都会相对于/mgmt路径。例如，`/metrics`端点的URL会变为`/mgmt/metrics`。
 
-With this new path, we now have a common prefix to work with when assigning ADMIN access restriction to the Actuator endpoints:
+With this new path, we now have a common prefix to work with when assigning ADMIN access restriction to the Actuator endpoints:  
+有了这个新的路径，我们就有了公共的前缀，在为Actuator端点赋予ADMIN权限限制时就能借助这个公共前缀：
 
 ```
 .antMatchers("/mgmt/**").access("hasRole('ADMIN')")
 ```
 
-Now all requests beginning with /mgmt, which includes all Actuator endpoints, will require an authenticated user who has been granted ADMIN access.
+Now all requests beginning with /mgmt, which includes all Actuator endpoints, will require an authenticated user who has been granted ADMIN access.  
+现在所有以`/mgmt`开头的请求，其中包含了所有的Actuator端点，都会限制只有被授予了ADMIN权限的认证用户才能访问。
 
 ## 7.6 Summary
+## 7.6 小结
 
-It can be difficult to know for sure what’s going on inside a running application. Spring Boot’s Actuator opens a portal into the inner workings of a Spring Boot application, exposing components, metrics, and gauges to help understand what makes the application tick.
+It can be difficult to know for sure what’s going on inside a running application. Spring Boot’s Actuator opens a portal into the inner workings of a Spring Boot application, exposing components, metrics, and gauges to help understand what makes the application tick.  
+想弄清楚正在运行的应用程序里正在发生什么，这是件很困难的事。Spring Boot的Actuator为你打开了一扇大门，深入Spring Boot应用程序的内部细节，它发布出来的组件、度量和指标能帮你理解应用程序的运作情况。
 
-In this chapter, we started by looking at the Actuator’s web endpoints—REST endpoints that expose runtime details over HTTP. These include endpoints for viewing all of the beans in the Spring application context, auto-configuration decisions, Spring MVC mappings, thread activity, application health, and various metrics, gauges, and counters.
+In this chapter, we started by looking at the Actuator’s web endpoints—REST endpoints that expose runtime details over HTTP. These include endpoints for viewing all of the beans in the Spring application context, auto-configuration decisions, Spring MVC mappings, thread activity, application health, and various metrics, gauges, and counters.  
+本章中，我们先了解了Actuator的Web端点——通过HTTP发布运行时细节信息的REST端点。这些端点的功能包含了查看Spring应用程序上下文里所有的Bean、查看自动配置决策、查看Spring MVC映射、查看线程活动、查看应用程序健康信息，还有多种度量、指标和计数器。
 
-In addition to web endpoints, the Actuator also offers two alternative ways to dig into the information it provides. The remote shell offers a way to securely shell into the application itself and issue commands that expose much of the same data as the Actuator’s endpoints. Meanwhile, all of the Actuator’s endpoints are exposed as MBeans that can be monitored and managed by a JMX client.
+In addition to web endpoints, the Actuator also offers two alternative ways to dig into the information it provides. The remote shell offers a way to securely shell into the application itself and issue commands that expose much of the same data as the Actuator’s endpoints. Meanwhile, all of the Actuator’s endpoints are exposed as MBeans that can be monitored and managed by a JMX client.  
+除了Web端点，Actuator还提供了另外两种获取它所提供的信息的途径。远程Shell让你能在Shell里安全地连上应用程序，发起指令，获得与Actuator端点相同的数据。与此同时，所有的Actuator端点也都发布成了MBean，可以通过JMX客户端进行监控和管理。
 
-Next, we took a look at how to customize the Actuator. We saw how to change Actuator endpoint paths by changing the endpoint IDs as well as how to enable and disable endpoints. We also plugged in a few custom metrics and created a custom trace repository to replace the default in-memory trace repository.
+Next, we took a look at how to customize the Actuator. We saw how to change Actuator endpoint paths by changing the endpoint IDs as well as how to enable and disable endpoints. We also plugged in a few custom metrics and created a custom trace repository to replace the default in-memory trace repository.  
+随后我们还了解了如何定制Actuator，包括如何通过端点的ID来修改Actuator端点的路径，如何启用和禁用端点等等。我们还插入了一些定制的度量信息，创建了定制的跟踪信息仓库，替换了原来的内存实现。
 
-Finally, we looked at how to secure the Actuator’s endpoints, restricting access to authorized users.
+Finally, we looked at how to secure the Actuator’s endpoints, restricting access to authorized users.  
+最后，我们学习了如何保护Actuator的端点，只让经过授权的用户访问它们。
 
-Coming up in the next chapter, we’ll see how to take an application from the coding phase to production, looking at how Spring Boot helps when deploying an application to a variety of platforms, including traditional application servers and the cloud.
+Coming up in the next chapter, we’ll see how to take an application from the coding phase to production, looking at how Spring Boot helps when deploying an application to a variety of platforms, including traditional application servers and the cloud.  
+接下来，在一章里，我们将看到如何让应用程序从编码阶段过渡到生产阶段，了解Spring Boot是如何协助我们在多种不同的平台上进行部署的，包括传统的应用容器和云平台。
