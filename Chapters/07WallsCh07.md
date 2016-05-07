@@ -1409,11 +1409,14 @@ By adding this starter, Spring Data MongoDB and supporting libraries will be add
 ### 7.4.5 Plugging in custom health indicators
 ### 7.4.5 插入自定义健康指示器
 
-As we’ve seen, the Actuator comes with a nice set of out-of-the-box health indicators for common needs such as reporting the health of a database or message broker that the application is using. But what if your application interacts with some system for which there’s no health indicator?
+As we’ve seen, the Actuator comes with a nice set of out-of-the-box health indicators for common needs such as reporting the health of a database or message broker that the application is using. But what if your application interacts with some system for which there’s no health indicator?  
+如前文所述，Actuator自带了很多健康指示器，能共满足常见需求，比如报告应用程序使用的数据库和消息代理的健康情况。但如果你的应用程序需要和一些没有健康指示器的系统交互该怎么办呢？
 
-Because our application includes links to Amazon for books in the reading list, it might be interesting to report whether or not Amazon is reachable. Sure, it’s not likely that Amazon will go down, but stranger things have happened. So let’s create a health indicator that reports whether Amazon is available. Listing 7.12 shows a HealthIndicator implementation that should do the job.
+Because our application includes links to Amazon for books in the reading list, it might be interesting to report whether or not Amazon is reachable. Sure, it’s not likely that Amazon will go down, but stranger things have happened. So let’s create a health indicator that reports whether Amazon is available. Listing 7.12 shows a HealthIndicator implementation that should do the job.  
+因为我们的阅读列表里有指向Amazon的图书链接，可以报告一下Amazon是否可以访问。当然，Amazon不太可能宕机，但不怕一万就怕万一，所以让我们为Amazon创建一个健康指示器吧。代码7.12演示了相关`HealthIndicator`的实现。
 
-__Listing 7.12 Defining a custom Amazon health indicator__
+__Listing 7.12 Defining a custom Amazon health indicator__  
+__代码7.12 自定义一个Amazon健康指示器__
 
 ```
 package readinglist;
@@ -1439,13 +1442,17 @@ public class AmazonHealth implements HealthIndicator {
 }
 ```
 
-Send request to Amazon
+Send request to Amazon  
+向Amazon发送请求
 
-Report “down” health
+Report “down” health  
+报告“DOWN”状态
 
-The AmazonHealth class isn’t terribly fancy. The health() method simply uses Spring’s RestTemplate to perform a GET request to Amazon’s home page. If it works, it returns a Health object indicating that Amazon is “UP”. On the other hand, if an exception is thrown while requesting Amazon’s home page, then health() returns a Health object indicating that Amazon is “DOWN”.
+The AmazonHealth class isn’t terribly fancy. The health() method simply uses Spring’s RestTemplate to perform a GET request to Amazon’s home page. If it works, it returns a Health object indicating that Amazon is “UP”. On the other hand, if an exception is thrown while requesting Amazon’s home page, then health() returns a Health object indicating that Amazon is “DOWN”.  
+`AmazonHealth`类并没有什么花哨的地方，`health()`方法里简单地使用了Spring的`RestTemplate`向Amazon首页发起了一个GET请求。如果请求成功，则返回一个表明Amazon状态为“UP”的`Health`对象。如果请求发生异常，则`health()`返回一个标明Amazon状态为“DOWN”的`Health`对象。
 
-The following excerpt from the /health endpoint’s response shows what you might see if Amazon is unreachable:
+The following excerpt from the /health endpoint’s response shows what you might see if Amazon is unreachable:  
+下面是`/health`端点响应的一个片段，从中可以看到Amazon是否可以访问：
 
 ```
 {
@@ -1456,15 +1463,18 @@ The following excerpt from the /health endpoint’s response shows what you migh
 }
 ```
 
-You wouldn’t believe how long I had to wait for Amazon to crash so that I could get that result!1
+You wouldn’t believe how long I had to wait for Amazon to crash so that I could get that result!1  
+你不会相信为了等Amazon宕机，我等了有多久，就为了能看到上面的结果！<sup>[1][]</sup>
 
-If you’d like to add additional information to the health record beyond a simple status, you can do so by calling withDetail() on the Health builder. For example, to add the exception’s message as a reason field in the health record, the catch block could be changed to return a Health object created like this:
+If you’d like to add additional information to the health record beyond a simple status, you can do so by calling withDetail() on the Health builder. For example, to add the exception’s message as a reason field in the health record, the catch block could be changed to return a Health object created like this:  
+除了简单的状态之外，如果你还想向健康记录里添加其他附加信息，可以调用`Health`构造器的`withDetail()`方法。例如，要添加异常消息，将其作为健康记录的`reason`字段，可以对`catch`块中的返回语句做如下修改：
 
 ```
 return Health.down().withDetail("reason", e.getMessage()).build();
 ```
 
-As a result of this change, the health record might look like this when the request to Amazon fails:
+As a result of this change, the health record might look like this when the request to Amazon fails:  
+修改后，当Amazon无法访问时，健康记录看起来是这样的：
 
 ```
 "amazonHealth": {
@@ -1476,4 +1486,122 @@ As a result of this change, the health record might look like this when the requ
 },
 ```
 
-You can add as many additional details as you want by calling withDetail() for each additional field you want included in the health record.
+You can add as many additional details as you want by calling withDetail() for each additional field you want included in the health record.  
+如果你有很多附加信息，可以多次调用`withDetail()`方法，每次设置一个想要放入健康记录的附加字段。
+
+[1]: # "Not really. I just disconnected my computer from the network. No network, no Amazon. 实际上我并没有等太久，我只是把电脑的网络断开了。没有网就没有Amazon。"
+
+## 7.5 Securing Actuator endpoints
+
+We’ve seen that many of the Actuator endpoints expose information that may be considered sensitive. And some, such as the /shutdown endpoint, are dangerous and can be used to bring your application down. Therefore, it’s very important to be able to secure these endpoints so that they’re only available to authorized clients.
+
+As it turns out, the Actuator endpoints can be secured the same way as any other URL path: with Spring Security. In a Spring Boot application, this means adding the Security starter as a build dependency and letting security auto-configuration take care of locking down the application, including the Actuator endpoints.
+
+In chapter 3, we saw how the default security auto-configuration results in all URL paths being secured, requiring HTTP Basic authentication where the username is “user” and the password is randomly generated at startup and written to the log file. This was not how we wanted to secure the application, and it’s likely not how you want to secure the Actuator either.
+
+We’ve already added some custom security configuration to restrict the root URL path (/) to only authenticated users with READER access. To lock down Actuator endpoints, we’ll need to make a few changes to the configure() method in SecurityConfig.java.
+
+Suppose, for instance, that we want to lock down the /shutdown endpoint, requiring that the user have ADMIN access. Listing 7.13 shows the changes required in the configure() method.
+
+__Listing 7.13 Securing the /shutdown endpoint__
+
+```
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+  http
+    .authorizeRequests()
+      .antMatchers("/").access("hasRole('READER')")
+      .antMatchers("/shutdown").access("hasRole('ADMIN')")
+      .antMatchers("/**").permitAll()
+    .and()
+    .formLogin()
+      .loginPage("/login")
+      .failureUrl("/login?error=true");
+}
+```
+
+Require ADMIN access
+
+Now the only way to access the /shutdown endpoint is to authenticate as a user with ADMIN access.
+
+The custom UserDetailsService we created in chapter 3, however, is coded to only apply READER access to users it looks up via the ReaderRepository. Therefore, you may want to create a smarter UserDetailsService implementation that is able to apply ADMIN access to some users. Optionally, you can configure an additional authentication implementation, such as the in-memory authentication shown in listing 7.14.
+
+__Listing 7.14 Adding an in-memory admin authentication user__
+
+```
+@Override
+protected void configure(
+            AuthenticationManagerBuilder auth) throws Exception {
+  auth
+    .userDetailsService(new UserDetailsService() {
+      @Override
+      public UserDetails loadUserByUsername(String username)
+          throws UsernameNotFoundException {
+        UserDetails user = readerRepository.findOne(username);
+        if (user != null) {
+          return user;
+        }
+        throw new UsernameNotFoundException(
+                      "User '" + username + "' not found.");
+      }
+    })
+    .and()
+    .inMemoryAuthentication()
+      .withUser("admin").password("s3cr3t")
+                        .roles("ADMIN", "READER");
+}
+```
+
+Reader authentication
+
+Admin authentication
+
+With the in-memory authentication added, you can authenticate with “admin” as the username and “s3cr3t” as the password and be granted both ADMIN and READER access.
+
+Now the /shutdown endpoint is locked down for everyone except users with ADMIN access. But what about the Actuator’s other endpoints? Assuming you want to lock them down with ADMIN access as for /shutdown, you can list each of them in the call to antMatchers(). For example, to lock down /metrics and /configprops as well as /shutdown, call antMatchers() like this:
+
+```
+.antMatchers("/shutdown", "/metrics", "/configprops")
+                          .access("hasRole('ADMIN')")
+```
+
+Although this approach will work, it’s only suitable if you want to secure a small subset of the Actuator endpoints. It becomes unwieldy if you use it to lock down all of the Actuator’s endpoints.
+
+Rather than explicitly list all of the Actuator endpoints when calling antMatchers(), it’s much easier to use wildcards to match them all with a simple Ant-style expression. This is challenging, however, because there’s not a lot in common between the endpoint paths. And we can’t apply ADMIN access to “/\*\*” because then everything except for the root path (/) would require ADMIN access.
+
+Instead, consider setting the endpoint’s context path by setting the management. context-path property. By default, this property is empty, which is why all of the Actuator’s endpoint paths are relative to the root path. But the following entry in application.yaml will prefix them all with /mgmt.
+
+```
+management:
+  context-path: /mgmt
+```
+
+Optionally, you can set it in application.properties like this:
+
+```
+management.context-path=/mgmt
+```
+
+With management.context-path set to /mgmt, all Actuator endpoints will be relative to the /mgmt path. For example, the /metrics endpoint will be at /mgmt/metrics.
+
+With this new path, we now have a common prefix to work with when assigning ADMIN access restriction to the Actuator endpoints:
+
+```
+.antMatchers("/mgmt/**").access("hasRole('ADMIN')")
+```
+
+Now all requests beginning with /mgmt, which includes all Actuator endpoints, will require an authenticated user who has been granted ADMIN access.
+
+## 7.6 Summary
+
+It can be difficult to know for sure what’s going on inside a running application. Spring Boot’s Actuator opens a portal into the inner workings of a Spring Boot application, exposing components, metrics, and gauges to help understand what makes the application tick.
+
+In this chapter, we started by looking at the Actuator’s web endpoints—REST endpoints that expose runtime details over HTTP. These include endpoints for viewing all of the beans in the Spring application context, auto-configuration decisions, Spring MVC mappings, thread activity, application health, and various metrics, gauges, and counters.
+
+In addition to web endpoints, the Actuator also offers two alternative ways to dig into the information it provides. The remote shell offers a way to securely shell into the application itself and issue commands that expose much of the same data as the Actuator’s endpoints. Meanwhile, all of the Actuator’s endpoints are exposed as MBeans that can be monitored and managed by a JMX client.
+
+Next, we took a look at how to customize the Actuator. We saw how to change Actuator endpoint paths by changing the endpoint IDs as well as how to enable and disable endpoints. We also plugged in a few custom metrics and created a custom trace repository to replace the default in-memory trace repository.
+
+Finally, we looked at how to secure the Actuator’s endpoints, restricting access to authorized users.
+
+Coming up in the next chapter, we’ll see how to take an application from the coding phase to production, looking at how Spring Boot helps when deploying an application to a variety of platforms, including traditional application servers and the cloud.
