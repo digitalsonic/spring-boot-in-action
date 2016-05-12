@@ -31,23 +31,34 @@ In fact, unlike most Java web applications, which are typically deployed to an a
 ## 8.1 Weighing deployment options
 ## 8.1 衡量多种部署方式
 
-There are several ways to build and run Spring Boot applications. You’ve already seen a few of them:
+There are several ways to build and run Spring Boot applications. You’ve already seen a few of them:  
+Spring Boot应用程序有多种构建和运行的方式，其中一些你已经用过了：
 
 * Running the application in the IDE (either Spring ToolSuite or IntelliJ IDEA)
 * Running from the command line using the Maven spring-boot:run goal or Gradle bootRun task
 * Using Maven or Gradle to produce an executable JAR file that can be run at the command line
 * Using the Spring Boot CLI to run Groovy scripts at the command line
 * Using the Spring Boot CLI to produce an executable JAR file that can be run at the command line
+* 在IDE中运行应用程序（Spring ToolSuite或IntelliJ IDEA）
+* 使用Maven的`spring-boot:run`或Gradle的`bootRun`在命令行里运行
+* 使用Maven或Gradle来生成可运行的JAR文件，随后在命令行中运行
+* 使用Spring Boot CLI在命令行中运行Groovy脚本
+* 使用Spring Boot CLI来生成可运行的JAR文件，随后在命令行中运行
 
-Any of these choices is suitable for running the application while you’re still developing it. But what about when you’re ready to deploy the application into a production or other non-development environment?
+Any of these choices is suitable for running the application while you’re still developing it. But what about when you’re ready to deploy the application into a production or other non-development environment?  
+这些选项中的每一种都适合用来运行正在开发的应用程序。但在要将应用程序部署到生产环境或其他非开发环境中时又该怎么办呢？
 
-Although none of the choices listed seems fitting for deploying an application beyond development, the truth is that all but one of them is a valid choice. Running an application within the IDE is certainly ill-suited for a production deployment. Executable JAR files and the Spring Boot CLI, however, are still on the table and are great choices when deploying to a cloud environment.
+Although none of the choices listed seems fitting for deploying an application beyond development, the truth is that all but one of them is a valid choice. Running an application within the IDE is certainly ill-suited for a production deployment. Executable JAR files and the Spring Boot CLI, however, are still on the table and are great choices when deploying to a cloud environment.  
+虽然这些选项里没有一个看起来能用在部署非开发环境，但事实上，它们之中除了在IDE中运行之外的那些选项都是适用于生产环境的。可运行的JAR文件和Spring Boot CLI还可用于将应用程序部署到云环境里。
 
-That said, you’re probably wondering how to deploy a Spring Boot application to a more traditional application server environment such as Tomcat, WebSphere, or WebLogic. In those cases, executable JAR files and Groovy source code won’t work. For application server deployment, you’ll need your application wrapped up in a WAR file.
+That said, you’re probably wondering how to deploy a Spring Boot application to a more traditional application server environment such as Tomcat, WebSphere, or WebLogic. In those cases, executable JAR files and Groovy source code won’t work. For application server deployment, you’ll need your application wrapped up in a WAR file.  
+也许你很想知道如何把Spring Boot应用程序部署到一个更加传统的应用服务器环境里，比如Tomcat、WebSphere或WebLogic。在这些情况中，可执行JAR文件和Groovy代码是不适用的。针对应用服务器的部署，需要将你的应用程序打包成一个WAR文件。
 
-As it turns out, Spring Boot applications can be packaged for deployment in several ways, as described in table 8.1.
+As it turns out, Spring Boot applications can be packaged for deployment in several ways, as described in table 8.1.  
+实际上，Spring Boot应用程序可以用多种方式来打包，详见表8.1。
 
-__Table 8.1 Spring Boot deployment choices__
+__Table 8.1 Spring Boot deployment choices__  
+__表8.1 Spring Boot部署选项__
 
 | Deployment artifact | Produced by                       | Target environment                                                                                           |
 |---------------------|-----------------------------------|--------------------------------------------------------------------------------------------------------------|
@@ -55,14 +66,27 @@ __Table 8.1 Spring Boot deployment choices__
 | Executable JAR      | Maven, Gradle, or Spring Boot CLI | Cloud environments, including Cloud Foundry and Heroku, as well as container deployment, such as with Docker |
 | WAR                 | Maven or Gradle                   | Java application servers or cloud environments such as Cloud Foundry                                         |
 
-As you can see in table 8.1, your target environment will need to be a factor in your choice. If you’re deploying to a Tomcat server running in your own data center, then the choice of a WAR file has been made for you. On the other hand, if you’ll be deploying to Cloud Foundry, you’re welcome to choose any of the deployment options shown.
+| 部署产物 | 产生方式 | 目标环境 |
+|---------|---------|----------|
+| Groovy源码 | 手写 | Cloud Foundry及容器部署，比如Docker |
+| 可执行JAR | Maven、Gradle或Spring Boot CLI | 云环境，包括Cloud Foundry和Heroku，还有容器部署，比如Docker |
+| WAR | Maven或Gradle | Java应用服务器或云环境，比如Cloud Foundry |
 
-In this chapter, we’re going to focus our attention on the following options:
+As you can see in table 8.1, your target environment will need to be a factor in your choice. If you’re deploying to a Tomcat server running in your own data center, then the choice of a WAR file has been made for you. On the other hand, if you’ll be deploying to Cloud Foundry, you’re welcome to choose any of the deployment options shown.  
+如你所见，在做最终选择时需要考虑你的目标环境。如果要将应用程序部署到自己数据中心的Tomcat服务器上，WAR文件就是你的选择。另一方面，如果要部署到Cloud Foundry，可以使用表里列出的各种选项。
+
+In this chapter, we’re going to focus our attention on the following options:  
+在本章中，我们将关注以下这些选项：
 
 * Deploying a WAR file to a Java application server
 * Deploying an executable JAR file to Cloud Foundry
 * Deploying an executable JAR file to Heroku (where the build is performed by Heroku)
+* 向Java应用服务器里部署WAR文件
+* 向Cloud Foundry里部署可执行JAR文件
+* 向Heroku（构建过程是由Heroku执行的）里部署可执行JAR文件
 
-As we explore these scenarios, we’re also going to have to deal with the fact that we’ve been using an embedded H2 database as we’ve developed the application, and we’ll look at ways to replace it with a production-ready database.
+As we explore these scenarios, we’re also going to have to deal with the fact that we’ve been using an embedded H2 database as we’ve developed the application, and we’ll look at ways to replace it with a production-ready database.  
+这这些场景中，我们还要处理一个问题，在开发应用程序时我们使用了嵌入式的H2数据库，现在得把它替换成生产环境所需的数据库了。
 
-To get started, let’s take a look at how we can build our reading-list application into a WAR file that can be deployed to a Java application server such as Tomcat, WebSphere, or WebLogic.
+To get started, let’s take a look at how we can build our reading-list application into a WAR file that can be deployed to a Java application server such as Tomcat, WebSphere, or WebLogic.  
+首先，让我们看看如何将阅读列表应用程序构建为WAR文件，这样才能把它部署到Java应用服务器里，比如Tomcat、WebSphere或WebLogic。
