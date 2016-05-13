@@ -90,3 +90,418 @@ As we explore these scenarios, we’re also going to have to deal with the fact 
 
 To get started, let’s take a look at how we can build our reading-list application into a WAR file that can be deployed to a Java application server such as Tomcat, WebSphere, or WebLogic.  
 首先，让我们看看如何将阅读列表应用程序构建为WAR文件，这样才能把它部署到Java应用服务器里，比如Tomcat、WebSphere或WebLogic。
+
+## 8.2 Deploying to an application server
+
+Thus far, every time we’ve run the reading-list application, the web application has been served from a Tomcat server embedded in the application. Compared to a conventional Java web application, the tables were turned. The application has not been deployed in Tomcat; rather, Tomcat has been deployed in the application.
+
+Thanks in large part to Spring Boot auto-configuration, we’ve not been required to create a web.xml file or servlet initializer class to declare Spring’s DispatcherServlet for Spring MVC. But if we’re going to deploy the application to a Java application server, we’re going to need to build a WAR file. And so that the application server will know how to run the application, we’ll also need to include a servlet initializer in that WAR file.
+
+### 8.2.1 Building a WAR file
+
+As it turns out, building a WAR file isn’t that difficult. If you’re using Gradle to build the application, you simply must apply the “war” plugin:
+
+```
+apply plugin: 'war'
+```
+
+Then, replace the existing jar configuration with the following war configuration in build.gradle:
+
+```
+war {
+  baseName = 'readinglist'
+  version = '0.0.1-SNAPSHOT'
+}
+```
+
+The only difference between this war configuration and the previous jar configuration is the change of the letter j to w.
+
+If you’re using Maven to build the project, then it’s even easier to get a WAR file. All you need to do is change the <packaging> element’s value from jar to war.
+
+```
+<packaging>war</packaging>
+```
+
+Those are the only changes required to produce a WAR file. But that WAR file will be useless unless it includes a web.xml file or a servlet initializer to enable Spring MVC’s DispatcherServlet.
+
+Spring Boot can help here. It provides SpringBootServletInitializer, a special Spring Boot-aware implementation of Spring’s WebApplicationInitializer. Aside from configuring Spring’s DispatcherServlet, SpringBootServletInitializer also looks for any beans in the Spring application context that are of type Filter, Servlet, or ServletContextInitializer and binds them to the servlet container.
+
+To use SpringBootServletInitializer, simply create a subclass and override the configure() method to specify the Spring configuration class. Listing 8.1 shows ReadingListServletInitializer, a subclass of SpringBootServletInitializer that we’ll use for the reading-list application.
+
+__Listing 8.1 Extending SpringBootServletInitializer for the reading-list application__
+
+```
+package readinglist;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.web.SpringBootServletInitializer;
+
+public class ReadingListServletInitializer
+       extends SpringBootServletInitializer {
+
+  @Override
+  protected SpringApplicationBuilder configure(
+                                    SpringApplicationBuilder builder) {
+    return builder.sources(Application.class);
+  }
+
+}
+```
+
+Specify Spring configuration
+
+As you can see, the configure() method is given a SpringApplicationBuilder as a parameter and returns it as a result. In between, it calls the sources() method to register any Spring configuration classes. In this case, it only registers the Application class, which, as you’ll recall, served dual purpose as both a bootstrap class (with a main() method) and a Spring configuration class.
+
+Even though the reading-list application has other Spring configuration classes, it’s not necessary to register them all with the sources() method. The Application class is annotated with @SpringBootApplication, which implicitly enables componentscanning. Component-scanning will discover and pull in any other configuration classes that it finds.
+
+Now we’re ready to build the application. If you’re using Gradle to build the project, simply invoke the build task:
+
+```
+$ gradle build
+```
+
+Assuming no problems, the build will produce a file named readinglist-0.0.1-SNAPSHOT. war in build/libs.
+
+For a Maven-based build, use the package goal:
+
+```
+$ mvn package
+```
+
+After a successful Maven build, the WAR file will be found in the “target” directory.
+
+All that’s left is to deploy the application. The deployment procedure varies across application servers, so consult the documentation for your application server’s specific deployment procedure.
+
+For Tomcat, you can deploy an application by copying the WAR file into Tomcat’s webapps directory. If Tomcat is running (or once it starts up if it isn’t currently running), it will detect the presence of the WAR file, expand it, and install it.
+
+Assuming that you didn’t rename the WAR file before deploying it, the servlet context path will be the same as the base name of the WAR file, or /readinglist-0.0.1-SNAPSHOT in the case of the reading-list application. Point your browser at http://server:_port_/readinglist-0.0.1-SNAPSHOT to kick the tires on the app.
+
+One other thing worth noting: even though we’re building a WAR file, it may still be possible to run it without deploying to an application server. Assuming you don’t remove the main() method from Application, the WAR file produced by the build can also be run as if it were an executable JAR file:
+
+```
+$ java -jar readinglist-0.0.1-SNAPSHOT.war
+```
+
+In effect, you get two deployment options out of a single deployment artifact!
+
+At this point, the application should be up and running in Tomcat. But it’s still using the embedded H2 database. An embedded database was handy while developing the application, but it’s not a great choice in production. Let’s see how to wire in a different data source when deploying to production.
+
+### 8.2.2 Creating a production profile
+
+Thanks to auto-configuration, we have a DataSource bean that references an embedded H2 database. More specifically, the DataSource bean is a data source pool, typically org.apache.tomcat.jdbc.pool.DataSource. Therefore, it may seem obvious that in order to use some database other than the embedded H2 database, we simply need to declare our own DataSource bean, overriding the auto-configured DataSource, to reference a production database of our choosing.
+
+For example, suppose that we wanted to work with a PostgreSQL database running on localhost with the name “readingList”. The following @Bean method would declare our DataSource bean:
+
+```
+@Bean
+@Profile("production")
+public DataSource dataSource() {
+  DataSource ds = new DataSource();
+  ds.setDriverClassName("org.postgresql.Driver");
+  ds.setUrl("jdbc:postgresql://localhost:5432/readinglist");
+  ds.setUsername("habuma");
+  ds.setPassword("password");
+  return ds;
+}
+```
+
+Here the DataSource type is Tomcat’s org.apache.tomcat.jdbc.pool.DataSource, not to be confused with javax.sql.DataSource, which it ultimately implements. The details required to connect to the database (including the JDBC driver class name, the database URL, and the database credentials) are given to the DataSource instance. With this bean declared, the default auto-configured DataSource bean will be passed over.
+
+The key thing to notice about this @Bean method is that it is also annotated with @Profile to specify that it should only be created if the “production” profile is active. Because of this, we can still use the embedded H2 database while developing the application, but use the PostgreSQL database in production by activating the profile.
+
+Although that should do the trick, there’s a better way to configure the database details without explicitly declaring our own DataSource bean. Rather than replace the auto-configured DataSource bean, we can configure it via properties in application. yml or application.properties. Table 8.2 lists all of the properties that are useful for configuring the DataSource bean.
+
+__Table 8.2 DataSource configuration properties__
+
+| Property (prefixed with spring.datasource.) | Description                                                                                                                  |
+|---------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| name                                        | The name of the data source                                                                                                  |
+| initialize                                  | Whether or not to populate using data.sql (default: true)                                                                    |
+| schema                                      | The name of a schema (DDL) script resource                                                                                   |
+| data                                        | The name of a data (DML) script resource                                                                                     |
+| sql-script-encoding                         | The character set for reading SQL scripts                                                                                    |
+| platform                                    | The platform to use when reading the schema resource (for example, “schema-{platform}.sql”)                                  |
+| continue-on-error                           | Whether or not to continue if initialization fails (default: false)                                                          |
+| separator                                   | The separator in the SQL scripts (default: ;)                                                                                |
+| driver-class-name                           | The fully qualified class name of the JDBC driver (can often be automatically inferred from the URL)                         |
+| url                                         | The database URL                                                                                                             |
+| username                                    | The database username                                                                                                        |
+| password                                    | The database password                                                                                                        |
+| jndi-name                                   | A JNDI name for looking up a datasource via JNDI                                                                             |
+| max-active                                  | Maximum active connections (default: 100)                                                                                    |
+| max-idle                                    | Maximum idle connections (default: 8)                                                                                        |
+| min-idle                                    | Minimum idle connections (default: 8)                                                                                        |
+| initial-size                                | The initial size of the connection pool (default: 10)                                                                        |
+| validation-query                            | A query to execute to verify the connection                                                                                  |
+| test-on-borrow                              | Whether or not to test a connection as it’s borrowed from the pool (default: false)                                          |
+| test-on-return                              | Whether or not to test a connection as it’s returned to the pool (default: false)                                            |
+| test-while-idle                             | Whether or not to test a connection while it is idle (default: false)                                                        |
+| time-between-eviction-runs-millis           | How often (in milliseconds) to evict connections (default: 5000)                                                             |
+| min-evictable-idle-time-millis              | The minimum time (in milliseconds) that a connection can be idle before being tested for eviction (default: 60000)           |
+| max-wait                                    | The maximum time (in milliseconds) that the pool will wait when no connections are available before failing (default: 30000) |
+| jmx-enabled                                 | Whether or not the data source is managed by JMX (default: false)                                                            |
+
+Most of the properties in table 8.2 are for fine-tuning the connection pool. I’ll leave it to you to tinker with those settings as you see fit. What we’re interested in now, however, is setting a few properties that will point the DataSource bean at PostgreSQL instead of the embedded H2 database. Specifically, the spring.datasource.url, spring.datasource.username, and spring.datasource.password properties are what we need.
+
+As I’m writing this, I have a PostgreSQL database running locally, listening on port 5432, with a username and password of “habuma” and “password”. Therefore, the following “production” profile in application.yml is what I used:
+
+```
+---
+spring:
+  profiles: production
+  datasource:
+    url: jdbc:postgresql://localhost:5432/readinglist
+    username: habuma
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+```
+
+Notice that this excerpt starts with --- and the first property set is spring.profiles. This indicates that the properties that follow will only be applied if the “production” profile is active.
+
+Next, the spring.datasource.url, spring.datasource.username, and spring.datasource.password properties are set. Note that it’s usually unnecessary to set the spring.datasource.driver-class-name property, as Spring Boot can infer it from the value of the spring.datasource.url property. I also had to set some JPA properties. The spring.jpa.database-platform property sets the underlying JPA engine to use Hibernate’s PostgreSQL dialect.
+
+To enable this profile, we’ll need to set the spring.profiles.active property to “production”. There are several ways to set this property, but the most convenient way is by setting a system environment variable on the machine running the application server. To enable the “production” profile before starting Tomcat, I exported the SPRING_PROFILES_ACTIVE environment variable like this:
+
+```
+$ export SPRING_PROFILES_ACTIVE=production
+```
+
+You probably noticed that SPRING_PROFILES_ACTIVE is different from spring.profiles.active. It’s not possible to export an environment variable with periods in the name, so it was necessary to alter the name slightly. From Spring’s point of view, the two names are equivalent.
+
+We’re almost ready to deploy the application to an application server and see it run. In fact, if you are feeling adventurous, go ahead and try it. You’ll run into a small problem, however.
+
+By default, Spring Boot configures Hibernate to create the schema automatically when using the embedded H2 database. More specifically, it sets Hibernate’s hibernate.hbm2ddl.auto to create-drop, indicating that the schema should be created when Hibernate’s SessionFactory is created and dropped when it is closed.
+
+But it’s set to do nothing if you’re not using an embedded H2 database. This means that our application’s tables won’t exist and you’ll see errors as it tries to query those nonexistent tables.
+
+### 8.2.3 Enabling database migration
+
+One option is to set the hibernate.hbm2ddl.auto property to create, create-drop, or update via Spring Boot’s spring.jpa.hibernate.ddl-auto property. For instance, to set hibernate.hbm2ddl.auto to create-drop we could add the following lines to application.yml:
+
+```
+spring:
+  jpa:
+    hibernate:
+    ddl-auto: create-drop
+```
+
+This, however, is not ideal for production, as the database schema would be wiped clean and rebuilt from scratch any time the application was restarted. It may be tempting to set it to update, but even that isn’t recommended in production.
+
+Alternatively, we could define the schema in schema.sql. This would work fine the first time, but every time we started the application thereafter, the initialization scripts would fail because the tables in question would already exist. This would force us to take special care in writing our initialization scripts to not attempt to repeat any work that has already been done.
+
+A better choice is to use a database migration library. Database migration libraries work from a set of database scripts and keep careful track of the ones that have already been applied so that they won’t be applied more than once. By including the scripts within each deployment of the application, the database is able to evolve in concert with the application.
+
+Spring Boot includes auto-configuration support for two popular database migration libraries:
+
+* Flyway (http://flywaydb.org)
+* Liquibase (www.liquibase.org)
+
+All you need to do to use either of these database migration libraries with Spring Boot is to include them as dependencies in the build and write the scripts. Let’s see how they work, starting with Flyway.
+
+#### DEFINING DATABASE MIGRATION WITH FLYWAY
+
+Flyway is a very simple, open source database migration library that uses SQL for defining the migration scripts. The idea is that each script is given a version number, and Flyway will execute each of them in order to arrive at the desired state of the database. It also records the status of scripts it has executed so that it won’t run them again.
+
+For the reading-list application, we’re starting with an empty database with no tables or data. Therefore, the script we’ll need to get started will need to create the Reader and Book tables, including any foreign-key constraints and initial data. Listing 8.2 shows the Flyway script we’ll need to go from an empty database to one that our application can use.
+
+__Listing 8.2 A database initialization script for Flyway__
+
+```
+create table Reader (
+  id serial primary key,
+  username varchar(25) unique not null,
+  password varchar(25) not null,
+  fullname varchar(50) not null
+);
+
+create table Book (
+  id serial primary key,
+  author varchar(50) not null,
+  description varchar(1000) not null,
+  isbn varchar(10) not null,
+  title varchar(250) not null,
+  reader_username varchar(25) not null,
+  foreign key (reader_username) references Reader(username)
+);
+
+create sequence hibernate_sequence;
+
+insert into Reader (username, password, fullname)
+            values ('craig', 'password', 'Craig Walls');
+```
+
+Create Reader table
+
+Create Book table
+
+Define a sequence
+
+An initial Reader
+
+As you can see, the Flyway script is just SQL. What makes it work with Flyway is where it’s placed in the classpath and how it’s named. Flyway scripts follow a naming convention that includes the version number, as illustrated in figure 8.1.
+
+![图8.1](../Figures/figure-8.1.png)
+
+__Figure 8.1 Flyway scripts are named with their version number.__
+
+
+
+All Flyway scripts have names that start with a capital V which precedes the script’s version number. That’s followed by two underscores and a description of the script. Because this is the first script in the migration, it will be version 1. The description given can be flexible and is primarily to provide some understanding of the script’s purpose. Later, should we need to add a new table to the database or a new column to an existing table, we can create another script named with 2 in the version place.
+
+Flyway scripts need to be placed in the path /db/migration relative to the application’s classpath root. Therefore, this script needs to be placed in src/main/resources/db/migration within the project.
+
+You’ll also need to tell Hibernate to not attempt to create the tables by setting spring.jpa.hibernate.ddl-auto to none. The following lines in application.yml take care of that:
+
+```
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+```
+
+All that’s left is to add Flyway as a dependency in the project build. Here’s the dependency that’s required for Gradle:
+
+```
+compile("org.flywaydb:flyway-core")
+```
+
+In a Maven build, the <dependency> is as follows:
+
+```
+<dependency>
+  <groupId>org.flywayfb</groupId>
+  <artifactId>flyway-core</artifactId>
+</dependency>
+```
+
+When the application is deployed and running, Spring Boot will detect Flyway in the classpath and auto-configure the beans necessary to enable it. Flyway will step through any scripts in /db/migration and apply them if they haven’t already been applied. As each script is executed, an entry will be written to a table named schema_version. The next time the application starts, Flyway will see that those scripts have been recorded in schema_version and skip over them.
+
+#### DEFINING DATABASE MIGRATION WITH LIQUIBASE
+
+Flyway is simple to use, especially with help from Spring Boot auto-configuration. But defining migration scripts with SQL is a two-edged sword. Although it’s easy and natural to work with SQL, you run the risk of defining a migration script that works with one database platform but not another.
+
+Rather than be limited to platform-specific SQL, Liquibase supports several formats for writing migration scripts that are agnostic to the underlying platform. These include XML, YAML, and JSON. And, if you really want it, Liquibase also supports SQL scripts.
+
+The first step to using Liquibase with Spring Boot is to add it as a dependency in your build. The Gradle dependency is as follows:
+
+```
+compile("org.liquibase:liquibase-core")
+```
+
+For Maven, here’s the <dependency> you’ll need:
+
+```
+<dependency>
+  <groupId>org.liquibase</groupId>
+  <artifactId>liquibase-core</artifactId>
+</dependency>
+```
+
+Spring Boot auto-configuration takes it from there, wiring up the beans that support Liquibase. By default, those beans are wired to look for all of the migration scripts in a single file named db.changelog-master.yaml in /db/changelog (relative to the classpath root). The migration script in listing 8.3 includes instructions to initialize the database for the reading-list application.
+
+__Listing 8.3 A Liquibase script for initializing the reading-list database__
+
+```
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: habuma
+      changes:
+        - createTable:
+            tableName: reader
+            columns:
+              - column:
+                  name: username
+                  type: varchar(25)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: password
+                  type: varchar(25)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: fullname
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: book
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: author
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(1000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: isbn
+                  type: varchar(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: title
+                  type: varchar(250)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reader_username
+                  type: varchar(25)
+                  constraints:
+                    nullable: false
+                    references: reader(username)
+                    foreignKeyName: fk_reader_username
+        - createSequence:
+            sequenceName: hibernate_sequence
+        - insert:
+            tableName: reader
+            columns:
+              - column:
+                  name: username
+                  value: craig
+              - column:
+                  name: password
+                  value: password
+              - column:
+                  name: fullname
+                  value: Craig Walls
+```
+
+Changeset ID
+
+Create reader table
+
+Create book table
+
+Define a sequence
+
+Insert an initial reader
+
+As you can see, the YAML format is a bit more verbose than the equivalent Flyway SQL script. But it’s still fairly clear as to its purpose and it isn’t coupled to any specific database platform.
+
+Unlike Flyway, which has multiple scripts, one for each change set, Liquibase changesets are all collected in the same file. Note the id property on the line following the changeset command. Future changes to the database can be included by adding a new changeset with a different id. Also note that the id property isn’t necessarily numeric and may contain any text you’d like.
+
+When the application starts up, Liquibase will read the changeset instructions in db.changelog-master.yaml, compare them with what it may have previously written to the databaseChangeLog table, and apply any changesets that have not yet been applied.
+
+Although the example given here is expressed in YAML format, you’re welcome to choose one of Liquibase’s other supported formats, such as XML or JSON. Simply set the liquibase.change-log property (in application.properties or application.yml) to reflect the file you want Liquibase to load. For example, to use an XML changeset file, set liquibase.change-log like this:
+
+```
+liquibase:
+  change-log: classpath:/db/changelog/db.changelog-master.xml
+```
+
+Spring Boot auto-configuration makes both Liquibase and Flyway a piece of cake to work with. But there’s a lot more to what each of these database migration libraries can do beyond what we’ve seen here. I encourage you to refer to each project’s documentation for more details.
+
+We’ve seen how building Spring Boot applications for deployment into a conventional Java application server is largely a matter of creating a subclass of SpringBootServletInitializer and adjusting the build specification to produce a WAR file instead of a JAR file. But as we’ll see next, Spring Boot applications are even easier to build for the cloud.
