@@ -92,20 +92,26 @@ To get started, let’s take a look at how we can build our reading-list applica
 首先，让我们看看如何将阅读列表应用程序构建为WAR文件，这样才能把它部署到Java应用服务器里，比如Tomcat、WebSphere或WebLogic。
 
 ## 8.2 Deploying to an application server
+## 8.2 部署到应用服务器
 
-Thus far, every time we’ve run the reading-list application, the web application has been served from a Tomcat server embedded in the application. Compared to a conventional Java web application, the tables were turned. The application has not been deployed in Tomcat; rather, Tomcat has been deployed in the application.
+Thus far, every time we’ve run the reading-list application, the web application has been served from a Tomcat server embedded in the application. Compared to a conventional Java web application, the tables were turned. The application has not been deployed in Tomcat; rather, Tomcat has been deployed in the application.  
+到目前为止，我们每次运行阅读列表应用程序时，Web应用程序都是通过内嵌在应用里Tomcat提供服务的。与传统Java Web应用程序相比，情况正好相反。应用程序并没有部署在Tomcat里，而是Tomcat部署在了应用程序里。
 
-Thanks in large part to Spring Boot auto-configuration, we’ve not been required to create a web.xml file or servlet initializer class to declare Spring’s DispatcherServlet for Spring MVC. But if we’re going to deploy the application to a Java application server, we’re going to need to build a WAR file. And so that the application server will know how to run the application, we’ll also need to include a servlet initializer in that WAR file.
+Thanks in large part to Spring Boot auto-configuration, we’ve not been required to create a web.xml file or servlet initializer class to declare Spring’s DispatcherServlet for Spring MVC. But if we’re going to deploy the application to a Java application server, we’re going to need to build a WAR file. And so that the application server will know how to run the application, we’ll also need to include a servlet initializer in that WAR file.  
+归功于Spring Boot的自动配置功能，我们不需要创建web.xml文件或者Servlet初始化类来声明Spring MVC的`DispatcherServlet`。但如果我们要将应用程序部署到Java应用服务器里，就需要构建WAR文件了，这样应用服务器才能知道如何运行应用程序，在那个WAR文件里还需要一个初始化Servlet的东西。
 
 ### 8.2.1 Building a WAR file
+### 8.2.1 构建WAR文件
 
-As it turns out, building a WAR file isn’t that difficult. If you’re using Gradle to build the application, you simply must apply the “war” plugin:
+As it turns out, building a WAR file isn’t that difficult. If you’re using Gradle to build the application, you simply must apply the “war” plugin:  
+实际上，构建WAR文件并不困难，如果你使用Gradle来构建应用程序，只需应用“war”插件即可：
 
 ```
 apply plugin: 'war'
 ```
 
-Then, replace the existing jar configuration with the following war configuration in build.gradle:
+Then, replace the existing jar configuration with the following war configuration in build.gradle:  
+随后，在build.gradle里用以下`war`配置替换原来的`jar`配置：
 
 ```
 war {
@@ -114,21 +120,27 @@ war {
 }
 ```
 
-The only difference between this war configuration and the previous jar configuration is the change of the letter j to w.
+The only difference between this war configuration and the previous jar configuration is the change of the letter j to w.  
+两者的唯一区别就是把___j___换成了___w___。
 
-If you’re using Maven to build the project, then it’s even easier to get a WAR file. All you need to do is change the <packaging> element’s value from jar to war.
+If you’re using Maven to build the project, then it’s even easier to get a WAR file. All you need to do is change the <packaging> element’s value from jar to war.  
+如果你使用Maven来构建项目，获取WAR文件就更容易了。只需把`<packaging>`元素的值从`jar`改为`war`。
 
 ```
 <packaging>war</packaging>
 ```
 
-Those are the only changes required to produce a WAR file. But that WAR file will be useless unless it includes a web.xml file or a servlet initializer to enable Spring MVC’s DispatcherServlet.
+Those are the only changes required to produce a WAR file. But that WAR file will be useless unless it includes a web.xml file or a servlet initializer to enable Spring MVC’s DispatcherServlet.  
+这样就能生成WAR文件了，但如果WAR文件里没有启用Spring MVC `DispatcherServlet`的web.xml文件或者Servlet初始化类，这个WAR文件就一无是处。
 
-Spring Boot can help here. It provides SpringBootServletInitializer, a special Spring Boot-aware implementation of Spring’s WebApplicationInitializer. Aside from configuring Spring’s DispatcherServlet, SpringBootServletInitializer also looks for any beans in the Spring application context that are of type Filter, Servlet, or ServletContextInitializer and binds them to the servlet container.
+Spring Boot can help here. It provides SpringBootServletInitializer, a special Spring Boot-aware implementation of Spring’s WebApplicationInitializer. Aside from configuring Spring’s DispatcherServlet, SpringBootServletInitializer also looks for any beans in the Spring application context that are of type Filter, Servlet, or ServletContextInitializer and binds them to the servlet container.  
+此时就该Spring Boot出马了，它提供了`SpringBootServletInitializer`，这是一个支持Spring Boot的Spring `WebApplicationInitializer`实现。除了配置Spring的`DispatcherServlet`，`SpringBootServletInitializer`还会在Spring应用程序上下文里查找`Filter`、`Servlet`或`ServletContextInitializer`类型的Bean，把它们绑定到Servlet容器里。
 
-To use SpringBootServletInitializer, simply create a subclass and override the configure() method to specify the Spring configuration class. Listing 8.1 shows ReadingListServletInitializer, a subclass of SpringBootServletInitializer that we’ll use for the reading-list application.
+To use SpringBootServletInitializer, simply create a subclass and override the configure() method to specify the Spring configuration class. Listing 8.1 shows ReadingListServletInitializer, a subclass of SpringBootServletInitializer that we’ll use for the reading-list application.  
+要使用`SpringBootServletInitializer`，只需创建一个子类，覆盖`configure()`方法来指定Spring配置类即可。代码8.1是`ReadingListServletInitializer`，我们为阅读列表应用程序写的`SpringBootServletInitializer`的子类。
 
-__Listing 8.1 Extending SpringBootServletInitializer for the reading-list application__
+__Listing 8.1 Extending SpringBootServletInitializer for the reading-list application__  
+__代码8.1 为阅读列表应用程序扩展`SpringBootServletInitializer`__
 
 ```
 package readinglist;
@@ -147,49 +159,65 @@ public class ReadingListServletInitializer
 }
 ```
 
-Specify Spring configuration
+Specify Spring configuration  
+指定Spring配置
 
-As you can see, the configure() method is given a SpringApplicationBuilder as a parameter and returns it as a result. In between, it calls the sources() method to register any Spring configuration classes. In this case, it only registers the Application class, which, as you’ll recall, served dual purpose as both a bootstrap class (with a main() method) and a Spring configuration class.
+As you can see, the configure() method is given a SpringApplicationBuilder as a parameter and returns it as a result. In between, it calls the sources() method to register any Spring configuration classes. In this case, it only registers the Application class, which, as you’ll recall, served dual purpose as both a bootstrap class (with a main() method) and a Spring configuration class.  
+如你所见，`configure()`方法传入了一个`SpringApplicationBuilder`参数，并将其作为结果返回。期间它调用了`sources()`方法注册了一个Spring配置类。本例中，只注册了一个`Application`类，回想一下，这个类既是启动类（带有`main()`方法），也是一个Spring配置类。
 
-Even though the reading-list application has other Spring configuration classes, it’s not necessary to register them all with the sources() method. The Application class is annotated with @SpringBootApplication, which implicitly enables componentscanning. Component-scanning will discover and pull in any other configuration classes that it finds.
+Even though the reading-list application has other Spring configuration classes, it’s not necessary to register them all with the sources() method. The Application class is annotated with @SpringBootApplication, which implicitly enables componentscanning. Component-scanning will discover and pull in any other configuration classes that it finds.  
+虽然阅读列表应用程序里还有其他Spring配置类，但没有必要在这里把它们全部注册进来。`Application`类上添加了`@SpringBootApplication`注解，这会开启组件扫描，而组件扫描则会发现并应用其他配置类。
 
-Now we’re ready to build the application. If you’re using Gradle to build the project, simply invoke the build task:
+Now we’re ready to build the application. If you’re using Gradle to build the project, simply invoke the build task:  
+现在我们可以构建应用程序了，如果你在使用Gradle，只需调用`build`任务即可：
 
 ```
 $ gradle build
 ```
 
-Assuming no problems, the build will produce a file named readinglist-0.0.1-SNAPSHOT. war in build/libs.
+Assuming no problems, the build will produce a file named readinglist-0.0.1-SNAPSHOT. war in build/libs.  
+如果没有问题，就能在build/libs里看到一个名为readinglist-0.0.1-SNAPSHOT.war的文件了。
 
-For a Maven-based build, use the package goal:
+For a Maven-based build, use the package goal:  
+对于基于Maven的项目而言，使用`package`：
 
 ```
 $ mvn package
 ```
 
-After a successful Maven build, the WAR file will be found in the “target” directory.
+After a successful Maven build, the WAR file will be found in the “target” directory.  
+成功构建之后，可以在“target”目录里找到WAR文件。
 
-All that’s left is to deploy the application. The deployment procedure varies across application servers, so consult the documentation for your application server’s specific deployment procedure.
+All that’s left is to deploy the application. The deployment procedure varies across application servers, so consult the documentation for your application server’s specific deployment procedure.  
+剩下的工作就是部署应用程序了，针对不同的应用服务器，部署过程会有所区别，因此请参考应用服务器的部署说明文档。
 
-For Tomcat, you can deploy an application by copying the WAR file into Tomcat’s webapps directory. If Tomcat is running (or once it starts up if it isn’t currently running), it will detect the presence of the WAR file, expand it, and install it.
+For Tomcat, you can deploy an application by copying the WAR file into Tomcat’s webapps directory. If Tomcat is running (or once it starts up if it isn’t currently running), it will detect the presence of the WAR file, expand it, and install it.  
+对于Tomcat而言，可以把WAR文件复制到Tomcat的webapps目录里。如果Tomcat正在运行（要是没有运行，则在下次启动时），它会检测到WAR文件，解压并进行安装。
 
-Assuming that you didn’t rename the WAR file before deploying it, the servlet context path will be the same as the base name of the WAR file, or /readinglist-0.0.1-SNAPSHOT in the case of the reading-list application. Point your browser at http://server:_port_/readinglist-0.0.1-SNAPSHOT to kick the tires on the app.
+Assuming that you didn’t rename the WAR file before deploying it, the servlet context path will be the same as the base name of the WAR file, or /readinglist-0.0.1-SNAPSHOT in the case of the reading-list application. Point your browser at http://server:_port_ /readinglist-0.0.1-SNAPSHOT to kick the tires on the app.  
+假设你没有在部署前重命名WAR文件，Servlet上下文路径则与WAR文件的主文件名相同，在本例中是/readinglist-0.0.1-SNAPSHOT。用你的浏览器打开http://server:port/readinglist-0.0.1-SNAPSHOT就能访问应用程序了。
 
-One other thing worth noting: even though we’re building a WAR file, it may still be possible to run it without deploying to an application server. Assuming you don’t remove the main() method from Application, the WAR file produced by the build can also be run as if it were an executable JAR file:
+One other thing worth noting: even though we’re building a WAR file, it may still be possible to run it without deploying to an application server. Assuming you don’t remove the main() method from Application, the WAR file produced by the build can also be run as if it were an executable JAR file:  
+还有一点值得注意：就算我们在构建的是WAR文件，这个文件仍旧可以脱离应用服务器直接运行。如果你没有删除`Application`里的`main()`方法，构建过程生成的WAR文件仍可直接运行，就和可执行的JAR文件一样：
 
 ```
 $ java -jar readinglist-0.0.1-SNAPSHOT.war
 ```
 
-In effect, you get two deployment options out of a single deployment artifact!
+In effect, you get two deployment options out of a single deployment artifact!  
+如此一来，同一个部署产物就能有两种部署方式了！
 
-At this point, the application should be up and running in Tomcat. But it’s still using the embedded H2 database. An embedded database was handy while developing the application, but it’s not a great choice in production. Let’s see how to wire in a different data source when deploying to production.
+At this point, the application should be up and running in Tomcat. But it’s still using the embedded H2 database. An embedded database was handy while developing the application, but it’s not a great choice in production. Let’s see how to wire in a different data source when deploying to production.  
+现在，应用程序应该已经在Tomcat里顺利地运行起来了。但是它还在使用内嵌的H2数据库，开发应用程序时嵌入式数据库很好用，但对生产环境而言这就不是一个明智的选择了。让我们来看看如何在部署到生产环境时选择一个不同的数据源。
 
 ### 8.2.2 Creating a production profile
+### 8.2.2 创建生产Profile
 
-Thanks to auto-configuration, we have a DataSource bean that references an embedded H2 database. More specifically, the DataSource bean is a data source pool, typically org.apache.tomcat.jdbc.pool.DataSource. Therefore, it may seem obvious that in order to use some database other than the embedded H2 database, we simply need to declare our own DataSource bean, overriding the auto-configured DataSource, to reference a production database of our choosing.
+Thanks to auto-configuration, we have a DataSource bean that references an embedded H2 database. More specifically, the DataSource bean is a data source pool, typically org.apache.tomcat.jdbc.pool.DataSource. Therefore, it may seem obvious that in order to use some database other than the embedded H2 database, we simply need to declare our own DataSource bean, overriding the auto-configured DataSource, to reference a production database of our choosing.  
+感谢自动配置，我们有一个指向嵌入式H2数据库的`DataSource` Bean。更确切地说，`DataSource` Bean是一个数据库连接池，通常是`org.apache.tomcat.jdbc.pool.DataSource`。因此，很明显，要使用嵌入式H2之外的数据库，我们只需声明自己的`DataSource` Bean，指向我们选择的生产数据库，用它覆盖自动配置的`DataSource` Bean就可以了。
 
-For example, suppose that we wanted to work with a PostgreSQL database running on localhost with the name “readingList”. The following @Bean method would declare our DataSource bean:
+For example, suppose that we wanted to work with a PostgreSQL database running on localhost with the name “readingList”. The following @Bean method would declare our DataSource bean:  
+例如，假设我们想使用运行在localhost上的PostgreSQL数据库，数据库名字是“readingList”。下面的`@Bean`方法就能声明我们的`DataSource` Bean：
 
 ```
 @Bean
@@ -204,13 +232,17 @@ public DataSource dataSource() {
 }
 ```
 
-Here the DataSource type is Tomcat’s org.apache.tomcat.jdbc.pool.DataSource, not to be confused with javax.sql.DataSource, which it ultimately implements. The details required to connect to the database (including the JDBC driver class name, the database URL, and the database credentials) are given to the DataSource instance. With this bean declared, the default auto-configured DataSource bean will be passed over.
+Here the DataSource type is Tomcat’s org.apache.tomcat.jdbc.pool.DataSource, not to be confused with javax.sql.DataSource, which it ultimately implements. The details required to connect to the database (including the JDBC driver class name, the database URL, and the database credentials) are given to the DataSource instance. With this bean declared, the default auto-configured DataSource bean will be passed over.  
+这里`DataSource`的类型是Tomcat的`org.apache.tomcat.jdbc.pool.DataSource`，不要和`javax.sql.DataSource`搞混了，这是前者是后者的实现。还要`DataSource`提供一些用来连接数据库的细节（包括JDBC驱动类名、数据库URL、用户名和密码）。声明了这个Bean之后，就会忽略自动配置的`DataSource` Bean了。
 
-The key thing to notice about this @Bean method is that it is also annotated with @Profile to specify that it should only be created if the “production” profile is active. Because of this, we can still use the embedded H2 database while developing the application, but use the PostgreSQL database in production by activating the profile.
+The key thing to notice about this @Bean method is that it is also annotated with @Profile to specify that it should only be created if the “production” profile is active. Because of this, we can still use the embedded H2 database while developing the application, but use the PostgreSQL database in production by activating the profile.  
+关于这个`@Bean`方法最关键的一点是它还添加了`@Profile`注解，说明只有在“production” Profile被激活时才会创建该Bean。所以在开发时我们还能继续使用嵌入式的H2数据库，激活了“production” Profile后就能使用PostgreSQL数据库了。
 
-Although that should do the trick, there’s a better way to configure the database details without explicitly declaring our own DataSource bean. Rather than replace the auto-configured DataSource bean, we can configure it via properties in application. yml or application.properties. Table 8.2 lists all of the properties that are useful for configuring the DataSource bean.
+Although that should do the trick, there’s a better way to configure the database details without explicitly declaring our own DataSource bean. Rather than replace the auto-configured DataSource bean, we can configure it via properties in application.yml or application.properties. Table 8.2 lists all of the properties that are useful for configuring the DataSource bean.  
+虽然这么做能达到目的，但最好还是不要显式地声明自己的`DataSource` Bean。在不替换自动配置的`Datasource` Bean的情况下，我们还能通过application.yml或application.properties来配置数据库的细节。表8.2列出了在配置`DataSource` Bean时用到的全部属性。
 
-__Table 8.2 DataSource configuration properties__
+__Table 8.2 DataSource configuration properties__  
+__表8.2 数据源配置属性__
 
 | Property (prefixed with spring.datasource.) | Description                                                                                                                  |
 |---------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
@@ -240,9 +272,39 @@ __Table 8.2 DataSource configuration properties__
 | max-wait                                    | The maximum time (in milliseconds) that the pool will wait when no connections are available before failing (default: 30000) |
 | jmx-enabled                                 | Whether or not the data source is managed by JMX (default: false)                                                            |
 
-Most of the properties in table 8.2 are for fine-tuning the connection pool. I’ll leave it to you to tinker with those settings as you see fit. What we’re interested in now, however, is setting a few properties that will point the DataSource bean at PostgreSQL instead of the embedded H2 database. Specifically, the spring.datasource.url, spring.datasource.username, and spring.datasource.password properties are what we need.
+| 属性（带有`spring.datasource.`前缀） | 描述 |
+|-----------------------------------|-----|
+| `name` | 数据源的名称 |
+| `initialize` | 是否执行data.sql（默认：`true`） |
+| `schema` | Schema（DDL）脚本资源的名称 |
+| `data` | 数据（DML）脚本资源的名称 |
+| `sql-script-encoding` | 读入SQL脚本的字符集 |
+| `platform` | 读入Schema资源时所使用的平台（例如：“schema-{platform}.sql”） |
+| `continue-on-error` | 如果初始化失败是否还要继续（默认：`false`） |
+| `separator` | SQL脚本的分隔符（默认：`;`） |
+| `driver-class-name` | JDBC驱动的全限定类名（通常能通过URL自动推断出来） |
+| `url` | 数据库URL |
+| `username` | 数据库的用户名 |
+| `password` | 数据库的密码 |
+| `jndi-name` | 通过JNDI查找数据源的JNDI名称 |
+| `max-active` | 最大的活跃连接数（默认：`100`） |
+| `max-idle` | 最大的闲置连接数（默认：`8`） |
+| `min-idle` | 最小的闲置连接数（默认：`8`） |
+| `initial-size` | 连接池的初始大小（默认：`10`） |
+| `validation-query` | 用来验证连接的查询语句 |
+| `test-on-borrow` | 是否在从连接池借用连接时检查连接（默认：`false`） |
+| `test-on-return` | 是否在向连接池归还连接时检查连接（默认：`false`） |
+| `test-while-idle` | 是否在连接空闲时测试连接（默认：`false`） |
+| `time-between-eviction-runs-millis` | 多久（单位为毫秒）清理一次连接（默认：`5000`） |
+| `min-evictable-idle-time-millis` | 在被测试是否要清理前，连接最少可以空闲多久（单位为毫秒，默认：`60000`） |
+| `max-wait` | 当没有可用连接时，连接池在返回失败前最多等多久（单位为毫秒，默认：`30000`） |
+| `jmx-enabled` | 数据源是否可以通过JMX进行管理（默认：`false`） |
 
-As I’m writing this, I have a PostgreSQL database running locally, listening on port 5432, with a username and password of “habuma” and “password”. Therefore, the following “production” profile in application.yml is what I used:
+Most of the properties in table 8.2 are for fine-tuning the connection pool. I’ll leave it to you to tinker with those settings as you see fit. What we’re interested in now, however, is setting a few properties that will point the DataSource bean at PostgreSQL instead of the embedded H2 database. Specifically, the spring.datasource.url, spring.datasource.username, and spring.datasource.password properties are what we need.  
+表8.2里的大部分属性都是用来微调连接池的，怎么设置这些属性来适应你的需要就交给你来解决了。我们现在要做的是设置一些属性，让`DataSource` Bean指向PostgreSQL而非内嵌的H2数据库。具体一点，我们要设置的是`spring.datasource.url`、`spring.datasource.username`以及`spring.datasource.password`属性。
+
+As I’m writing this, I have a PostgreSQL database running locally, listening on port 5432, with a username and password of “habuma” and “password”. Therefore, the following “production” profile in application.yml is what I used:  
+在我设置这些内容时，我本地运行了一个PostgreSQL数据库，监听了5432端口，用户名和密码分别是“habuma”和“password”。因此在application.yml的“production” Profile里需要如下内容：
 
 ```
 ---
@@ -343,8 +405,6 @@ As you can see, the Flyway script is just SQL. What makes it work with Flyway is
 ![图8.1](../Figures/figure-8.1.png)
 
 __Figure 8.1 Flyway scripts are named with their version number.__
-
-
 
 All Flyway scripts have names that start with a capital V which precedes the script’s version number. That’s followed by two underscores and a description of the script. Because this is the first script in the migration, it will be version 1. The description given can be flexible and is primarily to provide some understanding of the script’s purpose. Later, should we need to add a new table to the database or a new column to an existing table, we can create another script named with 2 in the version place.
 
