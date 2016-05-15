@@ -318,55 +318,75 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 ```
 
-Notice that this excerpt starts with --- and the first property set is spring.profiles. This indicates that the properties that follow will only be applied if the “production” profile is active.
+Notice that this excerpt starts with --- and the first property set is spring.profiles. This indicates that the properties that follow will only be applied if the “production” profile is active.  
+请注意，这个代码片段以`---`开头，设置的第一个属性是`spring.profiles`，这说明随后的属性都只在“production” Profile激活时才会生效。
 
-Next, the spring.datasource.url, spring.datasource.username, and spring.datasource.password properties are set. Note that it’s usually unnecessary to set the spring.datasource.driver-class-name property, as Spring Boot can infer it from the value of the spring.datasource.url property. I also had to set some JPA properties. The spring.jpa.database-platform property sets the underlying JPA engine to use Hibernate’s PostgreSQL dialect.
+Next, the spring.datasource.url, spring.datasource.username, and spring.datasource.password properties are set. Note that it’s usually unnecessary to set the spring.datasource.driver-class-name property, as Spring Boot can infer it from the value of the spring.datasource.url property. I also had to set some JPA properties. The spring.jpa.database-platform property sets the underlying JPA engine to use Hibernate’s PostgreSQL dialect.  
+随后设置的是`spring.datasource.url`、`spring.datasource.username`和`spring.datasource.password`属性。一般无需设置`spring.datasource.driver-class-name`属性，Spring Boot可以根据`spring.datasource.url`属性推断出对应的驱动。我还设置了一些JPA的属性，`spring.jpa.database-platform`属性将底层的JPA引擎设置为Hibernate的PostgreSQL方言。
 
-To enable this profile, we’ll need to set the spring.profiles.active property to “production”. There are several ways to set this property, but the most convenient way is by setting a system environment variable on the machine running the application server. To enable the “production” profile before starting Tomcat, I exported the SPRING_PROFILES_ACTIVE environment variable like this:
+To enable this profile, we’ll need to set the spring.profiles.active property to “production”. There are several ways to set this property, but the most convenient way is by setting a system environment variable on the machine running the application server. To enable the “production” profile before starting Tomcat, I exported the SPRING_PROFILES_ACTIVE environment variable like this:  
+要开启这个Profile，我们需要把`spring.profiles.active`属性设置为“production”，有多种实现方式，但最方便的还是在运行应用服务器的机器上设置一个系统环境变量。在启动Tomcat前开启“production” Profile，我需要像这样设置`SPRING_PROFILES_ACTIVE`环境变量：
 
 ```
 $ export SPRING_PROFILES_ACTIVE=production
 ```
 
-You probably noticed that SPRING_PROFILES_ACTIVE is different from spring.profiles.active. It’s not possible to export an environment variable with periods in the name, so it was necessary to alter the name slightly. From Spring’s point of view, the two names are equivalent.
+You probably noticed that SPRING_PROFILES_ACTIVE is different from spring.profiles.active. It’s not possible to export an environment variable with periods in the name, so it was necessary to alter the name slightly. From Spring’s point of view, the two names are equivalent.  
+你也许已经注意到了，`SPRING_PROFILES_ACTIVE`不同于`spring.profiles.active`，因为无法在环境变量名里使用句点，所以需要对变量名稍作修改。站在Spring的角度，这两个名字是等价的。
 
-We’re almost ready to deploy the application to an application server and see it run. In fact, if you are feeling adventurous, go ahead and try it. You’ll run into a small problem, however.
+We’re almost ready to deploy the application to an application server and see it run. In fact, if you are feeling adventurous, go ahead and try it. You’ll run into a small problem, however.  
+我们基本已经可以在应用服务器上部署并运行应用程序了，实际上，如果你喜欢冒险，也可以直接尝试一下。但是，你会遇到一点小问题。
 
-By default, Spring Boot configures Hibernate to create the schema automatically when using the embedded H2 database. More specifically, it sets Hibernate’s hibernate.hbm2ddl.auto to create-drop, indicating that the schema should be created when Hibernate’s SessionFactory is created and dropped when it is closed.
+By default, Spring Boot configures Hibernate to create the schema automatically when using the embedded H2 database. More specifically, it sets Hibernate’s hibernate.hbm2ddl.auto to create-drop, indicating that the schema should be created when Hibernate’s SessionFactory is created and dropped when it is closed.  
+默认情况下，在使用内嵌的H2数据库时，Spring Boot会配置Hibernate来自动创建Schema，更确切地说是将Hibernate的`hibernate.hbm2ddl.auto`设置为`create-drop`，说明在Hibernate的`SessionFactory`创建时会创建Schema，`SessionFactory`关闭时删除Schema。
 
-But it’s set to do nothing if you’re not using an embedded H2 database. This means that our application’s tables won’t exist and you’ll see errors as it tries to query those nonexistent tables.
+But it’s set to do nothing if you’re not using an embedded H2 database. This means that our application’s tables won’t exist and you’ll see errors as it tries to query those nonexistent tables.  
+但如果没使用内嵌的H2数据库，它什么都不会做，也就是说应用程序的数据表尚不存在，在查询那些不存在的表时就会报错。
 
 ### 8.2.3 Enabling database migration
+### 8.2.3 开启数据库迁移
 
-One option is to set the hibernate.hbm2ddl.auto property to create, create-drop, or update via Spring Boot’s spring.jpa.hibernate.ddl-auto property. For instance, to set hibernate.hbm2ddl.auto to create-drop we could add the following lines to application.yml:
+One option is to set the hibernate.hbm2ddl.auto property to create, create-drop, or update via Spring Boot’s spring.jpa.hibernate.ddl-auto property. For instance, to set hibernate.hbm2ddl.auto to create-drop we could add the following lines to application.yml:  
+一种途径是通过Spring Boot的`spring.jpa.hibernate.ddl-auto`属性将`hibernate.hbm2ddl.auto`属性设置为`create`、`create-drop`或`update`。例如，要把`hibernate.hbm2ddl.auto`设置为`create-drop`，我们可以在application.yml里加入如下内容：
 
 ```
 spring:
   jpa:
     hibernate:
-    ddl-auto: create-drop
+      ddl-auto: create-drop
 ```
 
-This, however, is not ideal for production, as the database schema would be wiped clean and rebuilt from scratch any time the application was restarted. It may be tempting to set it to update, but even that isn’t recommended in production.
+This, however, is not ideal for production, as the database schema would be wiped clean and rebuilt from scratch any time the application was restarted. It may be tempting to set it to update, but even that isn’t recommended in production.  
+然而，这对生产环境来说并不理想，因为应用程序每次重启数据库的Schema就会被清空，从头开始重建。可以将它设置为`update`，但就算这样，也不建议将其用于生产环境。
 
-Alternatively, we could define the schema in schema.sql. This would work fine the first time, but every time we started the application thereafter, the initialization scripts would fail because the tables in question would already exist. This would force us to take special care in writing our initialization scripts to not attempt to repeat any work that has already been done.
+Alternatively, we could define the schema in schema.sql. This would work fine the first time, but every time we started the application thereafter, the initialization scripts would fail because the tables in question would already exist. This would force us to take special care in writing our initialization scripts to not attempt to repeat any work that has already been done.  
+还有另一种途径，我们可以在schema.sql里定义Schema。在第一次运行时，这么做没有问题，但随后每次启动应用程序时，这个初始化脚本就会失败，因为数据表已经存在了。这就要求在书写初始化脚本时要格外注意，不要重复执行那些已经做过的工作。
 
-A better choice is to use a database migration library. Database migration libraries work from a set of database scripts and keep careful track of the ones that have already been applied so that they won’t be applied more than once. By including the scripts within each deployment of the application, the database is able to evolve in concert with the application.
+A better choice is to use a database migration library. Database migration libraries work from a set of database scripts and keep careful track of the ones that have already been applied so that they won’t be applied more than once. By including the scripts within each deployment of the application, the database is able to evolve in concert with the application.  
+一个比较好的选择是使用数据库迁移库（database migration library），它们使用一系列的数据库脚本，并会记录哪些已经用过了，这样就不会多次运用同一个脚本。应用程序的每个部署包里都包含了这些脚本，这样数据库就能和应用程序保持一致了。
 
-Spring Boot includes auto-configuration support for two popular database migration libraries:
+Spring Boot includes auto-configuration support for two popular database migration libraries:  
+Spring Boot为两款流行的数据库迁移库提供了自动配置支持：
 
 * Flyway (http://flywaydb.org)
 * Liquibase (www.liquibase.org)
+* Flyway（[http://flywaydb.org](http://flywaydb.org)）
+* Liquibase（[http://www.liquibase.org](http://www.liquibase.org)）
 
-All you need to do to use either of these database migration libraries with Spring Boot is to include them as dependencies in the build and write the scripts. Let’s see how they work, starting with Flyway.
+All you need to do to use either of these database migration libraries with Spring Boot is to include them as dependencies in the build and write the scripts. Let’s see how they work, starting with Flyway.  
+当你想要在Spring Boot里使用其中的某一个库时，只需在项目里加入对应的依赖，然后编写脚本就可以了。让我们先从Flyway开始了解起来吧。
 
 #### DEFINING DATABASE MIGRATION WITH FLYWAY
+#### 用Flyway定义数据库迁移过程
 
-Flyway is a very simple, open source database migration library that uses SQL for defining the migration scripts. The idea is that each script is given a version number, and Flyway will execute each of them in order to arrive at the desired state of the database. It also records the status of scripts it has executed so that it won’t run them again.
+Flyway is a very simple, open source database migration library that uses SQL for defining the migration scripts. The idea is that each script is given a version number, and Flyway will execute each of them in order to arrive at the desired state of the database. It also records the status of scripts it has executed so that it won’t run them again.  
+Flyway是一个非常简单的开源数据库迁移库，使用SQL来定义迁移脚本。它的理念是每个脚本都有一个版本号，Flyway会顺序执行这些脚本，让数据库达到期望的状态。它也会记录下已执行的脚本状态，这样不会重复执行它们。
 
-For the reading-list application, we’re starting with an empty database with no tables or data. Therefore, the script we’ll need to get started will need to create the Reader and Book tables, including any foreign-key constraints and initial data. Listing 8.2 shows the Flyway script we’ll need to go from an empty database to one that our application can use.
+For the reading-list application, we’re starting with an empty database with no tables or data. Therefore, the script we’ll need to get started will need to create the Reader and Book tables, including any foreign-key constraints and initial data. Listing 8.2 shows the Flyway script we’ll need to go from an empty database to one that our application can use.  
+对于阅读列表应用程序而言，我们先从一个没有数据表和数据的空数据库开始。因此这个脚本里需要先创建Reader和Book表，包含外键约束和初始化数据。代码8.2就是从空数据库开始将其变为可用状态的Flyway脚本。
 
-__Listing 8.2 A database initialization script for Flyway__
+__Listing 8.2 A database initialization script for Flyway__  
+__代码8.2 Flyway数据库初始脚本__
 
 ```
 create table Reader (
@@ -392,25 +412,34 @@ insert into Reader (username, password, fullname)
             values ('craig', 'password', 'Craig Walls');
 ```
 
-Create Reader table
+Create Reader table  
+创建Reader表
 
-Create Book table
+Create Book table  
+创建Book表
 
-Define a sequence
+Define a sequence  
+定义序列
 
-An initial Reader
+An initial Reader  
+Reader的初始数据
 
-As you can see, the Flyway script is just SQL. What makes it work with Flyway is where it’s placed in the classpath and how it’s named. Flyway scripts follow a naming convention that includes the version number, as illustrated in figure 8.1.
+As you can see, the Flyway script is just SQL. What makes it work with Flyway is where it’s placed in the classpath and how it’s named. Flyway scripts follow a naming convention that includes the version number, as illustrated in figure 8.1.  
+如你所见，Flyway脚本就是SQL，让其发挥作用的是其在Classpath里的位置和文件名。Flyway脚本都遵循一个命名规范，里面含有版本号，具体如图8.1所示。
 
 ![图8.1](../Figures/figure-8.1.png)
 
-__Figure 8.1 Flyway scripts are named with their version number.__
+__Figure 8.1 Flyway scripts are named with their version number.__  
+__图8.1 用版本号命名的Flyway脚本__
 
-All Flyway scripts have names that start with a capital V which precedes the script’s version number. That’s followed by two underscores and a description of the script. Because this is the first script in the migration, it will be version 1. The description given can be flexible and is primarily to provide some understanding of the script’s purpose. Later, should we need to add a new table to the database or a new column to an existing table, we can create another script named with 2 in the version place.
+All Flyway scripts have names that start with a capital V which precedes the script’s version number. That’s followed by two underscores and a description of the script. Because this is the first script in the migration, it will be version 1. The description given can be flexible and is primarily to provide some understanding of the script’s purpose. Later, should we need to add a new table to the database or a new column to an existing table, we can create another script named with 2 in the version place.  
+所有Flyway脚本的名字都以大写V开头，随后是脚本的版本号。后面跟着两个下划线和对脚本的描述。因为这是整个迁移过程中的第一个脚本，所以它的版本是1。描述可以很灵活，主要用来帮助理解脚本的用途。稍后我们需要向数据库里添加新表，或者向已有数据表里添加新字段，可以再创建一个脚本，在版本号的地方写2。
 
-Flyway scripts need to be placed in the path /db/migration relative to the application’s classpath root. Therefore, this script needs to be placed in src/main/resources/db/migration within the project.
+Flyway scripts need to be placed in the path /db/migration relative to the application’s classpath root. Therefore, this script needs to be placed in src/main/resources/db/migration within the project.  
+Flyway脚本需要放在相对于应用程序Classpath根路径的/db/migration目录下，因此，在项目里脚本需要放在src/main/resources/db/migration里。
 
-You’ll also need to tell Hibernate to not attempt to create the tables by setting spring.jpa.hibernate.ddl-auto to none. The following lines in application.yml take care of that:
+You’ll also need to tell Hibernate to not attempt to create the tables by setting spring.jpa.hibernate.ddl-auto to none. The following lines in application.yml take care of that:  
+你还需要告诉Hibernate不要创建数据表，可以将`spring.jpa.hibernate.ddl-auto`设置为`none`，就像下面这样：
 
 ```
 spring:
@@ -419,13 +448,15 @@ spring:
       ddl-auto: none
 ```
 
-All that’s left is to add Flyway as a dependency in the project build. Here’s the dependency that’s required for Gradle:
+All that’s left is to add Flyway as a dependency in the project build. Here’s the dependency that’s required for Gradle:  
+剩下的就是将Flyway添加为项目依赖。Gradle里是这样的：
 
 ```
 compile("org.flywaydb:flyway-core")
 ```
 
-In a Maven build, the <dependency> is as follows:
+In a Maven build, the <dependency> is as follows:  
+在Maven项目里，`<dependency>`是这样的：
 
 ```
 <dependency>
@@ -434,9 +465,11 @@ In a Maven build, the <dependency> is as follows:
 </dependency>
 ```
 
-When the application is deployed and running, Spring Boot will detect Flyway in the classpath and auto-configure the beans necessary to enable it. Flyway will step through any scripts in /db/migration and apply them if they haven’t already been applied. As each script is executed, an entry will be written to a table named schema_version. The next time the application starts, Flyway will see that those scripts have been recorded in schema_version and skip over them.
+When the application is deployed and running, Spring Boot will detect Flyway in the classpath and auto-configure the beans necessary to enable it. Flyway will step through any scripts in /db/migration and apply them if they haven’t already been applied. As each script is executed, an entry will be written to a table named schema_version. The next time the application starts, Flyway will see that those scripts have been recorded in schema_version and skip over them.  
+在应用程序部署并运行起来后，Spring Boot会检测到Classpath里的Flyway，自动配置所需的Bean。Flyway会依次查看/db/migration里的脚本，如果没有执行过就运行这个脚本。每个脚本都执行过后就会向schema_version表里写一条记录。应用程序下次启动时，Flyway会先看schema_version里的记录，跳过那些脚本。
 
 #### DEFINING DATABASE MIGRATION WITH LIQUIBASE
+#### 用Liquibase定义数据库迁移过程
 
 Flyway is simple to use, especially with help from Spring Boot auto-configuration. But defining migration scripts with SQL is a two-edged sword. Although it’s easy and natural to work with SQL, you run the risk of defining a migration script that works with one database platform but not another.
 
