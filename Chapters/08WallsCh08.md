@@ -615,3 +615,154 @@ Spring Boot的自动配置让Liquibase和Flyway的使用变得易如反掌，但
 
 We’ve seen how building Spring Boot applications for deployment into a conventional Java application server is largely a matter of creating a subclass of SpringBootServletInitializer and adjusting the build specification to produce a WAR file instead of a JAR file. But as we’ll see next, Spring Boot applications are even easier to build for the cloud.  
 我们已经了解了如何将Spring Boot应用程序部署到传统的Java应用服务器上，基本就是创建一个`SpringBootServletInitializer`的子类，调整构建说明来生成一个WAR文件，而非JAR文件。接下来我们会看到Spring Boot应用程序在云端使用会更方便。
+
+## 8.3 Pushing to the cloud## 8.3 推上云端
+Server hardware can be expensive to purchase and maintain. Properly scaling servers to handle heavy loads can be tricky and even prohibitive for some organizations. These days, deploying applications to the cloud is a compelling and cost-effective alternative to running your own data center.  
+服务器硬件的购买和维护成本很高，适当地扩展服务器以便能处理大流量的做法会很棘手，在某些组织中这样做甚至是被禁止的。现在，与在自己的数据中心运行应用程序相比，把它们部署到云上是更引人注目，而且划算的做法。There are several cloud choices available, but those that offer a platform as a service (PaaS) are among the most compelling. PaaS offers a ready-made application deployment platform with several add-on services (such as databases and message brokers) to bind to your applications. In addition, as your application requires additional horsepower, cloud platforms make it easy to scale up (or down) your application on the fly by adding and removing instances.  
+目前有多个云平台可供选择，但那些提供Platform as a Service（PaaS）能力的平台无疑是最有吸引力的。PaaS提供了现成的应用程序部署平台，其中带有附加服务（比如数据库和消息代理），可以绑定到应用程序上。除此之外，你的应用程序要求提供更大的马力，云平台能轻松实现应用程序在运行时向上（或向下）伸缩，只需添加或删除实例即可。
+Now that we’ve deployed the reading-list application to a traditional application server, we’re going to try deploying it to the cloud. Specifically, we’re going to deploy our application to two of the most popular PaaS platforms available: Cloud Foundry and Heroku.  
+之前我们已经把阅读列表应用程序部署到了传统的应用服务器上，现在再试试将其部署到云上。我们将把应用程序部署到两个著名的PaaS平台上——Cloud Foundry和Heroku。### 8.3.1 Deploying to Cloud Foundry
+### 8.3.1 部署到Cloud Foundry
+Cloud Foundry is a PaaS platform from Pivotal, the same company that sponsors the Spring Framework and the other libraries in the Spring platform. One of the most compelling things about Cloud Foundry is that it is both open source and has several commercial distributions, giving you the choice of how and where you use Cloud Foundry. It can even be run inside the firewall in a corporate datacenter, offering a private cloud.For the reading-list application, we’re going to deploy to Pivotal Web Services (PWS), a public Cloud Foundry hosted by Pivotal at http://run.pivotal.io. If you want to work with PWS, you’ll need to sign up for an account. PWS offers a 60-day free trial and doesn’t even require you to give any credit card information during the trial.
+Once you’ve signed up for PWS, you’ll need to download and install the cf command-line tool from https://console.run.pivotal.io/tools. You’ll use the cf tool to push applications to Cloud Foundry. But the first thing you’ll use it for is to log into your PWS account:
+
+```
+$ cf login -a https://api.run.pivotal.ioAPI endpoint: https://api.run.pivotal.io
+Email> {your email}Password> {your password}Authenticating...OK
+```
+Now we’re ready to take the reading-list application to the cloud. As it turns out, our reading-list project is already ready to be deployed to Cloud Foundry. All we need to do is use the cf push command:
+```$ cf push sbia-readinglist -p build/libs/readinglist.war```
+The first argument to cf push is the name given to the application in Cloud Foundry. Among other things, this name will be used as the subdomain that the application will be hosted at. In this case, the full URL for the application will be http://sbia-readinglist .cfapps.io. Therefore, it’s important that the name you give the application be unique so that it doesn’t collide with any other application deployed in Cloud Foundry (includ- ing those deployed by other Cloud Foundry users).Because dreaming up a unique name may be tricky, the cf push command offers a --random-route option that will randomly produce a subdomain for you. Here’s how to push the reading-list application so that a random route is generated:```$ cf push sbia-readinglist -p build/libs/readinglist.war --random-route```When using --random-route, the application name is still required, but two randomly chosen words will be appended to it to produce the subdomain. (When I tried it, the resulting subdomain was sbia-readinglist-gastroenterological-stethoscope.)
+
+> NOT JUST WAR FILES Although we’re going to deploy the reading-list applica- tion as a WAR file, Cloud Foundry will be happy to deploy Spring Boot appli- cations in any form they come in, including executable JAR files and even uncompiled Groovy scripts run via the Spring Boot CLI.
+
+Assuming everything goes well, the application should be deployed and ready to handle requests. Supposing that the subdomain is sbia-readinglist, you can point your browser at http://sbia-readinglist.cfapps.io to see it in action. You should be prompted with the login page. As you’ll recall, the database migration script inserted a user named “craig” with a password of “password”. Use those to log into the application.
+Go ahead and play around with the application and add a few books to the reading list. Everything should work. But something still isn’t quite right. If you were to restart the application (using the cf restart command) and then log back into the applica- tion, you’d see that your reading list is empty. Any book you’ve added before restarting the application will be gone.
+
+The reason the data doesn’t survive an application restart is because we’re still using the embedded H2 database. You can verify this by requesting the Actuator’s /health endpoint, which will reply with something like this:
+
+```
+{  "status": "UP",  "diskSpace": {    "status": "UP",    "free": 834236510208,    "threshold": 10485760  }, "db": {    "status": "UP",    "database": "H2",    "hello": 1  } 
+}
+```
+
+Notice the value of the db.database property. It confirms any suspicion we might have had that the database is an embedded H2 database. We need to fix that.As it turns out, Cloud Foundry offers a few database options to choose from in the form of marketplace services, including MySQL and PostgreSQL. Because we already have the PostgreSQL JDBC driver in our project, we’ll use the PostgreSQL service from the marketplace, which is named “elephantsql”.The elephantsql service comes with a handful of different plans to choose from, ranging from small development-sized databases to large industrial-strength produc- tion databases. You can get a list of all of the elephantsql plans with the cf market- place command like this:
+
+```
+$ cf marketplace -s elephantsqlGetting service plan information for service elephantsql as craig@habuma.com... OK
+
+service plan		description			free or paidturtle				Tiny Turtle			freepanda				Pretty Panda			paidhippo				Happy Hippo			paidelephant			Enormous Elephant	paid
+```
+
+As you can see, the more serious production-sized database plans require payment. You’re welcome to choose one of those plans if you want, but for now I’ll assume that you’re choosing the free “turtle” plan.
+To create an instance of the database service, you can use the cf create-service command, specifying the service name, the plan name, and an instance name:
+
+```
+$ cf create-service elephantsql turtle readinglistdbCreating service readinglistdb in org habuma /      space development as craig@habuma.com...OK
+```
+
+Once the service has been created, we’ll need to bind it to our application with the cf bind-service command:```$ cf bind-service sbia-readinglist readinglistdb```
+Binding a service to an application merely provides the application with details on how to connect to the service within an environment variable named VCAP_SERVICES. It doesn’t change the application to actually use that service.We could rewrite the reading-list application to read VCAP_SERVICES and use the information it provides to access the database service, but that’s completely unnecessary. Instead, all we need to do is restage the application with thecfrestagecommand:```$ cf restage sbia-readinglist
+```
+The cf restage command forces Cloud Foundry to redeploy the application and reevaluate the VCAP_SERVICES value. As it does, it will see that our application declares a DataSource bean in the Spring application context and replaces it with a DataSource that references the bound database service. As a consequence, our application will now be using the PostgreSQL service known as elephantsql rather than the embedded H2 database.
+Go ahead and try it out now. Log into the application, add a few books to the reading list, and then restart the application. Your books should still be in your reading list after the restart. That’s because they were persisted to the bound database service rather than to an embedded H2 database. Once again, the Actuator’s /health endpoint will back up that claim:
+
+```
+{  "status": "UP",  "diskSpace": {    "status": "UP",    "free": 834331525120,    "threshold": 10485760  }, "db": {    "status": "UP",    "database": "PostgreSQL",    "hello": 1  }
+}
+```
+
+Cloud Foundry is a great PaaS for Spring Boot application deployment. Its associa- tion with the Spring projects affords some synergy between the two. But it’s not the only PaaS where Spring Boot applications can be deployed. Let’s see what needs to be done to deploy the reading-list application to Heroku, another popular PaaS platform.
+
+### 8.3.2 Deploying to Heroku
+
+Heroku takes a unique approach to application deployment. Rather than deploy a completely built deployment artifact, Heroku arranges a Git repository for your appli- cation and builds and deploys the application for you every time you push it to the repository.
+If you’ve not already done so, you’ll want to initialize the project directory as a Git repository:
+
+```
+$ git init
+```
+
+This will enable the Heroku command-line tool to add the remote Heroku Git reposi- tory to the project automatically.
+Now it’s time to set up the application in Heroku using the Heroku command-line tool’s apps:create command:
+
+```
+$ heroku apps:create sbia-readinglist
+```
+
+Here I’ve asked Heroku to name the application “sbia-readinglist”. This name will be used as the name of the Git repository as well as the subdomain of the application at herokuapps.com. You’ll want to be sure to pick a unique name, as there can’t be more than one application with the same name. Alternatively, you can leave off the name and Heroku will generate a unique name for you (such as “fierce-river-8120” or “serene-anchorage-6223”).
+The apps:create command creates a remote Git repository at https://git.heroku .com/sbia-readinglist.git and adds a remote reference to the repository named “her- oku” in the local project’s Git configuration. That will enable us to push our project into Heroku using the git command.The project has been set up in Heroku, but we’re not quite ready to push it yet. Heroku asks that you provide a file named Procfile that tells Heroku how to run the application after it has been built. For our reading-list application, we need to tell Heroku to run the WAR file produced by the build as an executable JAR file using the java command.1 Assuming that the application will be built with Gradle, the following one-line Procfile is what we’ll need:
+
+```
+web: java -Dserver.port=$PORT -jar build/libs/readinglist.war```
+
+On the other hand, if you’re using Maven to build the project, then the path to the JAR file will be slightly different. Instead of referencing the executable WAR file in build/libs, Heroku will need to find it in the target directory, as shown in the follow- ing Procfile:
+
+```
+web: java -Dserver.port=$PORT -jar target/readinglist.war```
+
+[1]: # "The project we’re working with actually produces an executable WAR file, but as far as Heroku knows, it’s no different than an executable JAR file."In either case, you’ll also need to set the server.port property as shown so that the embedded Tomcat server starts up on the port that Heroku assigns to the application (provided by the `$PORT` variable).
+We’re almost ready to push the application to Heroku, but there’s a small change required in the Gradle build specification. When Heroku tries to build our application, it will do so by executing a task named stage. Therefore, we’ll need to add a stage task to build.gradle:
+
+```
+task stage(dependsOn: ['build']) {}
+```
+
+As you can see, this stage task doesn’t do much. But it does depend on the build task. Therefore, the build task will be triggered when Heroku tries to build the application with the stage task, and the resulting JAR will be ready to run in the build/libs directory.
+You may also need to inform Heroku of the Java version we’re building the applica- tion with so that it runs the application with the appropriate version of Java. The easi- est way to do that is to create a file named system.properties at the root of the project that sets a java.runtime.version property:
+
+```
+java.runtime.version=1.7
+```
+
+Now we’re ready to push the project into Heroku. As I said before, this is just a matter of pushing the code into the remote Git repository that Heroku set up for us:
+
+```
+$ git commit -am "Initial commit"$ git push heroku master
+```
+
+After the code is pushed into Heroku, Heroku will build it using either Maven or Gradle (depending on which kind of build file it finds) and then run it using the instructions in Procfile. Once it’s ready, you should be able to try it out by point- ing your browser at http://{app name}.herokuapp.com, where “{app name}” is the name given to the application when you used apps:create. For example, I named the application “sbia-readinglist” when I deployed it, so the application’s URL is http://sbia-readinglist.herokuapps.com.Feel free to poke about in the application as much as you’d like. But then go take a look at the /health endpoint. The db.database property should tell you that the application is using the embedded H2 database. We should change that to use a Post- greSQL service instead.We can create and bind to a PostgreSQL service using the Heroku command-line tool’s addons:add command like this:```
+$ heroku addons:add heroku-postgresql:hobby-dev
+```
+
+Here we’re asking for the addon service named heroku-postgresql, which is the PostgreSQL service offered by Heroku. We’re also asking for the hobby-dev plan for that service, which is the free plan.
+
+Now the PostgreSQL service is created and bound to our application, and Heroku will automatically restart the application to ensure that binding. But even so, if we were to go look at the /health endpoint, we’d see that the application is still using the embedded H2 database. That’s because the auto-configuration for H2 is still in play, and there’s nothing to tell Spring Boot to use PostgreSQL instead.
+One option is to set the spring.datasource.* properties like we did when deploy- ing to an application server. The information we’d need can be found on the database service’s dashboard, which can be opened with the addons:open command:
+
+```
+$ heroku addons:open waking-carefully-3728
+```
+
+In this case, the name of the database instance is “waking-carefully-3728”. This com- mand will open a dashboard page in your web browser that includes all of the neces- sary connection information, including the hostname, database name, and credentials—everything we’d need to set the spring.datasource.* properties.
+But there’s an easier way. Rather than look up that information for ourselves and set those properties, why can’t Spring look them up for us? In fact, that’s what the Spring Cloud Connectors project does. It works with both Cloud Foundry and Her- oku to look up any services bound to an application and automatically configure the application to use those services.We just need to add Spring Cloud Connectors as a dependency in the build. For a Gradle build, add the following to build.gradle:
+
+```
+compile( "org.springframework.boot:spring-boot-starter-cloud-connectors")```
+
+If you’re using Maven, the following <dependency> will add Spring Cloud Connectors to the build:
+
+```<dependency>  <groupId>org.springframework.boot</groupId>  <artifactId>spring-boot-starter-cloud-connectors</artifactId></dependency>
+```
+
+Spring Cloud Connectors will only work if the “cloud” profile is active. To activate the “cloud” profile in Heroku, use the config:set command:
+
+```
+$ heroku config:set SPRING_PROFILES_ACTIVE="cloud"
+```
+
+Now that the Spring Cloud Connectors dependency is in the build and the “cloud” profile is active, we’re ready to push the application again:
+
+```
+$ git commit -am "Add cloud connector"$ git push heroku master
+```
+
+After the application starts up, sign in to the application and view the /health end- point. It should indicate that the application is connected to a PostgreSQL database:
+
+```
+"db": {  "status": "UP",  "database": "PostgreSQL",  "hello": 1}
+```
+
+Now our application is deployed in the cloud, ready to take requests from the world!
+
+## 8.4 SummaryThere are several options for deploying Spring Boot applications, including traditional application servers and PaaS options in the cloud. In this chapter, we looked at a few of those options, deploying the reading-list application as a WAR file to Tomcat and in the cloud to both Cloud Foundry and Heroku.Spring Boot applications are often given a build specification that produces an executable JAR file. But we’ve seen how to tweak the build and write a SpringBootServletInitializer implementation to produce a WAR file suitable for deployment to an application server.We then took a first step toward deploying our application to Cloud Foundry. Cloud Foundry is flexible enough to accept Spring Boot applications in any form, including executable JAR files, traditional WAR files, or even raw Spring Boot CLI Groovy scripts. We also saw how Cloud Foundry is able to automatically swap out our embedded data source bean with one that references a database service bound to the application.Finally we saw how although Heroku doesn’t offer automatic swapping of data source beans like Cloud Foundry, by adding the Spring Cloud Connectors library to our deployment we can achieve the same effect, enabling a bound database service instead of an embedded database.Along the way, we also looked at how to enable database migration tools such as Flyway and Liquibase in Spring Boot. We used database migration to initialize our database on the first deployment and now are ready to evolve our database as needed on future deployments.
