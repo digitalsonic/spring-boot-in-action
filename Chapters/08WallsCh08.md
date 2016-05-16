@@ -471,17 +471,21 @@ When the application is deployed and running, Spring Boot will detect Flyway in 
 #### DEFINING DATABASE MIGRATION WITH LIQUIBASE
 #### 用Liquibase定义数据库迁移过程
 
-Flyway is simple to use, especially with help from Spring Boot auto-configuration. But defining migration scripts with SQL is a two-edged sword. Although it’s easy and natural to work with SQL, you run the risk of defining a migration script that works with one database platform but not another.
+Flyway is simple to use, especially with help from Spring Boot auto-configuration. But defining migration scripts with SQL is a two-edged sword. Although it’s easy and natural to work with SQL, you run the risk of defining a migration script that works with one database platform but not another.  
+Flyway用起来很简单，特别是在Spring Boot自动配置的帮助下。但是使用SQL来定义迁移脚本是一把双刃剑，虽然使用SQL很简单也很自然，但却冒着只能在一个数据库平台上使用的风险。
 
-Rather than be limited to platform-specific SQL, Liquibase supports several formats for writing migration scripts that are agnostic to the underlying platform. These include XML, YAML, and JSON. And, if you really want it, Liquibase also supports SQL scripts.
+Rather than be limited to platform-specific SQL, Liquibase supports several formats for writing migration scripts that are agnostic to the underlying platform. These include XML, YAML, and JSON. And, if you really want it, Liquibase also supports SQL scripts.  
+比起限定在某种平台特定的SQL上，Liquibase支持多种书写迁移脚本的格式，不用关心底层平台，其中包括XML、YAML和JSON。如果你希望的话，当然Liquibase也支持SQL脚本。
 
-The first step to using Liquibase with Spring Boot is to add it as a dependency in your build. The Gradle dependency is as follows:
+The first step to using Liquibase with Spring Boot is to add it as a dependency in your build. The Gradle dependency is as follows:  
+要在Spring Boot里使用Liquibase，第一步是添加依赖。Gradle里的依赖是这样的：
 
 ```
 compile("org.liquibase:liquibase-core")
 ```
 
-For Maven, here’s the <dependency> you’ll need:
+For Maven, here’s the <dependency> you’ll need:  
+对于Maven项目，你需要添加如下`<dependency>`：
 
 ```
 <dependency>
@@ -490,9 +494,11 @@ For Maven, here’s the <dependency> you’ll need:
 </dependency>
 ```
 
-Spring Boot auto-configuration takes it from there, wiring up the beans that support Liquibase. By default, those beans are wired to look for all of the migration scripts in a single file named db.changelog-master.yaml in /db/changelog (relative to the classpath root). The migration script in listing 8.3 includes instructions to initialize the database for the reading-list application.
+Spring Boot auto-configuration takes it from there, wiring up the beans that support Liquibase. By default, those beans are wired to look for all of the migration scripts in a single file named db.changelog-master.yaml in /db/changelog (relative to the classpath root). The migration script in listing 8.3 includes instructions to initialize the database for the reading-list application.  
+有了这个依赖，Spring Boot自动配置就能接手了，配置好用于支持Liquibase的Bean。默认情况下，那些Bean会在/db/changelog（相对于Classpath根目录）里查找db.changelog-master.yaml文件，文件里都是迁移脚本。代码8.3就是用于阅读列表应用程序的数据库初始化脚本。
 
-__Listing 8.3 A Liquibase script for initializing the reading-list database__
+__Listing 8.3 A Liquibase script for initializing the reading-list database__  
+__代码8.3 用于阅读列表数据库的初始化脚本__
 
 ```
 databaseChangeLog:
@@ -572,29 +578,40 @@ databaseChangeLog:
                   value: Craig Walls
 ```
 
-Changeset ID
+Changeset ID  
+变更集ID
 
-Create reader table
+Create reader table  
+创建reader表
 
-Create book table
+Create book table  
+创建book表
 
-Define a sequence
+Define a sequence  
+定义序列
 
-Insert an initial reader
+Insert an initial reader  
+插入reader的初始记录
 
-As you can see, the YAML format is a bit more verbose than the equivalent Flyway SQL script. But it’s still fairly clear as to its purpose and it isn’t coupled to any specific database platform.
+As you can see, the YAML format is a bit more verbose than the equivalent Flyway SQL script. But it’s still fairly clear as to its purpose and it isn’t coupled to any specific database platform.  
+如你所见，比起等效的Flyway SQL脚本，YAML格式略显繁琐。但看起来还是很清晰的，而且这个脚本不与任何特定的数据库平台绑定。
 
-Unlike Flyway, which has multiple scripts, one for each change set, Liquibase changesets are all collected in the same file. Note the id property on the line following the changeset command. Future changes to the database can be included by adding a new changeset with a different id. Also note that the id property isn’t necessarily numeric and may contain any text you’d like.
+Unlike Flyway, which has multiple scripts, one for each change set, Liquibase changesets are all collected in the same file. Note the id property on the line following the changeset command. Future changes to the database can be included by adding a new changeset with a different id. Also note that the id property isn’t necessarily numeric and may contain any text you’d like.  
+与Flyway不同，Flyway有多个脚本，每个脚本对应一个变更集，Liquibase变更集都集中在一个文件里。请注意`changeset`命令后的那行里有一个`id`属性，对数据库的后续变更可以添加一个新的`changeset`，只要`id`不一样即可。此外，`id`属性也不一定要是数字，可以包含任意内容。
 
-When the application starts up, Liquibase will read the changeset instructions in db.changelog-master.yaml, compare them with what it may have previously written to the databaseChangeLog table, and apply any changesets that have not yet been applied.
+When the application starts up, Liquibase will read the changeset instructions in db.changelog-master.yaml, compare them with what it may have previously written to the databaseChangeLog table, and apply any changesets that have not yet been applied.  
+应用程序启动时，Liquibase会读取db.changelog-master.yaml里的变更集指令集，与之前写入databaseChangeLog表里的内容做对比，随后执行未运行过的变更集。
 
-Although the example given here is expressed in YAML format, you’re welcome to choose one of Liquibase’s other supported formats, such as XML or JSON. Simply set the liquibase.change-log property (in application.properties or application.yml) to reflect the file you want Liquibase to load. For example, to use an XML changeset file, set liquibase.change-log like this:
+Although the example given here is expressed in YAML format, you’re welcome to choose one of Liquibase’s other supported formats, such as XML or JSON. Simply set the liquibase.change-log property (in application.properties or application.yml) to reflect the file you want Liquibase to load. For example, to use an XML changeset file, set liquibase.change-log like this:  
+虽然这里的例子使用的是YAML格式，但你也可以任意选择Liquibase所支持的其他格式，比如XML或JSON。只需简单地设置`liquibase.change-log`属性（在application.properties或application.yml里），标明希望Liquibase要加载的文件。举个例子，要使用XML变更集，可以像这样来设置`liquibase.change-log`：
 
 ```
 liquibase:
   change-log: classpath:/db/changelog/db.changelog-master.xml
 ```
 
-Spring Boot auto-configuration makes both Liquibase and Flyway a piece of cake to work with. But there’s a lot more to what each of these database migration libraries can do beyond what we’ve seen here. I encourage you to refer to each project’s documentation for more details.
+Spring Boot auto-configuration makes both Liquibase and Flyway a piece of cake to work with. But there’s a lot more to what each of these database migration libraries can do beyond what we’ve seen here. I encourage you to refer to each project’s documentation for more details.  
+Spring Boot的自动配置让Liquibase和Flyway的使用变得易如反掌，但其实关于每个数据库迁移库都还有更多的工作要做，建议大家可以参考它们的官方文档了解更多详细内容。
 
-We’ve seen how building Spring Boot applications for deployment into a conventional Java application server is largely a matter of creating a subclass of SpringBootServletInitializer and adjusting the build specification to produce a WAR file instead of a JAR file. But as we’ll see next, Spring Boot applications are even easier to build for the cloud.
+We’ve seen how building Spring Boot applications for deployment into a conventional Java application server is largely a matter of creating a subclass of SpringBootServletInitializer and adjusting the build specification to produce a WAR file instead of a JAR file. But as we’ll see next, Spring Boot applications are even easier to build for the cloud.  
+我们已经了解了如何将Spring Boot应用程序部署到传统的Java应用服务器上，基本就是创建一个`SpringBootServletInitializer`的子类，调整构建说明来生成一个WAR文件，而非JAR文件。接下来我们会看到Spring Boot应用程序在云端使用会更方便。
