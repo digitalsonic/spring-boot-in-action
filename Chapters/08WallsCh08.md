@@ -623,30 +623,44 @@ We’ve seen how building Spring Boot applications for deployment into a convent
 Now that we’ve deployed the reading-list application to a traditional application server, we’re going to try deploying it to the cloud. Specifically, we’re going to deploy our application to two of the most popular PaaS platforms available: Cloud Foundry and Heroku.  
 之前我们已经把阅读列表应用程序部署到了传统的应用服务器上，现在再试试将其部署到云上。我们将把应用程序部署到两个著名的PaaS平台上——Cloud Foundry和Heroku。### 8.3.1 Deploying to Cloud Foundry
 ### 8.3.1 部署到Cloud Foundry
-Cloud Foundry is a PaaS platform from Pivotal, the same company that sponsors the Spring Framework and the other libraries in the Spring platform. One of the most compelling things about Cloud Foundry is that it is both open source and has several commercial distributions, giving you the choice of how and where you use Cloud Foundry. It can even be run inside the firewall in a corporate datacenter, offering a private cloud.For the reading-list application, we’re going to deploy to Pivotal Web Services (PWS), a public Cloud Foundry hosted by Pivotal at http://run.pivotal.io. If you want to work with PWS, you’ll need to sign up for an account. PWS offers a 60-day free trial and doesn’t even require you to give any credit card information during the trial.
-Once you’ve signed up for PWS, you’ll need to download and install the cf command-line tool from https://console.run.pivotal.io/tools. You’ll use the cf tool to push applications to Cloud Foundry. But the first thing you’ll use it for is to log into your PWS account:
+Cloud Foundry is a PaaS platform from Pivotal, the same company that sponsors the Spring Framework and the other libraries in the Spring platform. One of the most compelling things about Cloud Foundry is that it is both open source and has several commercial distributions, giving you the choice of how and where you use Cloud Foundry. It can even be run inside the firewall in a corporate datacenter, offering a private cloud.  
+Cloud Foundry是Pivotal的一个PaaS平台，这家公司也赞助了Spring Framework和Spring平台里的其他库。Cloud Foundry里最吸引人的特点之一就是它既有开源版本，也有多个商业版本，这让你能选择在何处运行Cloud Foundry，它甚至还可以在公司数据中心的防火墙后运行，提供了一个私有云。For the reading-list application, we’re going to deploy to Pivotal Web Services (PWS), a public Cloud Foundry hosted by Pivotal at http://run.pivotal.io. If you want to work with PWS, you’ll need to sign up for an account. PWS offers a 60-day free trial and doesn’t even require you to give any credit card information during the trial.  
+对阅读列表应用程序而言，我打算将它部署到Pivotal Web Services（PWS）上，这是一个由Pivotal托管的公共Cloud Foundry，地址是[http://run.pivotal.io](http://run.pivotal.io)。如果你也想用PWS，可以注册一个账号，PWS提供了为期60天的免费试用，在试用期间也无需提供任何信用卡信息。
+Once you’ve signed up for PWS, you’ll need to download and install the cf command-line tool from https://console.run.pivotal.io/tools. You’ll use the cf tool to push applications to Cloud Foundry. But the first thing you’ll use it for is to log into your PWS account:  
+在注册了PWS后，可以从[https://console.run.pivotal.io/tools](https://console.run.pivotal.io/tools)下载并安装`cf`命令行工具，你将通过这个工具将应用程序推上Cloud Foundry。但你要先用这个工具来登录自己的PWS账号：
 
 ```
 $ cf login -a https://api.run.pivotal.ioAPI endpoint: https://api.run.pivotal.io
 Email> {your email}Password> {your password}Authenticating...OK
 ```
-Now we’re ready to take the reading-list application to the cloud. As it turns out, our reading-list project is already ready to be deployed to Cloud Foundry. All we need to do is use the cf push command:
+Now we’re ready to take the reading-list application to the cloud. As it turns out, our reading-list project is already ready to be deployed to Cloud Foundry. All we need to do is use the cf push command:  
+现在我们已经可以把阅读列表应用程序传到云上了，实际上我们的项目已经做好了部署到Cloud Foundry的准备，只需使用`cf push`命令把它推上去就好了：
 ```$ cf push sbia-readinglist -p build/libs/readinglist.war```
-The first argument to cf push is the name given to the application in Cloud Foundry. Among other things, this name will be used as the subdomain that the application will be hosted at. In this case, the full URL for the application will be http://sbia-readinglist .cfapps.io. Therefore, it’s important that the name you give the application be unique so that it doesn’t collide with any other application deployed in Cloud Foundry (includ- ing those deployed by other Cloud Foundry users).Because dreaming up a unique name may be tricky, the cf push command offers a --random-route option that will randomly produce a subdomain for you. Here’s how to push the reading-list application so that a random route is generated:```$ cf push sbia-readinglist -p build/libs/readinglist.war --random-route```When using --random-route, the application name is still required, but two randomly chosen words will be appended to it to produce the subdomain. (When I tried it, the resulting subdomain was sbia-readinglist-gastroenterological-stethoscope.)
+The first argument to cf push is the name given to the application in Cloud Foundry. Among other things, this name will be used as the subdomain that the application will be hosted at. In this case, the full URL for the application will be http://sbia-readinglist.cfapps.io. Therefore, it’s important that the name you give the application be unique so that it doesn’t collide with any other application deployed in Cloud Foundry (including those deployed by other Cloud Foundry users).  
+`cf push`命令的第一个参数指定了应用程序在Cloud Foundry里的名称，这个名称将被用作托管应用程序的子域名。本例中，应用程序的完整域名将是[http://sbia-readinglist.cfapps.io](http://sbia-readinglist.cfapps.io)。因此，你对应用程序的命名就很重要了，它必须是唯一的，这样它才不会和Cloud Foundry里部署的其他应用程序（包括其他用户部署的应用程序）发生冲突。Because dreaming up a unique name may be tricky, the cf push command offers a --random-route option that will randomly produce a subdomain for you. Here’s how to push the reading-list application so that a random route is generated:  
+因为空想一个唯一的名称有点困难，`cf push`命令还提供了一个`--random-route`选项，可以为你随机产生一个子域名。下面的例子演示了如何上传阅读列表应用程序，生成一个随机的子域名：```$ cf push sbia-readinglist -p build/libs/readinglist.war --random-route```When using --random-route, the application name is still required, but two randomly chosen words will be appended to it to produce the subdomain. (When I tried it, the resulting subdomain was sbia-readinglist-gastroenterological-stethoscope.)  
+在使用了`--random-route`后，还是要设定应用程序名称，两个随机选择的单词会添加到子域名后。（在我自己试的时候，生成的子域名是sbia-readinglist-gastroenterological-stethoscope。）
 
-> NOT JUST WAR FILES Although we’re going to deploy the reading-list applica- tion as a WAR file, Cloud Foundry will be happy to deploy Spring Boot appli- cations in any form they come in, including executable JAR files and even uncompiled Groovy scripts run via the Spring Boot CLI.
+> NOT JUST WAR FILES Although we’re going to deploy the reading-list application as a WAR file, Cloud Foundry will be happy to deploy Spring Boot applications in any form they come in, including executable JAR files and even uncompiled Groovy scripts run via the Spring Boot CLI.  
+> __不仅是WAR文件__ 虽然我们在部署的应用程序是一个WAR文件，但Cloud Foundry也可以部署其他格式的Spring Boot应用程序，包括可执行的JAR文件，甚至是Spring Boot CLI开发的未经编译的Groovy脚本。
 
-Assuming everything goes well, the application should be deployed and ready to handle requests. Supposing that the subdomain is sbia-readinglist, you can point your browser at http://sbia-readinglist.cfapps.io to see it in action. You should be prompted with the login page. As you’ll recall, the database migration script inserted a user named “craig” with a password of “password”. Use those to log into the application.
-Go ahead and play around with the application and add a few books to the reading list. Everything should work. But something still isn’t quite right. If you were to restart the application (using the cf restart command) and then log back into the applica- tion, you’d see that your reading list is empty. Any book you’ve added before restarting the application will be gone.
+Assuming everything goes well, the application should be deployed and ready to handle requests. Supposing that the subdomain is sbia-readinglist, you can point your browser at http://sbia-readinglist.cfapps.io to see it in action. You should be prompted with the login page. As you’ll recall, the database migration script inserted a user named “craig” with a password of “password”. Use those to log into the application.  
+如果一切顺利，我们部署的应用程序应该可以处理请求了。假设子域名是sbia-readinglist，你可以用浏览器访问[http://sbia-readinglist.cfapps.io](http://sbia-readinglist.cfapps.io)，看看是什么效果。你应该会被引导到登录页，回想一下，数据库迁移脚本中插入了一个名为“craig”的用户，密码是“password”，可以用它来登录应用程序。
+Go ahead and play around with the application and add a few books to the reading list. Everything should work. But something still isn’t quite right. If you were to restart the application (using the cf restart command) and then log back into the application, you’d see that your reading list is empty. Any book you’ve added before restarting the application will be gone.  
+可以在应用程序里随便点点，加几本书，所有的东西都能跑得起来。但始终还是有点问题，如果重启应用程序（通过`cf restart`命令），再重新登录应用程序，你会发现阅读列表被清空了，你在重启前添加书都不见了。
 
-The reason the data doesn’t survive an application restart is because we’re still using the embedded H2 database. You can verify this by requesting the Actuator’s /health endpoint, which will reply with something like this:
+The reason the data doesn’t survive an application restart is because we’re still using the embedded H2 database. You can verify this by requesting the Actuator’s /health endpoint, which will reply with something like this:  
+应用程序重启后数据消失的原因在于我们还在使用内嵌的H2数据库，可以通过Actuator的`/health`端点来验证我们的推测，它会返回类似如下的信息：
 
 ```
 {  "status": "UP",  "diskSpace": {    "status": "UP",    "free": 834236510208,    "threshold": 10485760  }, "db": {    "status": "UP",    "database": "H2",    "hello": 1  } 
 }
 ```
 
-Notice the value of the db.database property. It confirms any suspicion we might have had that the database is an embedded H2 database. We need to fix that.As it turns out, Cloud Foundry offers a few database options to choose from in the form of marketplace services, including MySQL and PostgreSQL. Because we already have the PostgreSQL JDBC driver in our project, we’ll use the PostgreSQL service from the marketplace, which is named “elephantsql”.The elephantsql service comes with a handful of different plans to choose from, ranging from small development-sized databases to large industrial-strength produc- tion databases. You can get a list of all of the elephantsql plans with the cf market- place command like this:
+Notice the value of the db.database property. It confirms any suspicion we might have had that the database is an embedded H2 database. We need to fix that.  
+请注意`db.database`属性的值，它证实了我们之前的怀疑，果然用的是内嵌的H2数据库。我们需要修复这个问题。As it turns out, Cloud Foundry offers a few database options to choose from in the form of marketplace services, including MySQL and PostgreSQL. Because we already have the PostgreSQL JDBC driver in our project, we’ll use the PostgreSQL service from the marketplace, which is named “elephantsql”.  
+实际上，Cloud Foundry通过市集服务（marketplace services）的形式提供了一些数据库以供选择，包括MySQL和PostgreSQL。因为我们已经在项目里放了PostgreSQL的JDBC驱动，所以就用市集里的PostgreSQL服务吧，名字是“elephantsql”。The elephantsql service comes with a handful of different plans to choose from, ranging from small development-sized databases to large industrial-strength produc- tion databases. You can get a list of all of the elephantsql plans with the cf marketplace command like this:  
+elephantsql服务也有不少计划可供选择，小到开发用的小型数据库，大到工业级生产数据库。可以通过`cf marketplace`命令获得elephantsql的完整计划列表：
 
 ```
 $ cf marketplace -s elephantsqlGetting service plan information for service elephantsql as craig@habuma.com... OK
@@ -654,15 +668,19 @@ $ cf marketplace -s elephantsqlGetting service plan information for service ele
 service plan		description			free or paidturtle				Tiny Turtle			freepanda				Pretty Panda			paidhippo				Happy Hippo			paidelephant			Enormous Elephant	paid
 ```
 
-As you can see, the more serious production-sized database plans require payment. You’re welcome to choose one of those plans if you want, but for now I’ll assume that you’re choosing the free “turtle” plan.
-To create an instance of the database service, you can use the cf create-service command, specifying the service name, the plan name, and an instance name:
+As you can see, the more serious production-sized database plans require payment. You’re welcome to choose one of those plans if you want, but for now I’ll assume that you’re choosing the free “turtle” plan.  
+如你所见，比较严谨的生产级数据库计划都是要付费的。你可以选择你所期望的计划，但我先假设你会选择免费的“turtle”。
+To create an instance of the database service, you can use the cf create-service command, specifying the service name, the plan name, and an instance name:  
+要创建一个数据库服务的实例，需要使用`cf create-service`命令，指定服务名、计划名和实例名：
 
 ```
 $ cf create-service elephantsql turtle readinglistdbCreating service readinglistdb in org habuma /      space development as craig@habuma.com...OK
 ```
 
-Once the service has been created, we’ll need to bind it to our application with the cf bind-service command:```$ cf bind-service sbia-readinglist readinglistdb```
-Binding a service to an application merely provides the application with details on how to connect to the service within an environment variable named VCAP_SERVICES. It doesn’t change the application to actually use that service.We could rewrite the reading-list application to read VCAP_SERVICES and use the information it provides to access the database service, but that’s completely unnecessary. Instead, all we need to do is restage the application with thecfrestagecommand:```$ cf restage sbia-readinglist
+Once the service has been created, we’ll need to bind it to our application with the cf bind-service command:  
+服务创建后，需要通过`cf bind-service`命令将它绑定到我们的应用程序上：```$ cf bind-service sbia-readinglist readinglistdb```
+Binding a service to an application merely provides the application with details on how to connect to the service within an environment variable named VCAP_SERVICES. It doesn’t change the application to actually use that service.  
+将一个服务绑定到应用程序上不过是为应用程序提供连接服务的细节We could rewrite the reading-list application to read VCAP_SERVICES and use the information it provides to access the database service, but that’s completely unnecessary. Instead, all we need to do is restage the application with thecfrestagecommand:```$ cf restage sbia-readinglist
 ```
 The cf restage command forces Cloud Foundry to redeploy the application and reevaluate the VCAP_SERVICES value. As it does, it will see that our application declares a DataSource bean in the Spring application context and replaces it with a DataSource that references the bound database service. As a consequence, our application will now be using the PostgreSQL service known as elephantsql rather than the embedded H2 database.
 Go ahead and try it out now. Log into the application, add a few books to the reading list, and then restart the application. Your books should still be in your reading list after the restart. That’s because they were persisted to the bound database service rather than to an embedded H2 database. Once again, the Actuator’s /health endpoint will back up that claim:
