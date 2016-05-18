@@ -701,56 +701,71 @@ Cloud Foundry对Spring Boot应用程序而言是个极佳的PaaS，Cloud Foundry
 ### 8.3.2 Deploying to Heroku
 ### 8.3.2 部署到Heroku
 
-Heroku takes a unique approach to application deployment. Rather than deploy a completely built deployment artifact, Heroku arranges a Git repository for your appli- cation and builds and deploys the application for you every time you push it to the repository.
-If you’ve not already done so, you’ll want to initialize the project directory as a Git repository:
+Heroku takes a unique approach to application deployment. Rather than deploy a completely built deployment artifact, Heroku arranges a Git repository for your application and builds and deploys the application for you every time you push it to the repository.  
+Heroku在应用程序部署时有一套独特的方法，它不用部署完整的部署产物，Heroku为你的应用程序安排了一个Git仓库，每当你向仓库里提交代码时它会自动为你构建并部署应用程序。
+If you’ve not already done so, you’ll want to initialize the project directory as a Git repository:  
+如果你还没有搞定，需要先将项目目录初始化为Git仓库：
 
 ```
 $ git init
 ```
 
-This will enable the Heroku command-line tool to add the remote Heroku Git reposi- tory to the project automatically.
-Now it’s time to set up the application in Heroku using the Heroku command-line tool’s apps:create command:
+This will enable the Heroku command-line tool to add the remote Heroku Git repository to the project automatically.  
+这样Heroku的命令行工具就能自动把远程Heroku Git仓库添加到项目里。
+Now it’s time to set up the application in Heroku using the Heroku command-line tool’s apps:create command:  
+现在可以通过Heroku的命令行工具在Heroku中设置应用程序了，使用`apps:create`命令：
 
 ```
 $ heroku apps:create sbia-readinglist
 ```
 
-Here I’ve asked Heroku to name the application “sbia-readinglist”. This name will be used as the name of the Git repository as well as the subdomain of the application at herokuapps.com. You’ll want to be sure to pick a unique name, as there can’t be more than one application with the same name. Alternatively, you can leave off the name and Heroku will generate a unique name for you (such as “fierce-river-8120” or “serene-anchorage-6223”).
-The apps:create command creates a remote Git repository at https://git.heroku .com/sbia-readinglist.git and adds a remote reference to the repository named “her- oku” in the local project’s Git configuration. That will enable us to push our project into Heroku using the git command.The project has been set up in Heroku, but we’re not quite ready to push it yet. Heroku asks that you provide a file named Procfile that tells Heroku how to run the application after it has been built. For our reading-list application, we need to tell Heroku to run the WAR file produced by the build as an executable JAR file using the java command.1 Assuming that the application will be built with Gradle, the following one-line Procfile is what we’ll need:
+Here I’ve asked Heroku to name the application “sbia-readinglist”. This name will be used as the name of the Git repository as well as the subdomain of the application at herokuapps.com. You’ll want to be sure to pick a unique name, as there can’t be more than one application with the same name. Alternatively, you can leave off the name and Heroku will generate a unique name for you (such as “fierce-river-8120” or “serene-anchorage-6223”).  
+这里我要求Heroku将应用程序命名为“sbia-readinglist”，这个名字将成为Git仓库的名字，同时也是应用程序在herokuapps.com的子域名。你需要确定这个名字的唯一性，因为不能有同名应用程序。此外，你也可以让Heroku来替你生成一个唯一的名字（比如“fierce-river-8120”或“serene-anchorage-6223”）。
+The apps:create command creates a remote Git repository at https://git.heroku .com/sbia-readinglist.git and adds a remote reference to the repository named “heroku” in the local project’s Git configuration. That will enable us to push our project into Heroku using the git command.  `apps:create`命令会在[https://git.heroku.com/sbia-readinglist.git](https://git.heroku.com/sbia-readinglist.git)创建一个远程Git仓库，并在本地项目的Git配置里添加一个名为“heroku”的远程仓库引用。有了它就能通过`git`命令将我们的项目推送到Heroku了。The project has been set up in Heroku, but we’re not quite ready to push it yet. Heroku asks that you provide a file named Procfile that tells Heroku how to run the application after it has been built. For our reading-list application, we need to tell Heroku to run the WAR file produced by the build as an executable JAR file using the java command.1 Assuming that the application will be built with Gradle, the following one-line Procfile is what we’ll need:  
+Heroku里的项目已经设置完毕了，但我们现在还不能进行推送。Heroku需要你提供一个名为`Procfile`的文件，它会告诉Heroku在应用程序构建后该如何运行它。对于我们的阅读列表应用程序而言，我们需要告诉Heroku把构建生成的WAR文件当作可执行JAR文件来运行，使用java命令。<sup>[1][]</sup>假设应用程序是用Gradle来构建的，只需要如下一行内容的`Procfile`即可：
 
 ```
 web: java -Dserver.port=$PORT -jar build/libs/readinglist.war```
 
-On the other hand, if you’re using Maven to build the project, then the path to the JAR file will be slightly different. Instead of referencing the executable WAR file in build/libs, Heroku will need to find it in the target directory, as shown in the follow- ing Procfile:
+[1]: # "The project we’re working with actually produces an executable WAR file, but as far as Heroku knows, it’s no different than an executable JAR file.当前使用的项目实际会生成一个可执行的WAR文件，但对Heroku来说，它和可执行的JAR文件没什么区别。"
+
+On the other hand, if you’re using Maven to build the project, then the path to the JAR file will be slightly different. Instead of referencing the executable WAR file in build/libs, Heroku will need to find it in the target directory, as shown in the following Procfile:  
+另一方面，如果你使用Maven来构建项目，JAR文件的路径就会有所不同了。不再是从build/libs目录里查找可执行WAR文件了，需要到target目录里去找，具体如下：
 
 ```
 web: java -Dserver.port=$PORT -jar target/readinglist.war```
 
-[1]: # "The project we’re working with actually produces an executable WAR file, but as far as Heroku knows, it’s no different than an executable JAR file."In either case, you’ll also need to set the server.port property as shown so that the embedded Tomcat server starts up on the port that Heroku assigns to the application (provided by the `$PORT` variable).
-We’re almost ready to push the application to Heroku, but there’s a small change required in the Gradle build specification. When Heroku tries to build our application, it will do so by executing a task named stage. Therefore, we’ll need to add a stage task to build.gradle:
+In either case, you’ll also need to set the server.port property as shown so that the embedded Tomcat server starts up on the port that Heroku assigns to the application (provided by the `$PORT` variable).  
+不管何种情况，你都需要像例子中那样设置`server.port`属性，这样内嵌的Tomcat服务器才能启动在Heroku分配的端口上（通过`$PORT`变量指定的）。
+We’re almost ready to push the application to Heroku, but there’s a small change required in the Gradle build specification. When Heroku tries to build our application, it will do so by executing a task named stage. Therefore, we’ll need to add a stage task to build.gradle:  
+我们差不多可以把应用程序推上Heroku了，但在Gradle构建说明里还要稍作调整。在Heroku构建应用程序时，它会执行一个名为`stage`的任务，因此需要在build.gradle里添加这个`stage`任务：
 
 ```
 task stage(dependsOn: ['build']) {}
 ```
 
-As you can see, this stage task doesn’t do much. But it does depend on the build task. Therefore, the build task will be triggered when Heroku tries to build the application with the stage task, and the resulting JAR will be ready to run in the build/libs directory.
-You may also need to inform Heroku of the Java version we’re building the applica- tion with so that it runs the application with the appropriate version of Java. The easi- est way to do that is to create a file named system.properties at the root of the project that sets a java.runtime.version property:
+As you can see, this stage task doesn’t do much. But it does depend on the build task. Therefore, the build task will be triggered when Heroku tries to build the application with the stage task, and the resulting JAR will be ready to run in the build/libs directory.  
+如你所见，这个`stage`任务什么也没做，但依赖了`build`任务。所以在Heroku使用`stage`任务构建应用程序时会触发`build`任务，生成的JAR文件会放在build/libs目录里。
+You may also need to inform Heroku of the Java version we’re building the application with so that it runs the application with the appropriate version of Java. The easiest way to do that is to create a file named system.properties at the root of the project that sets a java.runtime.version property:  
+你还需要告诉Heroku用什么Java版本来构建并运行应用程序，这样Heroku才能用合适的版本来运行它。最简单的方法是在项目根目录里创一个名为system.properties的文件，在其中设置`java.runtime.version`属性：
 
 ```
 java.runtime.version=1.7
 ```
 
-Now we’re ready to push the project into Heroku. As I said before, this is just a matter of pushing the code into the remote Git repository that Heroku set up for us:
+Now we’re ready to push the project into Heroku. As I said before, this is just a matter of pushing the code into the remote Git repository that Heroku set up for us:  
+现在就可以将项目推上Heroku了，就和我前面说的那样，只需将代码推到远程Git仓库，Heroku会帮我们搞定其他事情：
 
 ```
 $ git commit -am "Initial commit"$ git push heroku master
 ```
 
-After the code is pushed into Heroku, Heroku will build it using either Maven or Gradle (depending on which kind of build file it finds) and then run it using the instructions in Procfile. Once it’s ready, you should be able to try it out by point- ing your browser at http://{app name}.herokuapp.com, where “{app name}” is the name given to the application when you used apps:create. For example, I named the application “sbia-readinglist” when I deployed it, so the application’s URL is http://sbia-readinglist.herokuapps.com.Feel free to poke about in the application as much as you’d like. But then go take a look at the /health endpoint. The db.database property should tell you that the application is using the embedded H2 database. We should change that to use a Post- greSQL service instead.We can create and bind to a PostgreSQL service using the Heroku command-line tool’s addons:add command like this:```
+After the code is pushed into Heroku, Heroku will build it using either Maven or Gradle (depending on which kind of build file it finds) and then run it using the instructions in Procfile. Once it’s ready, you should be able to try it out by pointing your browser at http://{app name}.herokuapp.com, where “{app name}” is the name given to the application when you used apps:create. For example, I named the application “sbia-readinglist” when I deployed it, so the application’s URL is http://sbia-readinglist.herokuapps.com.  然后，Heroku会使用Maven或Gradle来进行构建（取决于它找到何种构建说明文件），再用`Procfile`里的指令来运行应用程序。就绪后，你就可以用浏览器打开[http://{app name}.herokuapp.com](http://{app name}.herokuapp.com)，这里的“{apop name}”就是你在`apps:create`里给应用程序起的名字。例如，我在部署时为应用程序起名“sbia-readinglist”，所以它的URL就是[http://sbia-readinglist.herokuapps.com](http://sbia-readinglist.herokuapps.com)。Feel free to poke about in the application as much as you’d like. But then go take a look at the /health endpoint. The db.database property should tell you that the application is using the embedded H2 database. We should change that to use a PostgreSQL service instead.  你可以在应用程序里随便点点，但在访问`/health`端点时，`db.database`属性会告诉你应用程序正在使用内嵌的H2数据库，我们应该把它换成PostgreSQL服务。We can create and bind to a PostgreSQL service using the Heroku command-line tool’s addons:add command like this:  我们可以通过Heroku命令行工具的`addons:add`命令来创建并绑定一个PostgreSQL服务：```
 $ heroku addons:add heroku-postgresql:hobby-dev
 ```
 
-Here we’re asking for the addon service named heroku-postgresql, which is the PostgreSQL service offered by Heroku. We’re also asking for the hobby-dev plan for that service, which is the free plan.
+Here we’re asking for the addon service named heroku-postgresql, which is the PostgreSQL service offered by Heroku. We’re also asking for the hobby-dev plan for that service, which is the free plan.  
+这里我们要使用名为`heroku-postgresql`的附加服务，这是Heroku提供的PostgreSQL服务。我们还要求使用该服务的`hobby-dev`计划，这是个免费计划。
 
 Now the PostgreSQL service is created and bound to our application, and Heroku will automatically restart the application to ensure that binding. But even so, if we were to go look at the /health endpoint, we’d see that the application is still using the embedded H2 database. That’s because the auto-configuration for H2 is still in play, and there’s nothing to tell Spring Boot to use PostgreSQL instead.
 One option is to set the spring.datasource.* properties like we did when deploy- ing to an application server. The information we’d need can be found on the database service’s dashboard, which can be opened with the addons:open command:
