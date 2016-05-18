@@ -653,7 +653,7 @@ The reason the data doesn’t survive an application restart is because we’re 
 应用程序重启后数据消失的原因在于我们还在使用内嵌的H2数据库，可以通过Actuator的`/health`端点来验证我们的推测，它会返回类似如下的信息：
 
 ```
-{  "status": "UP",  "diskSpace": {    "status": "UP",    "free": 834236510208,    "threshold": 10485760  }, "db": {    "status": "UP",    "database": "H2",    "hello": 1  } 
+{  "status": "UP",  "diskSpace": {    "status": "UP",    "free": 834236510208,    "threshold": 10485760  }, "db": {    "status": "UP",    "database": "H2",    "hello": 1  }
 }
 ```
 
@@ -680,19 +680,26 @@ $ cf create-service elephantsql turtle readinglistdbCreating service readinglis
 Once the service has been created, we’ll need to bind it to our application with the cf bind-service command:  
 服务创建后，需要通过`cf bind-service`命令将它绑定到我们的应用程序上：```$ cf bind-service sbia-readinglist readinglistdb```
 Binding a service to an application merely provides the application with details on how to connect to the service within an environment variable named VCAP_SERVICES. It doesn’t change the application to actually use that service.  
-将一个服务绑定到应用程序上不过是为应用程序提供连接服务的细节We could rewrite the reading-list application to read VCAP_SERVICES and use the information it provides to access the database service, but that’s completely unnecessary. Instead, all we need to do is restage the application with thecfrestagecommand:```$ cf restage sbia-readinglist
+将一个服务绑定到应用程序上不过就是为应用程序提供了连接服务的细节，用的就是名为`VCAP_SERVICES`的环境变量。它不会修改应用程序来使用服务。
+We could rewrite the reading-list application to read VCAP_SERVICES and use the information it provides to access the database service, but that’s completely unnecessary. Instead, all we need to do is restage the application with the cf restage command:  
+我们可以改写阅读列表应用程序读取`VCAP_SERVICES`，使用其中提供的信息来连接数据库服务，但其实完全不用这么做。实际上，我们只需用`cf restage`命令重启应用程序就可以了：
+```$ cf restage sbia-readinglist
 ```
-The cf restage command forces Cloud Foundry to redeploy the application and reevaluate the VCAP_SERVICES value. As it does, it will see that our application declares a DataSource bean in the Spring application context and replaces it with a DataSource that references the bound database service. As a consequence, our application will now be using the PostgreSQL service known as elephantsql rather than the embedded H2 database.
-Go ahead and try it out now. Log into the application, add a few books to the reading list, and then restart the application. Your books should still be in your reading list after the restart. That’s because they were persisted to the bound database service rather than to an embedded H2 database. Once again, the Actuator’s /health endpoint will back up that claim:
+The cf restage command forces Cloud Foundry to redeploy the application and reevaluate the VCAP_SERVICES value. As it does, it will see that our application declares a DataSource bean in the Spring application context and replaces it with a DataSource that references the bound database service. As a consequence, our application will now be using the PostgreSQL service known as elephantsql rather than the embedded H2 database.  
+`cf restage`命令会让Cloud Foundry重新部署应用程序，并重新计算`VCAP_SERVICES`的值。如此一来，我们的应用程序会在Spring应用程序上下文里声明一个引用了绑定数据库服务的`DataSource` Bean，用它来替换原来的`DataSource` Bean。这样我们就能抛开内嵌的H2数据库，使用elephantsql提供的PostgreSQL服务了。
+Go ahead and try it out now. Log into the application, add a few books to the reading list, and then restart the application. Your books should still be in your reading list after the restart. That’s because they were persisted to the bound database service rather than to an embedded H2 database. Once again, the Actuator’s /health endpoint will back up that claim:  
+现在来试一下，登录应用程序，添加几本书，然后重启。重启之后你所添加的书应该还在列表里，因为它们已经被持久化在绑定的数据库服务里了，而非内嵌的H2数据库。再访问一下Actuator的`/health`端点，返回的内容能证明我们在用PostgreSQL：
 
 ```
 {  "status": "UP",  "diskSpace": {    "status": "UP",    "free": 834331525120,    "threshold": 10485760  }, "db": {    "status": "UP",    "database": "PostgreSQL",    "hello": 1  }
 }
 ```
 
-Cloud Foundry is a great PaaS for Spring Boot application deployment. Its associa- tion with the Spring projects affords some synergy between the two. But it’s not the only PaaS where Spring Boot applications can be deployed. Let’s see what needs to be done to deploy the reading-list application to Heroku, another popular PaaS platform.
+Cloud Foundry is a great PaaS for Spring Boot application deployment. Its association with the Spring projects affords some synergy between the two. But it’s not the only PaaS where Spring Boot applications can be deployed. Let’s see what needs to be done to deploy the reading-list application to Heroku, another popular PaaS platform.  
+Cloud Foundry对Spring Boot应用程序而言是个极佳的PaaS，Cloud Foundry与Spring项目搭配可谓如虎添翼。但Cloud Foundry并非Spring Boot应用程序在PaaS方面的唯一选择，让我们来看看想要将阅读列表应用程序部署到Heroku上需要做点什么，这是另一个流行的PaaS平台。
 
 ### 8.3.2 Deploying to Heroku
+### 8.3.2 部署到Heroku
 
 Heroku takes a unique approach to application deployment. Rather than deploy a completely built deployment artifact, Heroku arranges a Git repository for your appli- cation and builds and deploys the application for you every time you push it to the repository.
 If you’ve not already done so, you’ll want to initialize the project directory as a Git repository:
