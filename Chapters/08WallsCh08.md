@@ -767,42 +767,59 @@ $ heroku addons:add heroku-postgresql:hobby-dev
 Here we’re asking for the addon service named heroku-postgresql, which is the PostgreSQL service offered by Heroku. We’re also asking for the hobby-dev plan for that service, which is the free plan.  
 这里我们要使用名为`heroku-postgresql`的附加服务，这是Heroku提供的PostgreSQL服务。我们还要求使用该服务的`hobby-dev`计划，这是个免费计划。
 
-Now the PostgreSQL service is created and bound to our application, and Heroku will automatically restart the application to ensure that binding. But even so, if we were to go look at the /health endpoint, we’d see that the application is still using the embedded H2 database. That’s because the auto-configuration for H2 is still in play, and there’s nothing to tell Spring Boot to use PostgreSQL instead.
-One option is to set the spring.datasource.* properties like we did when deploy- ing to an application server. The information we’d need can be found on the database service’s dashboard, which can be opened with the addons:open command:
+Now the PostgreSQL service is created and bound to our application, and Heroku will automatically restart the application to ensure that binding. But even so, if we were to go look at the /health endpoint, we’d see that the application is still using the embedded H2 database. That’s because the auto-configuration for H2 is still in play, and there’s nothing to tell Spring Boot to use PostgreSQL instead.  
+在PostgreSQL服务创建并绑定到应用程序后，Heroku会自动重启应用程序以保证绑定生效。但即便如此，我们在访问`/health`端点时仍然会看到应用程序还在使用内嵌的H2数据库。那是因为H2的自动配置仍然生效，谁也没告诉Spring Boot要用PostgreSQL代替H2。
+One option is to set the spring.datasource.* properties like we did when deploying to an application server. The information we’d need can be found on the database service’s dashboard, which can be opened with the addons:open command:  
+一个办法是像我们将应用程序部署到应用服务器上那样，设置`spring.datasource.*`属性，我们所需要的信息能在数据库服务的仪表板上找到，可以用`addons:open`命令打开仪表板：
 
 ```
 $ heroku addons:open waking-carefully-3728
 ```
 
-In this case, the name of the database instance is “waking-carefully-3728”. This com- mand will open a dashboard page in your web browser that includes all of the neces- sary connection information, including the hostname, database name, and credentials—everything we’d need to set the spring.datasource.* properties.
-But there’s an easier way. Rather than look up that information for ourselves and set those properties, why can’t Spring look them up for us? In fact, that’s what the Spring Cloud Connectors project does. It works with both Cloud Foundry and Her- oku to look up any services bound to an application and automatically configure the application to use those services.We just need to add Spring Cloud Connectors as a dependency in the build. For a Gradle build, add the following to build.gradle:
+In this case, the name of the database instance is “waking-carefully-3728”. This command will open a dashboard page in your web browser that includes all of the necessary connection information, including the hostname, database name, and credentials—everything we’d need to set the spring.datasource.* properties.  
+在这个例子里，数据库实例的名字是“waking-carefully-3728”。该命令会在Web浏览器里打开仪表板页面，其中包含了你所需要的全部连接信息，包括主机名、数据库名和账户信息，总之设置`spring.datasource.*`属性所需的一切信息都在这里了。
+But there’s an easier way. Rather than look up that information for ourselves and set those properties, why can’t Spring look them up for us? In fact, that’s what the Spring Cloud Connectors project does. It works with both Cloud Foundry and Heroku to look up any services bound to an application and automatically configure the application to use those services.  
+还有一个更简单的办法，与其自己查找那些信息，再设置到属性里，为什么不让Spring替我们查找信息呢？实际上，Spring Cloud Connectors项目就是用来干这个的，它可以用在Cloud Foundry和Heroku上，查找绑定到应用程序上的所有服务，并自动配置应用程序来使用那些服务。We just need to add Spring Cloud Connectors as a dependency in the build. For a Gradle build, add the following to build.gradle:  
+我们只需在项目中加入Spring Cloud Connectors依赖即可。在Gradle项目里，在build.gradle中添加如下内容：
 
 ```
 compile( "org.springframework.boot:spring-boot-starter-cloud-connectors")```
 
-If you’re using Maven, the following <dependency> will add Spring Cloud Connectors to the build:
+If you’re using Maven, the following <dependency> will add Spring Cloud Connectors to the build:  
+如果你在用Maven，则添加如下Spring Cloud Connectors的`<dependency>`：
 
 ```<dependency>  <groupId>org.springframework.boot</groupId>  <artifactId>spring-boot-starter-cloud-connectors</artifactId></dependency>
 ```
 
-Spring Cloud Connectors will only work if the “cloud” profile is active. To activate the “cloud” profile in Heroku, use the config:set command:
+Spring Cloud Connectors will only work if the “cloud” profile is active. To activate the “cloud” profile in Heroku, use the config:set command:  
+只有“cloud” Profile激活时，Spring Cloud Connectors才会工作。要在Heroku里激活“cloud” Profile，可以使用`config:set`命令：
 
 ```
 $ heroku config:set SPRING_PROFILES_ACTIVE="cloud"
 ```
 
-Now that the Spring Cloud Connectors dependency is in the build and the “cloud” profile is active, we’re ready to push the application again:
+Now that the Spring Cloud Connectors dependency is in the build and the “cloud” profile is active, we’re ready to push the application again:  
+现在项目里有了Spring Cloud Connectors依赖，也激活了“cloud” Profile，我们可以再推一次应用程序：
 
 ```
 $ git commit -am "Add cloud connector"$ git push heroku master
 ```
 
-After the application starts up, sign in to the application and view the /health end- point. It should indicate that the application is connected to a PostgreSQL database:
+After the application starts up, sign in to the application and view the /health endpoint. It should indicate that the application is connected to a PostgreSQL database:  
+应用程序启动后，登入应用程序，查看`/health`端点，它应该会显示应用程序已经连接到PostgreSQL数据库上了：
 
 ```
 "db": {  "status": "UP",  "database": "PostgreSQL",  "hello": 1}
 ```
 
-Now our application is deployed in the cloud, ready to take requests from the world!
+Now our application is deployed in the cloud, ready to take requests from the world!  
+现在我们的应用程序已经部署到云上了，可以接受世界各地的请求了！
 
-## 8.4 SummaryThere are several options for deploying Spring Boot applications, including traditional application servers and PaaS options in the cloud. In this chapter, we looked at a few of those options, deploying the reading-list application as a WAR file to Tomcat and in the cloud to both Cloud Foundry and Heroku.Spring Boot applications are often given a build specification that produces an executable JAR file. But we’ve seen how to tweak the build and write a SpringBootServletInitializer implementation to produce a WAR file suitable for deployment to an application server.We then took a first step toward deploying our application to Cloud Foundry. Cloud Foundry is flexible enough to accept Spring Boot applications in any form, including executable JAR files, traditional WAR files, or even raw Spring Boot CLI Groovy scripts. We also saw how Cloud Foundry is able to automatically swap out our embedded data source bean with one that references a database service bound to the application.Finally we saw how although Heroku doesn’t offer automatic swapping of data source beans like Cloud Foundry, by adding the Spring Cloud Connectors library to our deployment we can achieve the same effect, enabling a bound database service instead of an embedded database.Along the way, we also looked at how to enable database migration tools such as Flyway and Liquibase in Spring Boot. We used database migration to initialize our database on the first deployment and now are ready to evolve our database as needed on future deployments.
+## 8.4 Summary## 8.4 小结
+There are several options for deploying Spring Boot applications, including traditional application servers and PaaS options in the cloud. In this chapter, we looked at a few of those options, deploying the reading-list application as a WAR file to Tomcat and in the cloud to both Cloud Foundry and Heroku.  
+有多种部署Spring Boot应用程序的方式，包括传统的应用服务器和云上的PaaS平台。在本章中，我们了解了其中的一些部署方式，把阅读列表应用程序以WAR文件的方式部署到Tomcat上，还把它部署到了Cloud Foundry和Heroku上。Spring Boot applications are often given a build specification that produces an executable JAR file. But we’ve seen how to tweak the build and write a SpringBootServletInitializer implementation to produce a WAR file suitable for deployment to an application server.  
+Spring Boot应用程序的构建说明经常会配置为生成一个可执行的JAR文件。但我们也看到了如何对构建做微调，如何编写一个`SpringBootServletInitializer`实现生成WAR文件，以便将WAR文件部署到应用服务器上。We then took a first step toward deploying our application to Cloud Foundry. Cloud Foundry is flexible enough to accept Spring Boot applications in any form, including executable JAR files, traditional WAR files, or even raw Spring Boot CLI Groovy scripts. We also saw how Cloud Foundry is able to automatically swap out our embedded data source bean with one that references a database service bound to the application.  
+随后，我们进一步了解了如何将应用程序部署到Cloud Foundry上。Cloud Foundry非常灵活，能够接受各种形式的Spring Boot应用程序，包括可执行JAR文件、传统WAR文件，甚至是原始的Spring Boot CLI Groovy脚本。我们还了解了Cloud Foundry是如何自动将我们的内嵌式数据源替换为绑定到应用程序上的数据库服务的。Finally we saw how although Heroku doesn’t offer automatic swapping of data source beans like Cloud Foundry, by adding the Spring Cloud Connectors library to our deployment we can achieve the same effect, enabling a bound database service instead of an embedded database.  
+虽然Heroku不能像Cloud Foundry那样自动替换数据源的Bean，但在本章最后，我们还是看了下如何通过添加Spring Cloud Foundry库来实现一样的效果，使用绑定的数据库服务，而非内嵌式数据库。Along the way, we also looked at how to enable database migration tools such as Flyway and Liquibase in Spring Boot. We used database migration to initialize our database on the first deployment and now are ready to evolve our database as needed on future deployments.  
+在本章中，我们还了解了如何在Spring Boot里使用Flyway和Liquibase这样的数据库迁移工具。我们在初次部署应用程序时通过数据库迁移的方式完成了数据库的初始化，在后续的部署过程中，我们可以按需修改数据库。
+
