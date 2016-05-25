@@ -12,121 +12,179 @@ Although Spring Boot handles a lot of the grunt work when it comes to configurin
 执行基线时用来标记已有Schema的描述。* `flyway.baseline-on-migrate`  Whether to automatically call baseline when migrate is executed against a non-empty schema with no metadata table. (Default value: false)  在没有元数据表的情况下，针对非空Schema执行迁移时是否自动调用基线。（默认值：`false`）* `flyway.baseline-version`  Sets the version to tag an existing schema with when executing baseline. (Default value: 1)  
 执行基线时用来标记已有Schema的版本。（默认值：`1`）
 * `flyway.check-location`  
-Check that migration scripts location exists. (Default value: false)
+Check that migration scripts location exists. (Default value: false)  
+检查迁移脚本所在的位置是否存在。（默认值：`false`）
 * `flyway.clean-on-validation-error`  
-Whether to automatically call clean or not when a validation error occurs. (Default value: false)
+Whether to automatically call clean or not when a validation error occurs. (Default value: false)  
+在验证错误时，是否自动执行清理。（默认值：`false`）
 * `flyway.enabled`  
-Enable flyway. (Default value: true)
+Enable flyway. (Default value: true)  
+开启Flyway。（默认值：`true`）
 * `flyway.encoding`  
-Sets the SQL migration encoding. (Default value: UTF-8)
+Sets the SQL migration encoding. (Default value: UTF-8)  
+设置SQL迁移文件的编码。（默认值：`UTF-8`）
 * `flyway.ignore-failed-future-migration`  
-Whether to ignore failed future migrations when reading the metadata table. (Default value: false)
+Whether to ignore failed future migrations when reading the metadata table. (Default value: false)  
+在读元数据表时，是否忽略失败的后续迁移。（默认值：`false`）
 * `flyway.init-sqls`  
-SQL statements to execute to initialize a connection immediately after obtaining it.
+SQL statements to execute to initialize a connection immediately after obtaining it.  
+获取连接后立即执行做初始化的SQL语句。
 * `flyway.locations`  
-Locations of migrations scripts. (Default value: db/migration)
+Locations of migrations scripts. (Default value: db/migration)  
+迁移脚本的位置。（默认值：`db/migration`）
 * `flyway.out-of-order`  
-Whether or not “out of order” migrations are allowed. (Default value: false)
+Whether or not “out of order” migrations are allowed. (Default value: false)  
+是否允许“乱序”（out of order）迁移。（默认值：`false`）
 * `flyway.password`  
-Login password of the database to migrate.
+Login password of the database to migrate.  
+待迁移数据库的登录密码。
 * `flyway.placeholder-prefix`  
-Sets the prefix of every placeholder. (Default value: ${)
+Sets the prefix of every placeholder. (Default value: ${)  
+设置每个占位符的前缀。（默认值：`${`）
 * `flyway.placeholder-replacement`  
-Whether placeholders should be replaced. (Default value: true)
+Whether placeholders should be replaced. (Default value: true)  
+是否要替换占位符。（默认值：`true`）
 * `flyway.placeholder-suffix`  
-Sets the prefix of every placeholder. (Default value: ${)
+Sets the prefix of every placeholder. (Default value: ${)  
+设置占位符的后缀。（默认值：`}`）
 * `flyway.placeholders.[placeholder name]`  
-Sets a placeholder value.
+Sets a placeholder value.  
+设置占位符的值。
 * `flyway.schemas`  
-A case-sensitive list of schemes managed by Flyway. Defaults to the default schema of the connection.
+A case-sensitive list of schemes managed by Flyway. Defaults to the default schema of the connection.  
+Flyway管理的Schema列表，大小写敏感。默认是连接对应的默认Schema。
 * `flyway.sql-migration-prefix`  
-The filename prefix for SQL migrations. (Default value: V)
+The filename prefix for SQL migrations. (Default value: V)  
+SQL迁移的文件名前缀。（默认值：`V`）
 * `flyway.sql-migration-separator`  
-The filename separator for SQL migrations. (Default value: \__)
+The filename separator for SQL migrations. (Default value: \__)  
+SQL迁移的文件名分隔符。（默认值：`__`）
 * `flyway.sql-migration-suffix`  
-The filename suffix for SQL migrations. (Default value: .sql)
+The filename suffix for SQL migrations. (Default value: .sql)  
+SQL迁移的文件名后缀。（默认值：`.sql`）
 * `flyway.table`  
-The name of the schema metadata table to be used by Flyway. (Default value: schema_version)
+The name of the schema metadata table to be used by Flyway. (Default value: schema_version)  
+Flyway使用的Schema元数据表名称。（默认值：`schema_version`）
 * `flyway.target`  
-The target version up to which Flyway should consider migrations. (Defaults to the latest version)
+The target version up to which Flyway should consider migrations. (Defaults to the latest version)  
+Flyway要迁移到的目标版本号。（默认是最新版本）
 * `flyway.url`  
-JDBC URL of the database to migrate. If not set, the primary configured data source is used.
+JDBC URL of the database to migrate. If not set, the primary configured data source is used.  
+待迁移的数据库的JDBC URL。如果没有设置，就使用配置的主数据源。
 * `flyway.user`  
-Login user of the database to migrate.
+Login user of the database to migrate.  
+待迁移数据库的登录用户。
 * `flyway.validate-on-migrate`  
-Whether to automatically validate when running migrate. (Default value: true)
+Whether to automatically validate when running migrate. (Default value: true)  
+在运行迁移时是否要自动验证。（默认值：`true`）
 * `liquibase.change-log`  
-Change log configuration path. (Default value: classpath:/db/changelog/db.changelog-master.yaml)
+Change log configuration path. (Default value: classpath:/db/changelog/db.changelog-master.yaml)  
+变更日志配置路径。（默认值：`classpath:/db/changelog/db.changelog-master.yaml`）
 * `liquibase.check-change-log-location`  
-Check that the change log location exists. (Default value: true)
+Check that the change log location exists. (Default value: true)  
+检查变更日志位置是否存在。（默认值：`true`）
 * `liquibase.contexts`  
-Comma-separated list of runtime contexts to use.
+Comma-separated list of runtime contexts to use.  
+要使用的运行时上下文列表，用逗号分隔。
 * `liquibase.default-schema`  
-Default database schema.
+Default database schema.  
+默认的数据库Schema。
 * `liquibase.drop-first`  
-Drop the database schema first. (Default value: false)
+Drop the database schema first. (Default value: false)  
+先删除数据库Schema。（默认值：`false`）
 * `liquibase.enabled`  
-Enable Liquibase support. (Default value: true)
+Enable Liquibase support. (Default value: true)  
+开启Liquibase支持。（默认值：`true`）
 * `liquibase.password`  
-Login password of the database to migrate.
+Login password of the database to migrate.  
+待迁移数据库的登录密码。
 * `liquibase.url`  
-JDBC URL of the database to migrate. If not set, the primary configured data source is used.
+JDBC URL of the database to migrate. If not set, the primary configured data source is used.  
+待迁移数据库的JDBC URL。如果没有设置，就使用配置的主数据源。
 * `liquibase.user`  
 Login user of the database to migrate.
+待迁移数据库的登录用户。
 * `multipart.enabled`  
-Enable support of multi-part uploads. (Default value: true)
+Enable support of multi-part uploads. (Default value: true)  
+开启分段（multi-part）上传支持。（默认值：`true`）
 * `multipart.file-size-threshold`  
-Threshold after which files will be written to disk. Values can use the suffixes “MB” or “KB” to indicate a megabyte or kilobyte size. (Default value: 0)
+Threshold after which files will be written to disk. Values can use the suffixes “MB” or “KB” to indicate a megabyte or kilobyte size. (Default value: 0)  
+大于该阈值的文件会被写到磁盘上。这里的值可以使用“MB”或“KB”的后缀来表明是兆字节还是千字节。（默认值：`0`）
 * `multipart.location`  
-Intermediate location of uploaded files.
+Intermediate location of uploaded files.  
+上传文件的中间存放位置。
 * `multipart.max-file-size`  
-Max file size. Values can use the suffixes “MB” or “KB” to indicate a megabyte or kilobyte size. (Default value: 1MB)
+Max file size. Values can use the suffixes “MB” or “KB” to indicate a megabyte or kilobyte size. (Default value: 1MB)  
+最大文件大小。这里的值可以使用“MB”或“KB”的后缀来表明是兆字节还是千字节。（默认值：`1MB`）
 * `multipart.max-request-size`  
-Max request size. Values can use the suffixes “MB” or “KB” to indicate a megabyte or kilobyte size. (Default value: 10MB)
+Max request size. Values can use the suffixes “MB” or “KB” to indicate a megabyte or kilobyte size. (Default value: 10MB)  
+最大请求大小。这里的值可以使用“MB”或“KB”的后缀来表明是兆字节还是千字节。（默认值：`10MB`）
 * `security.basic.authorize-mode`  
 Security authorize mode to apply.
+要运用的安全授权模式。
 * `security.basic.enabled`  
-Enable basic authentication. (Default value: true)
+Enable basic authentication. (Default value: true)  
+开启基本身份验证。（默认值：`true`）
 * `security.basic.path`  
-Comma-separated list of paths to secure. (Default value: [/\**])
+Comma-separated list of paths to secure. (Default value: [/\**])  
+要保护的路径，用逗号分隔。（默认值：`[/**]`）
 * `security.basic.realm`  
-HTTP basic realm name. (Default value: Spring)
+HTTP basic realm name. (Default value: Spring)  
+HTTP基本领域（realm）用户名。（默认值：`Spring`）
 * `security.enable-csrf`  
-Enable cross-site request forgery support. (Default value: false)
+Enable cross-site request forgery support. (Default value: false)  
+开启跨站请求伪造（cross-site request forgery）支持。（默认值：`false`）
 * `security.filter-order`  
-Security filter chain order. (Default value: 0)
+Security filter chain order. (Default value: 0)  
+安全过滤器链顺序。（默认值：`0`）
 * `security.headers.cache`  
-Enable cache control HTTP headers. (Default value: false)
+Enable cache control HTTP headers. (Default value: false)  
+开启缓存控制HTTP头。（默认值：`false`）
 * `security.headers.content-type`  
-Enable X-Content-Type-Options header. (Default value: false)
+Enable X-Content-Type-Options header. (Default value: false)  
+开启`X-Content-Type-Options`头。（默认值：`false`）
 * `security.headers.frame`  
-Enable X-Frame-Options header. (Default value: false)
+Enable X-Frame-Options header. (Default value: false)  
+开启`X-Frame-Options`头。（默认值：`false`）
 * `security.headers.hsts`  
-HTTP Strict Transport Security (HSTS) mode (none, domain, all).
+HTTP Strict Transport Security (HSTS) mode (none, domain, all).  
+HTTP Strict Transport Security（HSTS）模式（`none`、`domain`和`all`）。
 * `security.headers.xss`  
-Enable cross-site scripting (XSS) protection. (Default value: false)
+Enable cross-site scripting (XSS) protection. (Default value: false)  
+开启跨站脚本（cross-site scripting）保护。（默认值：`false`）
 * `security.ignored`  
-Comma-separated list of paths to exclude from the default secured paths.
+Comma-separated list of paths to exclude from the default secured paths.  
+要从默认保护路径中排除掉的路径列表，用逗号分隔。
 * `security.oauth2.client.access-token-uri`  
-The URI used to fetch an access token.
+The URI used to fetch an access token.  
+用于获取访问令牌的URI。
 * `security.oauth2.client.access-token-validity-seconds`  
-How long an access token is to be valid before expiring.
+How long an access token is to be valid before expiring.  
+在令牌过期前多长时间验证一次。
 * `security.oauth2.client.additional-information.[key]`  
-Set additional information that token granters would like to add to the token.
+Set additional information that token granters would like to add to the token.  
+设置额外的信息，令牌授予者会将其添加到令牌里。
 * `security.oauth2.client.authentication-scheme`  
-The method for transmitting the bearer token. One of form, header, none, or query. (Default value: header)
+The method for transmitting the bearer token. One of form, header, none, or query. (Default value: header)  
+传送持有人令牌（bearer token）的方法。`form`、`header`、`none`或`query`中的一种。（默认值：`header`）
 * `security.oauth2.client.authorities`  
-The authorities to be granted to an authenticated client.
+The authorities to be granted to an authenticated client.  
+要赋予经授权客户端的权限。
 * `security.oauth2.client.authorized-grant-types`  
-The grant types allowed to the client.
+The grant types allowed to the client.  
+客户端可用的授予类型。
 * `security.oauth2.client.auto-approve-scopes`  
-The scope to automatically approve for a client.
+The scope to automatically approve for a client.  
+客户端自动通过的范围。
 * `security.oauth2.client.client-authentication-scheme`  
-The method for transmitting authentication credentials when authenticating the client. One of form, header, none, or query. (Default value: header)
+The method for transmitting authentication credentials when authenticating the client. One of form, header, none, or query. (Default value: header)  
+在客户端身份认证时用于传输身份认证信息的方法。`form`、`header`、`none`或`query`中的一种。（默认值：`header`）
 * `security.oauth2.client.client-id`  
-OAuth2 client ID.
+OAuth2 client ID.  
+OAuth2客户端ID。
 * `security.oauth2.client.client-secret`  
-OAuth2 client secret. A random secret is generated by default.
+OAuth2 client secret. A random secret is generated by default.  
+OAuth2客户端密钥。默认是生成的随机密钥。
 * `security.oauth2.client.grant-type`  
 The grant type for obtaining an access token for this resource.
 * `security.oauth2.client.id`  
