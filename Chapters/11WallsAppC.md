@@ -612,186 +612,303 @@ The default size of a page in paged data. (Default value: 20)
 The name of the URL query string parameter that indicates how many results to return at once. (Default value: size)  
 用于标识一次返回多少记录的URL查询字符串参数名。（默认值：`size`）
 * `spring.data.rest.max-page-size`  
-The maximum size of pages. (Default value: 1000)
+The maximum size of pages. (Default value: 1000)  
+最大分页大小。（默认值：`1000`）
 * `spring.data.rest.page-param-name`  
-The name of the URL query string parameter that indicates what page to return. (Default value: page)
+The name of the URL query string parameter that indicates what page to return. (Default value: page)  
+URL查询字符串参数的名称，用来标识返回哪一页。（默认值：`page`）
 * `spring.data.rest.return-body-on-create`  
-Whether to return a response body after creating an entity. (Default value: false)
+Whether to return a response body after creating an entity. (Default value: false)  
+在创建实体后是否要返回一个响应体。（默认值：`false`）
 * `spring.data.rest.return-body-on-update`  
-Whether to return a response body after updating an entity. (Default value: false)
+Whether to return a response body after updating an entity. (Default value: false)  
+在更新实体后是否要返回一个响应体。（默认值：`false`）
 * `spring.data.rest.sort-param-name`  
-The name of the URL query string parameter that indicates what direction to sort results. (Default value: sort)
+The name of the URL query string parameter that indicates what direction to sort results. (Default value: sort)  
+URL查询字符串参数的名称，用来标识结果排序的方向。（默认值：`sort`）
 * `spring.data.solr.host`  
-Solr host. Ignored if zk-host is set. (Default value: http://127.0.0.1:8983/solr)
+Solr host. Ignored if zk-host is set. (Default value: http://127.0.0.1:8983/solr)  
+Solr的主机地址。如果设置了`zk-host`则忽略该属性。（默认值：`http://127.0.0.1:8983/solr`）
 * `spring.data.solr.repositories.enabled`  
-Enable Solr repositories. (Default value: true)
+Enable Solr repositories. (Default value: true)  
+开启Solr仓库。（默认值：`true`）
 * `spring.data.solr.zk-host`  
-ZooKeeper host address in the form HOST:PORT.
+ZooKeeper host address in the form HOST:PORT.  
+ZooKeeper主机地址，格式为HOST:PORT。
 * `spring.datasource.abandon-when-percentage-full`  
-The percentage threshold above which connections that have been abandoned (timed out) will be closed and reported.
+The percentage threshold above which connections that have been abandoned (timed out) will be closed and reported.  
+一个百分比形式的阈值，超过该阈值后会关闭并报告被弃用（超时）的连接。
 * `spring.datasource.allow-pool-suspension`  
-Whether or not pool suspension is allowed. There is a performance impact when pool suspension is enabled. Unless you need it (for a redundancy system, for example) do not enable it. This property only applies when using the Hikari data pool. (Default value: false)
+Whether or not pool suspension is allowed. There is a performance impact when pool suspension is enabled. Unless you need it (for a redundancy system, for example) do not enable it. This property only applies when using the Hikari data pool. (Default value: false)  
+是否允许池暂停（pool suspension）。在开启池暂停后会有一定性能影响，除非你真的需要这个功能（例如一个冗余的系统），否则不要开启它。该属性只在使用Hikari数据库连接池时有用。（默认值：`false`）
 * `spring.datasource.alternate-username-allowed`  
-Whether or not an alternate username is allowed.
+Whether or not an alternate username is allowed.  
+是否允许使用其他用户名。
 * `spring.datasource.auto-commit`  
-Whether or not updates are auto-committed.
+Whether or not updates are auto-committed.  
+更新操作是否是自动提交的。
 * `spring.datasource.catalog`  
-The default catalog name.
+The default catalog name.  
+默认的Catalog名称。
 * `spring.datasource.commit-on-return`  
-Whether or not the connection pool should commit any pending transaction when a connection is returned.
+Whether or not the connection pool should commit any pending transaction when a connection is returned.  
+在连接归还时，连接池是否要提交挂起的事务。
 * `spring.datasource.connection-init-sql`  
-A SQL string that will be executed on all new connections when they are created, before they are added to the connection pool.
+A SQL string that will be executed on all new connections when they are created, before they are added to the connection pool.  
+在所有新连接创建时都会执行的SQL语句，该语句会在连接被加入连接池前执行。
 * `spring.datasource.connection-init-sqls`  
-A list of SQL statements to be executed when a physical connection is first created. (For use with the DBCP connection pool.)
+A list of SQL statements to be executed when a physical connection is first created. (For use with the DBCP connection pool.)  
+在物理连接第一次创建时执行的SQL语句列表。（用于DBCP连接池。）
 * `spring.datasource.connection-properties.[key]`  
-Sets a property to be used when creating a connection. (For the DBCP connection pool.)
+Sets a property to be used when creating a connection. (For the DBCP connection pool.)  
+设置创建连接时使用的属性。（用于DBCP连接池。）
 * `spring.datasource.connection-test-query`  
-A SQL query to be executed to test the validity of connections.
+A SQL query to be executed to test the validity of connections.  
+用于测试连接有效性的SQL查询。
 * `spring.datasource.connection-timeout`  
-The connection timeout (in milliseconds).
+The connection timeout (in milliseconds).  
+连接超时（单位为毫秒）。
 * `spring.datasource.continue-on-error`  
-Do not stop if an error occurs while initializing the database. (Default value: false)
+Do not stop if an error occurs while initializing the database. (Default value: false)  
+初始化数据库时如果发生错误不要终止。（默认值：`false`）
 * `spring.datasource.data`  
-Data (DML) script resource reference.
+Data (DML) script resource reference.  
+指向数据（DML）脚本资源的引用。
 * `spring.datasource.data-source-class-name`  
-The fully qualified class name of the data source to use to get connections.
+The fully qualified class name of the data source to use to get connections.  
+用于获取连接的数据源的全限定类名。
 * `spring.datasource.data-source-jndi`  
-The JNDI location of the data source to use to get connections.
+The JNDI location of the data source to use to get connections.  
+用于获取连接的数据源的JNDI位置。
 * `spring.datasource.data-source-properties.[key]`  
-Sets a property to be used when creating the data source. (For the Hikari connection pool.)
+Sets a property to be used when creating the data source. (For the Hikari connection pool.)  
+设置创建数据源时使用的属性。（用于Hikari连接池。）
 * `spring.datasource.db-properties`  
-Sets a property to be used when creating the data source. (For the Tomcat connection pool.)
+Sets a property to be used when creating the data source. (For the Tomcat connection pool.)  
+设置创建数据源时使用的属性。（用于Tomcat连接池。）
 * `spring.datasource.default-auto-commit`  
-Whether or not to auto-commit on connections.
+Whether or not to auto-commit on connections.  
+连接上的操作是否自动提交。
 * `spring.datasource.default-catalog`  
-The default catalog for connections.
+The default catalog for connections.  
+连接的默认Catalog。
 * `spring.datasource.default-read-only`  
-The default read-only state for connections.
+The default read-only state for connections.  
+连接的默认只读状态。
 * `spring.datasource.default-transaction-isolation`  
-The default transaction isolation for connections.
+The default transaction isolation for connections.  
+连接的默认事务隔离级别。
 * `spring.datasource.driver-class-name`  
-Fully qualified name of the JDBC driver. Auto-detected based on the URL by default.
+Fully qualified name of the JDBC driver. Auto-detected based on the URL by default.  
+JDBC驱动的全限定类名。默认会根据URL自动检测。
 * `spring.datasource.fair-queue`  
-Whether or not to return connections in a FIFO fashion.
+Whether or not to return connections in a FIFO fashion.  
+是否以FIFO方式返回连接。
 * `spring.datasource.health-check-properties.[key]`  
-Sets a property to be included in the health check. (For the Hikari connection pool.)
+Sets a property to be included in the health check. (For the Hikari connection pool.)  
+设置要纳入健康检查的属性。（用于Hikari连接池。）
 * `spring.datasource.idle-timeout`  
-The maximum amount of time (in milliseconds) that a connection is allowed to sit idle in the pool. (Default value: 10)
+The maximum amount of time (in milliseconds) that a connection is allowed to sit idle in the pool. (Default value: 10)  
+连接池中的连接能保持闲置状态的最长时间，单位为毫秒。（默认值：`10`）
 * `spring.datasource.ignore-exception-on-pre-load`  
-Whether or not to ignore connections while initializing the datasource pool.
+Whether or not to ignore connections while initializing the datasource pool.  
+初始化数据库连接池时是否要忽略连接。
 * `spring.datasource.init-sql`  
-A custom query to run when a connection is first created.
+A custom query to run when a connection is first created.  
+在连接第一次创建时运行的自定义查询。
 * `spring.datasource.initial-size`  
-The number of connections that will be established when the connection pool is started.
+The number of connections that will be established when the connection pool is started.  
+在连接池启动时要建立的连接数。
 * `spring.datasource.initialization-fail-fast`  
-Whether or not the construction of the pool should throw an exception if the minimum number of connections cannot be created. (Default value: true)
+Whether or not the construction of the pool should throw an exception if the minimum number of connections cannot be created. (Default value: true)  
+在连接池创建时，如果达不到最小连接数是否要抛出异常。（默认值：`true`）
 * `spring.datasource.initialize`  
-Populate the database using data.sql. (Default value: true)
+Populate the database using data.sql. (Default value: true)  
+使用data.sql来初始化数据库。（默认值：`true`）
 * `spring.datasource.isolate-internal-queries`  
-Whether internal queries should be isolated. (Default value: false)
+Whether internal queries should be isolated. (Default value: false)  
+是否要隔离内部请求。（默认值：`false`）
 * `spring.datasource.jdbc-interceptors`  
-A semicolon-separated list of classnames extending the JdbcInterceptor class. These interceptors will be inserted as an interceptor into the chain of operations on a java.sql.Connection object. (For the Tomcat connection pool.)
+A semicolon-separated list of classnames extending the JdbcInterceptor class. These interceptors will be inserted as an interceptor into the chain of operations on a java.sql.Connection object. (For the Tomcat connection pool.)  
+一个分号分隔的类名列表，这些类都扩展了`JdbcInterceptor`类。这些拦截器会被插入`java.sql.Connection`对象的操作链里。（用于Tomcat连接池。）
 * `spring.datasource.jdbc-url`  
-The JDBC URL to create connections with.
+The JDBC URL to create connections with.  
+用来创建连接的JDBC URL。
 * `spring.datasource.jmx-enabled`  
-Enable JMX support (if provided by the underlying pool). (Default value: false)
+Enable JMX support (if provided by the underlying pool). (Default value: false)  
+开启JMX支持（如果底层连接池提供该功能的话）。（默认值：`false`）
 * `spring.datasource.jndi-name`  
-JNDI location of the datasource. Class, URL, username, and password are ignored when set.
+JNDI location of the datasource. Class, URL, username, and password are ignored when set.  
+数据源的JNDI位置。设置了该属性后就会忽略类、URL、用户名和密码属性。
 * `spring.datasource.leak-detection-threshold`  
-The threshold, in milliseconds, for detecting connection leaks with the Hikari connection pool.
+The threshold, in milliseconds, for detecting connection leaks with the Hikari connection pool.  
+用来检测Hikari连接池连接泄露的阈值，单位为毫秒。
 * `spring.datasource.log-abandoned`  
-Whether to log stack traces for application code that abandoned a statement or connection. For use with the DBCP connection pool. (Default value: false)
+Whether to log stack traces for application code that abandoned a statement or connection. For use with the DBCP connection pool. (Default value: false)  
+是否针对弃用语句或连接的应用程序代码记录下跟踪栈。用于DBCP连接池。（默认值：`false`）
 * `spring.datasource.log-validation-errors`  
-Whether validation errors should be logged when using the Tomcat connection pool.
+Whether validation errors should be logged when using the Tomcat connection pool.  
+在使用Tomcat连接池时是否要记录验证错误。
 * `spring.datasource.login-timeout`  
-The timeout (in seconds) for connecting to the database.
+The timeout (in seconds) for connecting to the database.  
+连接数据库时的超时时间（单位为秒）。
 * `spring.datasource.max-active`  
-The maximum number of active connections in the connection pool.
+The maximum number of active connections in the connection pool.  
+连接池中的最大活跃连接数。
 * `spring.datasource.max-age`  
-The maximum age of a connection in the connection pool.
+The maximum age of a connection in the connection pool.  
+连接池中连接的最长寿命。
 * `spring.datasource.max-idle`  
-The maximum number of idle connections in the connection pool.
+The maximum number of idle connections in the connection pool.  
+连接池中的最大空闲连接数。
 * `spring.datasource.max-lifetime`  
-The maximum lifetime (in milliseconds) of a connection in the connection pool.
+The maximum lifetime (in milliseconds) of a connection in the connection pool.  
+连接池中连接的最长寿命（单位为毫秒）。
 * `spring.datasource.max-open-prepared-statements`  
-The maximum number of open prepared statements.
+The maximum number of open prepared statements.  
+开启状态的`PreparedStatement`的最大数量。
 * `spring.datasource.max-wait`  
-The maximum number of milliseconds that the pool will wait for a connection to be returned before throwing an exception.
+The maximum number of milliseconds that the pool will wait for a connection to be returned before throwing an exception.  
+连接池在等待返回连接时，最多等待多少毫秒后抛出异常。
 * `spring.datasource.maximum-pool-size`  
-The maximum size that the pool is allowed to reach, including both idle and in-use connections.
+The maximum size that the pool is allowed to reach, including both idle and in-use connections.  
+连接池能达到的最大连接数，包含空闲连接和使用中的连接。
 * `spring.datasource.min-evictable-idle-time-millis`  
-The minimum amount of time an object may sit idle in the pool before it is eligible for eviction by the idle object evictor (if any).
+The minimum amount of time an object may sit idle in the pool before it is eligible for eviction by the idle object evictor (if any).  
+一个空闲的连接在可被空闲连接释放器（如果存在的话）优雅的释放前，最少会在连接池里停留多少时间。
 * `spring.datasource.min-idle`  
-The minimum number of established connections that should be kept in the pool at all times. (For DBCP and Tomcat connection pools.)
+The minimum number of established connections that should be kept in the pool at all times. (For DBCP and Tomcat connection pools.)  
+连接池里始终应该保持的最小连接数。（用于DBCP和Tomcat连接池。）
 * `spring.datasource.minimum-idle`  
-The minimum number of idle connections that HikariCP tries to maintain in the pool.
+The minimum number of idle connections that HikariCP tries to maintain in the pool.  
+HikariCP试图在连接池里维持的最小空闲连接数。
 * `spring.datasource.name`  
-The datasource name.
+The datasource name.  
+数据源的名称。
 * `spring.datasource.num-tests-per-eviction-run`  
-The number of objects to examine during each run of the idle object evictor thread (if any).
+The number of objects to examine during each run of the idle object evictor thread (if any).  
+空闲对象释放器线程（如果存在的话）每次运行时要检查的对象数。
 * `spring.datasource.password`  
-Login password of the database.
+Login password of the database.  
+数据库的登录密码。
 * `spring.datasource.platform`  
-Platform to use in the schema resource (schema-${platform}.sql). (Default value: all)
+Platform to use in the schema resource (schema-${platform}.sql). (Default value: all)  
+在Schema资源（schema-${platform}.sql）里要使用的平台。（默认值：`all`）
 * `spring.datasource.pool-name`  
-The connection pool name.
+The connection pool name.  
+连接池名称。
 * `spring.datasource.pool-prepared-statements`  
-Whether to pool statements or not.
+Whether to pool statements or not.  
+是否要将`Statement`放在池里。
 * `spring.datasource.propagate-interrupt-state`  
-Whether to propagate interrupt state for interrupted threads waiting for a connection.
+Whether to propagate interrupt state for interrupted threads waiting for a connection.  
+对于在等待连接的中断线程，是否要传播中断状态。
 * `spring.datasource.read-only`  
-Set a datasource as read-only when using the Hikari connection pool.
+Set a datasource as read-only when using the Hikari connection pool.  
+在使用Hikari连接池时将数据源设置为只读的。
 * `spring.datasource.register-mbeans`  
-Whether or not the Hikari connection pool should register JMX MBeans.
+Whether or not the Hikari connection pool should register JMX MBeans.  
+Hikari连接池是否要注册JMX MBean。
 * `spring.datasource.remove-abandoned`  
-Whether abandoned connections should be removed if they exceed the abandoned timeout.
+Whether abandoned connections should be removed if they exceed the abandoned timeout.  
+被弃用的连接在到达弃用超时后是否应该被移除。
 * `spring.datasource.remove-abandoned-timeout`  
-The time in seconds before a connection can be considered abandoned.
+The time in seconds before a connection can be considered abandoned.  
+连接在多少秒后应该考虑弃用。
 * `spring.datasource.rollback-on-return`  
-Whether any pending transactions should be rolled back when a connection is returned to the pool.
+Whether any pending transactions should be rolled back when a connection is returned to the pool.  
+在连接归还连接池时，是否要回滚挂起的事务。
 * `spring.datasource.schema`  
-Schema (DDL) script resource reference.
+Schema (DDL) script resource reference.  
+Schema（DDL）脚本资源的引用。
 * `spring.datasource.separator`  
-Statement separator in SQL initialization scripts. (Default value: ;)
+Statement separator in SQL initialization scripts. (Default value: ;)  
+SQL初始化脚本里的语句分割符。（默认值：`;`）
 * `spring.datasource.sql-script-encoding`  
-SQL scripts encoding.
+SQL scripts encoding.  
+SQL脚本的编码。
 * `spring.datasource.suspect-timeout`  
-How long in seconds before logging a suspected abandoned connection.
+How long in seconds before logging a suspected abandoned connection.  
+在记录下一个疑似弃用连接前要等待多少秒。
 * `spring.datasource.test-on-borrow`  
-Whether a connection should be tested upon being borrowed from the connection pool.
+Whether a connection should be tested upon being borrowed from the connection pool.  
+在从连接池中借用连接时是否要进行测试。
 * `spring.datasource.test-on-connect`  
-Whether a connection should be tested upon creation.
+Whether a connection should be tested upon creation.  
+在建立连接时是否要进行测试。
 * `spring.datasource.test-on-return`  
-Whether a connection should be tested upon return to the connection pool.
+Whether a connection should be tested upon return to the connection pool.  
+在将连接归还到连接池时是否要进行测试。
 * `spring.datasource.test-while-idle`  
-Whether a connection should be tested while idle.
+Whether a connection should be tested while idle.  
+在连接空闲时是否要进行测试。
 * `spring.datasource.time-between-eviction-runs-millis`  
-The number of milliseconds to sleep between runs of the idle connection validation, abandoned cleaner, and idle pool resizing.
+The number of milliseconds to sleep between runs of the idle connection validation, abandoned cleaner, and idle pool resizing.  
+在两次空闲连接验证、弃用连接清理和空闲池大小调整之间睡眠的毫秒数。
 * `spring.datasource.transaction-isolation`  
-Set the default transaction isolation level when using the Hikari connection pool.
+Set the default transaction isolation level when using the Hikari connection pool.  
+在使用Hikari连接池时设置的默认事务隔离级别。
 * `spring.datasource.url`  
-JDBC URL of the database.
+JDBC URL of the database.  
+数据库的JDBC URL。
 * `spring.datasource.use-disposable-connection-facade`  
-Whether the connection will be wrapped with a facade that will disallow the connection to be used after Connection.close() is called.
+Whether the connection will be wrapped with a facade that will disallow the connection to be used after Connection.close() is called.  
+连接是否要用一个门面（facade）封装起来，在调用了`Connection.close()`后就不能再使用这个连接了。
 * `spring.datasource.use-equals`  
-Whether to use String.equals() instead of == when comparing method names.
+Whether to use String.equals() instead of == when comparing method names.  
+在比较方法名时是否使用`String.equals()`来代替`==`。
 * `spring.datasource.use-lock`  
-Whether a lock should be used when operations are performed on the connection object.
+Whether a lock should be used when operations are performed on the connection object.  
+在操作连接对象时是否要加锁。
 * `spring.datasource.username`  
-Login user of the database.
+Login user of the database.  
+数据库的登录用户名。
 * `spring.datasource.validation-interval`  
-How often, in milliseconds, to run connection validation.
+How often, in milliseconds, to run connection validation.  
+执行连接验证的间隔时间，单位为毫秒。
 * `spring.datasource.validation-query`  
-The SQL query that will be used to validate connections from this pool before returning them to the caller or pool.
+The SQL query that will be used to validate connections from this pool before returning them to the caller or pool.  
+在连接池里的连接被返回给调用者或连接池时要执行的验证SQL查询。
 * `spring.datasource.validation-query-timeout`  
-The timeout in seconds before a connection validation query fails.
+The timeout in seconds before a connection validation query fails.  
+在连接验证查询执行失败前等待的超时时间，单位为秒。
 * `spring.datasource.validation-timeout`  
-The timeout in seconds before a connection validation fails. (For use with the Hikari connection pool.)
+The timeout in seconds before a connection validation fails. (For use with the Hikari connection pool.)  
+在连接验证失败前等待的超时时间，单位为秒。（用于Hikari连接池。）
 * `spring.datasource.validator-class-name`  
-The fully qualified class name for an optional validator class that will be used in place of test queries.
+The fully qualified class name for an optional validator class that will be used in place of test queries.  
+可选的验证器类的全限定类名，它会执行测试查询。
 * `spring.datasource.xa.data-source-class-name`  
-XA datasource fully qualified name.
+XA datasource fully qualified name.  
+XA数据源的全限定类名。
 * `spring.datasource.xa.properties`  
-Properties to pass to the XA data source.
+Properties to pass to the XA data source.  
+要传递给XA数据源的属性。
 * `spring.freemarker.allow-request-override`  
-Set whether HttpServletRequest attributes are allowed to override (hide) controller-generated model attributes of the same name.
+Set whether HttpServletRequest attributes are allowed to override (hide) controller-generated model attributes of the same name.  
+`HttpServletRequest`的属性是否允许覆盖（隐藏）控制器生成的同名模型属性。
+* `spring.freemarker.allow-session-override`  Set whether HttpSession attributes are allowed to override (hide) controller- generated model attributes of the same name.* `spring.freemarker.cache`  
+Enable template caching.* `spring.freemarker.charset`  
+Template encoding.* `spring.freemarker.check-template-location`  
+Check that the templates location exists.* `spring.freemarker.content-type`  
+Content-Type value.* `spring.freemarker.enabled`  Enable MVC view resolution for this technology.* `spring.freemarker.expose-request-attributes`  Set whether all request attributes should be added to the model prior to merging with the template.* `spring.freemarker.expose-session-attributes`  Set whether all HttpSession attributes should be added to the model prior to merging with the template.* `spring.freemarker.expose-spring-macro-helpers`  Set whether to expose a RequestContext for use by Spring’s macro library, under the name springMacroRequestContext.* `spring.freemarker.prefer-file-system-access`  Prefer filesystem access for template loading. Filesystem access enables hot detec- tion of template changes. (Default value: true)* `spring.freemarker.prefix`  Prefix that gets prepended to view names when building a URL.* `spring.freemarker.request-context-attribute`  
+Name of the RequestContext attribute for all views.* `spring.freemarker.settings`  Well-known FreeMarker keys that will be passed to FreeMarker’s configuration.* `spring.freemarker.suffix`  Suffix that gets appended to view names when building a URL.* `spring.freemarker.template-loader-path`  Comma-separated list of template paths. (Default value: ["classpath:/templates/"])
+* `spring.freemarker.view-names`  Whitelist of view names that can be resolved.* `spring.groovy.template.allow-request-override`  Set whether HttpServletRequest attributes are allowed to override (hide) controller-generated model attributes of the same name.* `spring.groovy.template.allow-session-override`  Set whether HttpSession attributes are allowed to override (hide) controller- generated model attributes of the same name.* `spring.groovy.template.cache`  Enable template caching.* `spring.groovy.template.charset`  Template encoding.* `spring.groovy.template.check-template-location`  Check that the templates location exists.* `spring.groovy.template.configuration.auto-escape`  Whether or not model variables are escaped when rendered in the template. (Default value: false)* `spring.groovy.template.configuration.auto-indent`  Whether or not the template renders indentation automatically. (Default value: false)* `spring.groovy.template.configuration.auto-indent-string`  The string used for indentation when auto-indentation is enabled. Either SPACES or TAB. (Default value: SPACES)* `spring.groovy.template.configuration.auto-new-line`  Whether or not new lines should be rendered by the template. (Default value: false)* `spring.groovy.template.configuration.base-template-class`  The template base class.* `spring.groovy.template.configuration.cache-templates`  
+Whether or not templates should be cached. (Default value: true)* `spring.groovy.template.configuration.declaration-encoding`  The encoding used to write the declaration header.* `spring.groovy.template.configuration.expand-empty-elements`  Whether elements without a body should be written in the short form (e.g., <br/>) or expanded form (e.g., <br></br>). (Default value: false)
+* `spring.groovy.template.configuration.locale`  Set the template locale.* `spring.groovy.template.configuration.new-line-string`  The string to render for a new line when auto-newlines are enabled. (Default is the value of the system’s line.separator property)* `spring.groovy.template.configuration.resource-loader-path`  The path to the Groovy templates. (Default value: classpath:/templates/)* `spring.groovy.template.configuration.use-double-quotes`  Whether attributes should use double quotes or single quotes. (Default value: false)* `spring.groovy.template.content-type`  
+Content-Type value.* `spring.groovy.template.enabled`  Enable MVC view resolution for this technology.* `spring.groovy.template.expose-request-attributes`  Set whether all request attributes should be added to the model prior to merging with the template.* `spring.groovy.template.expose-session-attributes`  Set whether all HttpSession attributes should be added to the model prior to merging with the template.* `spring.groovy.template.expose-spring-macro-helpers`  Set whether to expose a RequestContext for use by Spring’s macro library, under the name springMacroRequestContext.* `spring.groovy.template.prefix`  Prefix that gets prepended to view names when building a URL.* `spring.groovy.template.request-context-attribute`  
+Name of the RequestContext attribute for all views.* `spring.groovy.template.resource-loader-path`  
+Template path. (Default value: classpath:/templates/)* `spring.groovy.template.suffix`  Suffix that gets appended to view names when building a URL.* `spring.groovy.template.view-names`  
+Whitelist of view names that can be resolved.* `spring.h2.console.enabled`  Enable the console. (Default value: false)
+* `spring.h2.console.path`  Path at which the console will be available. (Default value: /h2-console)* `spring.hateoas.apply-to-primary-object-mapper`  Specify if HATEOAS support should be applied to the primary ObjectMapper. (Default value: true)* `spring.hornetq.embedded.cluster-password`  Cluster password. Randomly generated on startup by default.* `spring.hornetq.embedded.data-directory`  Journal file directory. Not necessary if persistence is turned off.* `spring.hornetq.embedded.enabled`  Enable embedded mode if the HornetQ server APIs are available. (Default value: true)* `spring.hornetq.embedded.persistent`  
+Enable persistent store. (Default value: false)* `spring.hornetq.embedded.queues`  Comma-separated list of queues to create on startup. (Default value: [])* `spring.hornetq.embedded.server-id`  Server ID. By default, an auto-incremented counter is used. (Default value: 0)* `spring.hornetq.embedded.topics`  Comma-separated list of topics to create on startup. (Default value: [])* `spring.hornetq.host`  HornetQ broker host. (Default value: localhost)* `spring.hornetq.mode`  HornetQ deployment mode, auto-detected by default. Can be explicitly set to native or embedded.* `spring.hornetq.port`  HornetQ broker port. (Default value: 5445)* `spring.http.converters.preferred-json-mapper`  Preferred JSON mapper to use for HTTP message conversion.* `spring.http.encoding.charset`  Charset of HTTP requests and responses. Added to the Content-Type header if not set explicitly. (Default value: UTF-8)* `spring.http.encoding.enabled`  Enable HTTP encoding support. (Default value: true)
+* `spring.http.encoding.force`  Force the encoding to the configured charset on HTTP requests and responses. (Default value: true)* `spring.jackson.date-format`  Date format string (yyyy-MM-dd HH:mm:ss) or a fully qualified date format class name.* `spring.jackson.deserialization`  Jackson on/off features that affect the way Java objects are deserialized.* `spring.jackson.generator`  Jackson on/off features for generators.* `spring.jackson.joda-date-time-format`  Joda date/time format string (yyyy-MM-dd HH:mm:ss). If not configured, date- format will be used as a fallback if it’s configured with a format string.* `spring.jackson.locale`  
+Locale used for formatting.* `spring.jackson.mapper`  Jackson general purpose on/off features.* `spring.jackson.parser`  Jackson on/off features for parsers.* `spring.jackson.property-naming-strategy`  One of the constants on Jackson’s PropertyNamingStrategy (CAMEL_CASE_TO _LOWER_CASE_WITH_UNDERSCORES). Can also be a fully qualified class name of a`PropertyNamingStrategy` subclass.* `spring.jackson.serialization`  Jackson on/off features that affect the way Java objects are serialized.* `spring.jackson.serialization-inclusion`  Controls the inclusion of properties during serialization. Configured with one of the values in Jackson’s JsonInclude.Include enumeration.* `spring.jackson.time-zone`  Time zone used when formatting dates. Configured using any recognized time zone identifier, such as America/Los_Angeles or GMT+10.* `spring.jersey.filter.order`  Jersey filter chain order. (Default value: 0)* `spring.jersey.init`  Init parameters to pass to Jersey via the servlet or filter.* `spring.jersey.type`  Jersey integration type. Can be either servlet or filter.* `spring.jms.jndi-name`  Connection factory JNDI name. When set, takes precedence to others’ connection factory auto-configurations.* `spring.jms.listener.acknowledge-mode`  Acknowledge mode of the container. By default, the listener is transacted with automatic acknowledgment.* `spring.jms.listener.auto-startup`  Start the container automatically on startup. (Default value: true)* `spring.jms.listener.concurrency`  Minimum number of concurrent consumers.* `spring.jms.listener.max-concurrency`  Maximum number of concurrent consumers.* `spring.jms.pub-sub-domain`  Specify if the default destination type supports publish/subscribe (if it is a topic as opposed to a queue). (Default value: false)* `spring.jmx.default-domain`  JMX domain name.* `spring.jmx.enabled`  Expose management beans to the JMX domain. (Default value: true)* `spring.jmx.server`  MBeanServer bean name. (Default value: mbeanServer)* `spring.jooq.sql-dialect`  SQLDialect JOOQ used when communicating with the configured datasource, such as POSTGRES.* `spring.jpa.database`  Target database to operate on, auto-detected by default. Can be alternatively set using the databasePlatform property.* `spring.jpa.database-platform`  Name of the target database to operate on, auto-detected by default. Can be alter- natively set using the Database enum.* `spring.jpa.generate-ddl`  Initialize the schema on startup. (Default value: false)* `spring.jpa.hibernate.ddl-auto`  DDL mode (none, validate, update, create, create-drop). This is actually a shortcut for the hibernate.hbm2ddl.auto property. Default to create-drop when using an embedded database; none otherwise.
+* `spring.jpa.hibernate.naming-strategy`  The fully qualified class name of a Hibernate naming strategy.* `spring.jpa.open-in-view`  Register OpenEntityManagerInViewInterceptor. Binds a JPA EntityManager to the thread for the entire processing of the request. (Default value: true)* `spring.jpa.properties`  Additional native properties to set on the JPA provider.* `spring.jpa.show-sql`  Enable logging of SQL statements when using the Bitronix Transaction Manager. (Default value: false)* `spring.jta.allow-multiple-lrc`  Whether the transaction manager should allow enlistment of multiple LRC resources in a single transaction when using the Bitronix Transaction Manager. (Default value: false)* `spring.jta.asynchronous2-pc`  Whether two-phase commit should be executed asynchronously when using the Bitronix Transaction Manager. (Default value: false)* `spring.jta.background-recovery-interval`  How often, in minutes, to run the recovery process when using the Bitronix Trans- action Manager. (Default value: 1)* `spring.jta.background-recovery-interval-seconds`  How often, in seconds, to run the recovery process when using the Bitronix Trans- action Manager. (Default value: 60)* `spring.jta.current-node-only-recovery`  Whether recovery should filter out recovered XIDs that don’t contain this JVM’s unique ID when using the Bitronix Transaction Manager. (Default value: true)* `spring.jta.debug-zero-resource-transaction`  Whether creation and commit call stacks of transactions executed without a single enlisted resource should be tracked and logged when using the Bitronix Transaction Manager. (Default value: false)* `spring.jta.default-transaction-timeout`  The default transaction timeout, in seconds, when using the Bitronix Transaction Manager. (Default value: 60)* `spring.jta.disable-jmx`  Whether the registration of JMX MBeans should be disabled when using the Bitronix Transaction Manager. (Default value: false)
+* `spring.jta.enabled`  Enable JTA support. (Default value: true)* `spring.jta.exception-analyzer`  The exception analyzer to use when using the Bitronix Transaction Manager. Can be null for the default exception analyzer or the fully qualified class name of a custom exception analyzer.* `spring.jta.filter-log-status`  Whether mandatory logs should be written when using the Bitronix Transaction Manager. Enabling this parameter lowers space usage of the fragments but makes debugging more complex. (Default value: false)* `spring.jta.force-batching-enabled`  Whether disk forces are batched when using the Bitronix Transaction Manager. Disabling batching can seriously lower the transaction manager’s throughput. (Default value: true)* `spring.jta.forced-write-enabled`  Whether logs are forced to disk when using the Bitronix Transaction Manager. Do not set to false in production because without disk force, integrity is not guaranteed. (Default value: true)* `spring.jta.graceful-shutdown-interval`  Maximum number of seconds the transaction manager will wait for transactions to be done before aborting them at shutdown time when using the Bitronix Transaction Manager. (Default value: 60)* `spring.jta.jndi-transaction-synchronization-registry-name`  The name that the transaction synchronization registry should be bound under in JNDI when using the Bitronix Transaction Manager. (Default value: java:comp/TransactionSynchronizationRegistry)* `spring.jta.jndi-user-transaction-name`  The name the user transaction should be bound under in JNDI when using the Bitronix Transaction Manager. (Default value: java:comp/UserTransaction)* `spring.jta.journal`  The journal name, when using the Bitronix Transaction Manager. Can be disk, null, or a fully qualified class name. (Default value: disk)* `spring.jta.log-dir`  Transaction logs directory.* `spring.jta.log-part1-filename`  The journal fragment file 1 name. (Default value: btm1.tlog)
+* `spring.jta.log-part2-filename`  The journal fragment file 2 name. (Default value: btm2.tlog)* `spring.jta.max-log-size-in-mb`  The maximum size in megabytes of the journal fragments. Larger logs allow trans- actions to stay longer in-doubt. If, however, the size is too small, the transaction manager will pause longer when a fragment is full. For use with the Bitronix Trans- action Manager. (Default value: 2)* `spring.jta.resource-configuration-filename`  The Bitronix Transaction Manager configuration filename.* `spring.jta.server-id`  The ID that uniquely identifies the Bitronix Transaction Manager instance.* `spring.jta.skip-corrupted-logs`  Whether corrupted log files should be skipped. (Default value: false)* `spring.jta.transaction-manager-id`  
+Transaction manager unique identifier.* `spring.jta.warn-about-zero-resource-transaction`  Whether to warn about transactions executed without a single enlisted resource when using the Bitronix Transaction Manager. (Default value: true)* `spring.mail.default-encoding`  Default MimeMessage encoding. (Default value: UTF-8)* `spring.mail.host`  
+SMTP server host.* `spring.mail.jndi-name`  Session JNDI name. When set, takes precedence over any other mail settings.* `spring.mail.password`  Login password of the SMTP server.* `spring.mail.port`  
+SMTP server port.* `spring.mail.properties`  Additional JavaMail session properties.* `spring.mail.protocol`  Protocol used by the SMTP server. (Default value: smtp)* `spring.mail.test-connection`  Test that the mail server is available on startup. (Default value: false)* `spring.mail.username`  Login user of the SMTP server.* `spring.messages.basename`  Comma-separated list of basenames, each following the ResourceBundle conven- tion. Essentially a fully qualified classpath location. If it doesn’t contain a package qualifier (such as org.mypackage), it will be resolved from the classpath root. (Default value: messages)* `spring.messages.cache-seconds`  Loaded resource bundle files cache expiration, in seconds. When set to -1, bun- dles are cached forever. (Default value: -1)* `spring.messages.encoding`  Message bundles encoding. (Default value: UTF-8)* `spring.mobile.devicedelegatingviewresolver.enable-fallback`  
+Enable support for fallback resolution. (Default value: false)* `spring.mobile.devicedelegatingviewresolver.enabled`  
+Enable device view resolver. (Default value: false)* `spring.mobile.devicedelegatingviewresolver.mobile-prefix`  Prefix that gets prepended to view names for mobile devices. (Default value: mobile/)* `spring.mobile.devicedelegatingviewresolver.mobile-suffix`  Suffix that gets appended to view names for mobile devices.* `spring.mobile.devicedelegatingviewresolver.normal-prefix`  Prefix that gets prepended to view names for normal devices.* `spring.mobile.devicedelegatingviewresolver.normal-suffix`  Suffix that gets appended to view names for normal devices.* `spring.mobile.devicedelegatingviewresolver.tablet-prefix`  Prefix that gets prepended to view names for tablet devices. (Default value: tablet/)* `spring.mobile.devicedelegatingviewresolver.tablet-suffix`  Suffix that gets appended to view names for tablet devices.* `spring.mobile.sitepreference.enabled`  Enable SitePreferenceHandler. (Default value: true)* `spring.mongodb.embedded.features`  Comma-separated list of features to enable.* `spring.mongodb.embedded.version`  Version of Mongo to use. (Default value: 2.6.10)
