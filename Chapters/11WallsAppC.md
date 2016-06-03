@@ -987,161 +987,239 @@ Enable support for fallback resolution. (Default value: false)  开启降级解
 Enable device view resolver. (Default value: false)  开启设备视图解析器。（默认值：`false`）* `spring.mobile.devicedelegatingviewresolver.mobile-prefix`  Prefix that gets prepended to view names for mobile devices. (Default value: mobile/)  添加到移动设备视图名前的前缀。（默认值：`mobile/`）* `spring.mobile.devicedelegatingviewresolver.mobile-suffix`  Suffix that gets appended to view names for mobile devices.  添加到移动设备视图名后的后缀。* `spring.mobile.devicedelegatingviewresolver.normal-prefix`  Prefix that gets prepended to view names for normal devices.  添加到普通设备视图名前的前缀。* `spring.mobile.devicedelegatingviewresolver.normal-suffix`  Suffix that gets appended to view names for normal devices.  添加到普通设备视图名后的后缀。* `spring.mobile.devicedelegatingviewresolver.tablet-prefix`  Prefix that gets prepended to view names for tablet devices. (Default value: tablet/)  添加到平板设备视图名前的前缀。（默认值：`tablet/`）* `spring.mobile.devicedelegatingviewresolver.tablet-suffix`  Suffix that gets appended to view names for tablet devices.  添加到平板设备视图名后的后缀。* `spring.mobile.sitepreference.enabled`  Enable SitePreferenceHandler. (Default value: true)  开启`SitePreferenceHandler`。（默认值：`true`）* `spring.mongodb.embedded.features`  Comma-separated list of features to enable.  要开启的特性列表，用逗号分隔。* `spring.mongodb.embedded.version`  Version of Mongo to use. (Default value: 2.6.10)  
 要使用的Mongo版本。（默认值：`2.6.10`）
 * `spring.mustache.cache`  
-Enable template caching.
+Enable template caching.  
+开启模板缓存。
 * `spring.mustache.charset`  
-Template encoding.
+Template encoding.  
+模板编码。
 * `spring.mustache.check-template-location`  
-Check that the templates location exists.
+Check that the templates location exists.  
+检查模板位置是否存在。
 * `spring.mustache.content-type`  
-Content-Type value.
+Content-Type value.  
+`Content-Type`的值。
 * `spring.mustache.enabled`  
-Enable MVC view resolution for this technology.
+Enable MVC view resolution for this technology.  
+开启Mustache的MVC视图解析。
 * `spring.mustache.prefix`  
-Prefix to apply to template names. (Default value: classpath:/templates/)
+Prefix to apply to template names. (Default value: classpath:/templates/)  
+添加到模板名前的前缀。（默认值：`classpath:/templates/`）
 * `spring.mustache.suffix`  
-Suffix to apply to template names. (Default value: .html)
+Suffix to apply to template names. (Default value: .html)  
+添加到模板名后的后缀。（默认值：`.html`）
 * `spring.mustache.view-names`  
-Whitelist of view names that can be resolved.
+Whitelist of view names that can be resolved.  
+可解析的视图名称的白名单。
 * `spring.mvc.async.request-timeout`  
-Amount of time (in milliseconds) before asynchronous request handling times out. If this value is not set, the default timeout of the underlying implementation is used, such as 10 seconds on Tomcat with Servlet 3.
+Amount of time (in milliseconds) before asynchronous request handling times out. If this value is not set, the default timeout of the underlying implementation is used, such as 10 seconds on Tomcat with Servlet 3.  
+异步请求处理超时等待的时间（单位为毫秒）。如果没有设置该属性，会使用底层实现的默认超时时间，比如，Tomcat上使用Servlet 3时超时时间为10秒。
 * `spring.mvc.date-format`  
-Date format to use (such as dd/MM/yyyy).
+Date format to use (such as dd/MM/yyyy).  
+要使用的日期格式（比如`dd/MM/yyyy`）。
 * `spring.mvc.favicon.enabled`  
-Enable resolution of favicon.ico. (Default value: true)
+Enable resolution of favicon.ico. (Default value: true)  
+开启favicon.ico的解析。（默认值：`true`）
 * `spring.mvc.ignore-default-model-on-redirect`  
-If the content of the “default” model should be ignored during redirect scenarios. (Default value: true)
+If the content of the “default” model should be ignored during redirect scenarios. (Default value: true)  
+在重定向的场景下，是否要忽略“默认”模型对象的内容。（默认值：`true`）
 * `spring.mvc.locale`  
-Locale to use.
+Locale to use.  
+要使用的地域配置。
 * `spring.mvc.message-codes-resolver-format`  
-Formatting strategy for message codes (PREFIX_ERROR_CODE, POSTFIX_ERROR_CODE).
+Formatting strategy for message codes (PREFIX_ERROR_CODE, POSTFIX_ERROR_CODE).  
+消息码的格式化策略（`PREFIX_ERROR_CODE`、`POSTFIX_ERROR_CODE`）。
 * `spring.mvc.view.prefix`  
-Spring MVC view prefix.
+Spring MVC view prefix.  
+Spring MVC视图前缀。
 * `spring.mvc.view.suffix`  
-Spring MVC view suffix.
+Spring MVC view suffix.  
+Spring MVC视图后缀。
 * `spring.rabbitmq.addresses`  
-Comma-separated list of addresses to which the client should connect.
+Comma-separated list of addresses to which the client should connect.  
+客户端应该连接的地址列表，用逗号分隔。
 * `spring.rabbitmq.dynamic`  
-Create an AmqpAdmin bean. (Default value: true)
+Create an AmqpAdmin bean. (Default value: true)  
+创建一个`AmqpAdmin` Bean。（默认值：`true`）
 * `spring.rabbitmq.host`  
-RabbitMQ host. (Default value: localhost)
+RabbitMQ host. (Default value: localhost)  
+RabbitMQ主机地址。（默认值：`localhost`）
 * `spring.rabbitmq.listener.acknowledge-mode`  
-Acknowledge mode of container.
+Acknowledge mode of container.  
+容器的应答模式。
 * `spring.rabbitmq.listener.auto-startup`  
-Start the container automatically on startup. (Default value: true)
+Start the container automatically on startup. (Default value: true)  
+启动时自动开启容器。（默认值：`true`）
 * `spring.rabbitmq.listener.concurrency`  
-Minimum number of consumers.
+Minimum number of consumers.  
+消费者的最小数量。
 * `spring.rabbitmq.listener.max-concurrency`  
-Maximum number of consumers.
+Maximum number of consumers.  
+消费者的最大数量。
 * `spring.rabbitmq.listener.prefetch`  
-Number of messages to be handled in a single request. It should be greater than or equal to the transaction size (if used).
+Number of messages to be handled in a single request. It should be greater than or equal to the transaction size (if used).  
+单个请求里要处理的消息数。该数值应该大于等于事务数（如果用到的话）。
 * `spring.rabbitmq.listener.transaction-size`  
-Number of messages to be processed in a transaction. For best results, it should be less than or equal to the prefetch count.
+Number of messages to be processed in a transaction. For best results, it should be less than or equal to the prefetch count.  
+一个事务里要处理的消息数。为了保证效果，应该小于等于预先获取的数量。
 * `spring.rabbitmq.password`  
-Login to authenticate against the broker.
+Login to authenticate against the broker.  
+进行身份验证的密码。
 * `spring.rabbitmq.port`  
-RabbitMQ port. (Default value: 5672)
+RabbitMQ port. (Default value: 5672)  
+RabbitMQ端口。（默认值：`5672`）
 * `spring.rabbitmq.requested-heartbeat`  
-Requested heartbeat timeout in seconds; 0 for none.
+Requested heartbeat timeout in seconds; 0 for none.  
+请求心跳超时，单位为秒；`0`表示不启用心跳。
 * `spring.rabbitmq.ssl.enabled`  
-Enable SSL support. (Default value: false)
+Enable SSL support. (Default value: false)  
+开启SSL支持。（默认值：`false`）
 * `spring.rabbitmq.ssl.key-store`  
-Path to the key store that holds the SSL certificate.
+Path to the key store that holds the SSL certificate.  
+持有SSL证书的KeyStore路径。
 * `spring.rabbitmq.ssl.key-store-password`  
-Password used to access the key store.
+Password used to access the key store.  
+访问KeyStore的密码。
 * `spring.rabbitmq.ssl.trust-store`  
-Trust store that holds SSL certificates.
+Trust store that holds SSL certificates.  
+持有SSL证书的TrustStore。
 * `spring.rabbitmq.ssl.trust-store-password`  
-Password used to access the trust store.
+Password used to access the trust store.  
+访问TrustStore的密码。
 * `spring.rabbitmq.username`  
-Login user to authenticate to the broker.
+Login user to authenticate to the broker.  
+进行身份验证的用户名。
 * `spring.rabbitmq.virtual-host`  
-Virtual host to use when connecting to the broker.
+Virtual host to use when connecting to the broker.  
+在连接RabbitMQ时的虚拟主机。
 * `spring.redis.database`  
-Database index used by the connection factory. (Default value: 0)
+Database index used by the connection factory. (Default value: 0)  
+连接工厂使用的数据库索引。（默认值：`0`）
 * `spring.redis.host`  
-Redis server host. (Default value: localhost)
+Redis server host. (Default value: localhost)  
+Redis服务器主机地址。（默认值：`localhost`）
 * `spring.redis.password`  
-Login password of the Redis server.
+Login password of the Redis server.  
+Redis服务器的登录密码。
 * `spring.redis.pool.max-active`  
-Max number of connections that can be allocated by the pool at a given time. Use a negative value for no limit. (Default value: 8)
+Max number of connections that can be allocated by the pool at a given time. Use a negative value for no limit. (Default value: 8)  
+连接池在指定时间里能分配的最大连接数。负数表示无限制。（默认值：`8`）
 * `spring.redis.pool.max-idle`  
-Max number of idle connections in the pool. Use a negative value to indicate an unlimited number of idle connections. (Default value: 8)
+Max number of idle connections in the pool. Use a negative value to indicate an unlimited number of idle connections. (Default value: 8)  
+连接池里的最大空闲连接数。负数表示空闲连接数可以是无限大。（默认值：`8`）
 * `spring.redis.pool.max-wait`  
-Maximum amount of time (in milliseconds) a connection allocation should block before throwing an exception when the pool is exhausted. Use a negative value to block indefinitely. (Default value: -1)
+Maximum amount of time (in milliseconds) a connection allocation should block before throwing an exception when the pool is exhausted. Use a negative value to block indefinitely. (Default value: -1)  
+当连接池被耗尽时，分配连接的请求应该在抛出异常前被阻塞多少时间（单位为秒）。负数表示一直阻塞。（默认值：`-1`）
 * `spring.redis.pool.min-idle`  
-Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive. (Default value: 0)
+Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive. (Default value: 0)  
+连接池里要维持的最小空闲连接数。该属性只有在设置为正数时才有效。（默认值：`0`）
 * `spring.redis.port`  
-Redis server port. (Default value: 6379)
+Redis server port. (Default value: 6379)  
+Redis服务器端口。（默认值：`6379`）
 * `spring.redis.sentinel.master`  
-Name of Redis server.
+Name of Redis server.  
+Redis服务器的名字。
 * `spring.redis.sentinel.nodes`  
-Comma-separated list of host:port pairs.
+Comma-separated list of host:port pairs.  
+形如“主机:端口”配对的列表，用逗号分隔。
 * `spring.redis.timeout`  
-Connection timeout in milliseconds. (Default value: 0)
+Connection timeout in milliseconds. (Default value: 0)  
+连接超时时间，单位为秒。（默认值：`0`）
 * `spring.resources.add-mappings`  
-Enable default resource handling. (Default value: true)
+Enable default resource handling. (Default value: true)  
+开启默认资源处理。（默认值：`true`）
 * `spring.resources.cache-period`  
-Cache period for the resources served by the resource handler, in seconds.
+Cache period for the resources served by the resource handler, in seconds.  
+资源处理器对资源的缓存周期，单位为秒。
 * `spring.resources.chain.cache`  
-Enable caching in the resource chain. (Default value: true)
+Enable caching in the resource chain. (Default value: true)  
+对资源链开启缓存。（默认值：`true`）
 * `spring.resources.chain.enabled`  
-Enable the Spring resource handling chain. (Disabled by default unless at least one strategy has been enabled.)
+Enable the Spring resource handling chain. (Disabled by default unless at least one strategy has been enabled.)  
+开启Spring资源处理链。（默认是关闭的，除非至少开启了一个策略。）
 * `spring.resources.chain.html-application-cache`  
-Enable HTML5 application cache manifest rewriting. (Default value: false)
+Enable HTML5 application cache manifest rewriting. (Default value: false)  
+开启HTML5应用程序缓存证明重写。（默认值：`false`）
 * `spring.resources.chain.strategy.content.enabled`  
-Enable the content version strategy. (Default value: false)
+Enable the content version strategy. (Default value: false)  
+开启内容版本策略。（默认值：`false`）
 * `spring.resources.chain.strategy.content.paths`  
-Comma-separated list of patterns to apply to the version strategy. (Default value: `[/**]`)
+Comma-separated list of patterns to apply to the version strategy. (Default value: `[/**]`)  
+要运用于版本策略上的模式列表，用逗号分隔。（默认值：`[/**]`）
 * `spring.resources.chain.strategy.fixed.enabled`  
-Enable the fixed version strategy. (Default value: false)
+Enable the fixed version strategy. (Default value: false)  
+开启固定版本策略。（默认值：`false`）
 * `spring.resources.chain.strategy.fixed.paths`  
-Comma-separated list of patterns to apply to the version strategy.
+Comma-separated list of patterns to apply to the version strategy.  
+要运用于固定版本策略的模式列表，用逗号分隔。
 * `spring.resources.chain.strategy.fixed.version`  
-Version string to use for the version strategy.
+Version string to use for the version strategy.  
+用于固定版本策略的版本字符串。
 * `spring.resources.static-locations`  
-Locations of static resources. Defaults to classpath:[/META-INF/resources/, /resources/, /static/, /public/] plus context:/ (the root of the servlet context).
+Locations of static resources. Defaults to classpath:[/META-INF/resources/, /resources/, /static/, /public/] plus context:/ (the root of the servlet context).  
+静态资源位置。默认是`classpath:[/META-INF/resources/, /resources/, /static/, /public/]`加上`context:/`（Servlet上下文的根目录）。
 * `spring.sendgrid.password`  
-SendGrid password.
+SendGrid password.  
+SendGrid密码。
 * `spring.sendgrid.proxy.host`  
-SendGrid proxy host.
+SendGrid proxy host.  
+SendGrid代理主机地址。
 * `spring.sendgrid.proxy.port`  
-SendGrid proxy port.
+SendGrid proxy port.  
+SendGrid代理端口。
 * `spring.sendgrid.username`  
-SendGrid username.
+SendGrid username.  
+SendGrid用户名。
 * `spring.social.auto-connection-views`  
-Enable the connection status view for supported providers. (Default value: false)
+Enable the connection status view for supported providers. (Default value: false)  
+针对所支持的提供方开启连接状态视图。（默认值：`false`）
 * `spring.social.facebook.app-id`  
-Application ID.
+Application ID.  
+应用程序ID。
 * `spring.social.facebook.app-secret`  
-Application secret.
+Application secret.  
+应用程序的密钥。
 * `spring.social.linkedin.app-id`  
-Application ID.
+Application ID.  
+应用程序ID。
 * `spring.social.linkedin.app-secret`  
-Application secret.
+Application secret.  
+应用程序的密钥。
 * `spring.social.twitter.app-id`  
-Application ID.
+Application ID.  
+应用程序ID。
 * `spring.social.twitter.app-secret`  
-Application secret.
+Application secret.  
+应用程序的密钥。
 * `spring.thymeleaf.cache`  
-Enable template caching. (Default value: true)
+Enable template caching. (Default value: true)  
+开启模板缓存。（默认值：`true`）
 * `spring.thymeleaf.check-template-location`  
-Check that the templates location exists. (Default value: true)
+Check that the templates location exists. (Default value: true)  
+检查模板位置是否存在。（默认值：`true`）
 * `spring.thymeleaf.content-type`  
-Content-Type value. (Default value: text/html)
+Content-Type value. (Default value: text/html)  
+`Content-Type`的值。（默认值：`text/html`）
 * `spring.thymeleaf.enabled`  
-Enable MVC Thymeleaf view resolution. (Default value: true)
+Enable MVC Thymeleaf view resolution. (Default value: true)  
+开启MVC Thymeleaf视图解析。（默认值：`true`）
 * `spring.thymeleaf.encoding`  
-Template encoding. (Default value: UTF-8)
+Template encoding. (Default value: UTF-8)  
+模板编码。（默认值：`UTF-8`）
 * `spring.thymeleaf.excluded-view-names`  
-Comma-separated list of view names that should be excluded from resolution.
+Comma-separated list of view names that should be excluded from resolution.  
+要被排除在解析之外的视图名称列表，用逗号分隔。
 * `spring.thymeleaf.mode`  
-Template mode to be applied to templates. See also StandardTemplateModeHandlers. (Default value: HTML5)
+Template mode to be applied to templates. See also StandardTemplateModeHandlers. (Default value: HTML5)  
+要运用于模板之上的模板模式。另见`StandardTemplateModeHandlers`。（默认值：`HTML5`）
 * `spring.thymeleaf.prefix`  
-Prefix that gets prepended to view names when building a URL. (Default value: classpath:/templates/)
+Prefix that gets prepended to view names when building a URL. (Default value: classpath:/templates/)  
+在构建URL时添加到视图名称前的前缀。（默认值：`classpath:/templates/`）
 * `spring.thymeleaf.suffix`  
-Suffix that gets appended to view names when building a URL. (Default value: .html)
+Suffix that gets appended to view names when building a URL. (Default value: .html)  
+在构建URL时添加到视图名称后的后缀。（默认值：`.html`）
 * `spring.thymeleaf.template-resolver-order`  
-Order of the template resolver in the chain. By default, the template resolver is first in the chain. Ordering starts at 1 and should only be set if you have defined additional TemplateResolver beans.
+Order of the template resolver in the chain. By default, the template resolver is first in the chain. Ordering starts at 1 and should only be set if you have defined additional TemplateResolver beans.  
+Thymeleaf模板解析器在解析器链中的顺序。默认情况下，它排在第一位。顺序从1开始，只有在定义了额外的`TemplateResolver` Bean时才需要设置这个属性。
 * `spring.thymeleaf.view-names`  
 Comma-separated list of view names that can be resolved.
 * `spring.velocity.allow-request-override`  
