@@ -986,3 +986,205 @@ SMTP server port.  SMTP服务器的端口号。* `spring.mail.properties`  Ad
 Enable support for fallback resolution. (Default value: false)  开启降级解析支持。（默认值：`false`）* `spring.mobile.devicedelegatingviewresolver.enabled`  
 Enable device view resolver. (Default value: false)  开启设备视图解析器。（默认值：`false`）* `spring.mobile.devicedelegatingviewresolver.mobile-prefix`  Prefix that gets prepended to view names for mobile devices. (Default value: mobile/)  添加到移动设备视图名前的前缀。（默认值：`mobile/`）* `spring.mobile.devicedelegatingviewresolver.mobile-suffix`  Suffix that gets appended to view names for mobile devices.  添加到移动设备视图名后的后缀。* `spring.mobile.devicedelegatingviewresolver.normal-prefix`  Prefix that gets prepended to view names for normal devices.  添加到普通设备视图名前的前缀。* `spring.mobile.devicedelegatingviewresolver.normal-suffix`  Suffix that gets appended to view names for normal devices.  添加到普通设备视图名后的后缀。* `spring.mobile.devicedelegatingviewresolver.tablet-prefix`  Prefix that gets prepended to view names for tablet devices. (Default value: tablet/)  添加到平板设备视图名前的前缀。（默认值：`tablet/`）* `spring.mobile.devicedelegatingviewresolver.tablet-suffix`  Suffix that gets appended to view names for tablet devices.  添加到平板设备视图名后的后缀。* `spring.mobile.sitepreference.enabled`  Enable SitePreferenceHandler. (Default value: true)  开启`SitePreferenceHandler`。（默认值：`true`）* `spring.mongodb.embedded.features`  Comma-separated list of features to enable.  要开启的特性列表，用逗号分隔。* `spring.mongodb.embedded.version`  Version of Mongo to use. (Default value: 2.6.10)  
 要使用的Mongo版本。（默认值：`2.6.10`）
+* `spring.mustache.cache`  
+Enable template caching.
+* `spring.mustache.charset`  
+Template encoding.
+* `spring.mustache.check-template-location`  
+Check that the templates location exists.
+* `spring.mustache.content-type`  
+Content-Type value.
+* `spring.mustache.enabled`  
+Enable MVC view resolution for this technology.
+* `spring.mustache.prefix`  
+Prefix to apply to template names. (Default value: classpath:/templates/)
+* `spring.mustache.suffix`  
+Suffix to apply to template names. (Default value: .html)
+* `spring.mustache.view-names`  
+Whitelist of view names that can be resolved.
+* `spring.mvc.async.request-timeout`  
+Amount of time (in milliseconds) before asynchronous request handling times out. If this value is not set, the default timeout of the underlying implementation is used, such as 10 seconds on Tomcat with Servlet 3.
+* `spring.mvc.date-format`  
+Date format to use (such as dd/MM/yyyy).
+* `spring.mvc.favicon.enabled`  
+Enable resolution of favicon.ico. (Default value: true)
+* `spring.mvc.ignore-default-model-on-redirect`  
+If the content of the “default” model should be ignored during redirect scenarios. (Default value: true)
+* `spring.mvc.locale`  
+Locale to use.
+* `spring.mvc.message-codes-resolver-format`  
+Formatting strategy for message codes (PREFIX_ERROR_CODE, POSTFIX_ERROR_CODE).
+* `spring.mvc.view.prefix`  
+Spring MVC view prefix.
+* `spring.mvc.view.suffix`  
+Spring MVC view suffix.
+* `spring.rabbitmq.addresses`  
+Comma-separated list of addresses to which the client should connect.
+* `spring.rabbitmq.dynamic`  
+Create an AmqpAdmin bean. (Default value: true)
+* `spring.rabbitmq.host`  
+RabbitMQ host. (Default value: localhost)
+* `spring.rabbitmq.listener.acknowledge-mode`  
+Acknowledge mode of container.
+* `spring.rabbitmq.listener.auto-startup`  
+Start the container automatically on startup. (Default value: true)
+* `spring.rabbitmq.listener.concurrency`  
+Minimum number of consumers.
+* `spring.rabbitmq.listener.max-concurrency`  
+Maximum number of consumers.
+* `spring.rabbitmq.listener.prefetch`  
+Number of messages to be handled in a single request. It should be greater than or equal to the transaction size (if used).
+* `spring.rabbitmq.listener.transaction-size`  
+Number of messages to be processed in a transaction. For best results, it should be less than or equal to the prefetch count.
+* `spring.rabbitmq.password`  
+Login to authenticate against the broker.
+* `spring.rabbitmq.port`  
+RabbitMQ port. (Default value: 5672)
+* `spring.rabbitmq.requested-heartbeat`  
+Requested heartbeat timeout in seconds; 0 for none.
+* `spring.rabbitmq.ssl.enabled`  
+Enable SSL support. (Default value: false)
+* `spring.rabbitmq.ssl.key-store`  
+Path to the key store that holds the SSL certificate.
+* `spring.rabbitmq.ssl.key-store-password`  
+Password used to access the key store.
+* `spring.rabbitmq.ssl.trust-store`  
+Trust store that holds SSL certificates.
+* `spring.rabbitmq.ssl.trust-store-password`  
+Password used to access the trust store.
+* `spring.rabbitmq.username`  
+Login user to authenticate to the broker.
+* `spring.rabbitmq.virtual-host`  
+Virtual host to use when connecting to the broker.
+* `spring.redis.database`  
+Database index used by the connection factory. (Default value: 0)
+* `spring.redis.host`  
+Redis server host. (Default value: localhost)
+* `spring.redis.password`  
+Login password of the Redis server.
+* `spring.redis.pool.max-active`  
+Max number of connections that can be allocated by the pool at a given time. Use a negative value for no limit. (Default value: 8)
+* `spring.redis.pool.max-idle`  
+Max number of idle connections in the pool. Use a negative value to indicate an unlimited number of idle connections. (Default value: 8)
+* `spring.redis.pool.max-wait`  
+Maximum amount of time (in milliseconds) a connection allocation should block before throwing an exception when the pool is exhausted. Use a negative value to block indefinitely. (Default value: -1)
+* `spring.redis.pool.min-idle`  
+Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive. (Default value: 0)
+* `spring.redis.port`  
+Redis server port. (Default value: 6379)
+* `spring.redis.sentinel.master`  
+Name of Redis server.
+* `spring.redis.sentinel.nodes`  
+Comma-separated list of host:port pairs.
+* `spring.redis.timeout`  
+Connection timeout in milliseconds. (Default value: 0)
+* `spring.resources.add-mappings`  
+Enable default resource handling. (Default value: true)
+* `spring.resources.cache-period`  
+Cache period for the resources served by the resource handler, in seconds.
+* `spring.resources.chain.cache`  
+Enable caching in the resource chain. (Default value: true)
+* `spring.resources.chain.enabled`  
+Enable the Spring resource handling chain. (Disabled by default unless at least one strategy has been enabled.)
+* `spring.resources.chain.html-application-cache`  
+Enable HTML5 application cache manifest rewriting. (Default value: false)
+* `spring.resources.chain.strategy.content.enabled`  
+Enable the content version strategy. (Default value: false)
+* `spring.resources.chain.strategy.content.paths`  
+Comma-separated list of patterns to apply to the version strategy. (Default value: `[/**]`)
+* `spring.resources.chain.strategy.fixed.enabled`  
+Enable the fixed version strategy. (Default value: false)
+* `spring.resources.chain.strategy.fixed.paths`  
+Comma-separated list of patterns to apply to the version strategy.
+* `spring.resources.chain.strategy.fixed.version`  
+Version string to use for the version strategy.
+* `spring.resources.static-locations`  
+Locations of static resources. Defaults to classpath:[/META-INF/resources/, /resources/, /static/, /public/] plus context:/ (the root of the servlet context).
+* `spring.sendgrid.password`  
+SendGrid password.
+* `spring.sendgrid.proxy.host`  
+SendGrid proxy host.
+* `spring.sendgrid.proxy.port`  
+SendGrid proxy port.
+* `spring.sendgrid.username`  
+SendGrid username.
+* `spring.social.auto-connection-views`  
+Enable the connection status view for supported providers. (Default value: false)
+* `spring.social.facebook.app-id`  
+Application ID.
+* `spring.social.facebook.app-secret`  
+Application secret.
+* `spring.social.linkedin.app-id`  
+Application ID.
+* `spring.social.linkedin.app-secret`  
+Application secret.
+* `spring.social.twitter.app-id`  
+Application ID.
+* `spring.social.twitter.app-secret`  
+Application secret.
+* `spring.thymeleaf.cache`  
+Enable template caching. (Default value: true)
+* `spring.thymeleaf.check-template-location`  
+Check that the templates location exists. (Default value: true)
+* `spring.thymeleaf.content-type`  
+Content-Type value. (Default value: text/html)
+* `spring.thymeleaf.enabled`  
+Enable MVC Thymeleaf view resolution. (Default value: true)
+* `spring.thymeleaf.encoding`  
+Template encoding. (Default value: UTF-8)
+* `spring.thymeleaf.excluded-view-names`  
+Comma-separated list of view names that should be excluded from resolution.
+* `spring.thymeleaf.mode`  
+Template mode to be applied to templates. See also StandardTemplateModeHandlers. (Default value: HTML5)
+* `spring.thymeleaf.prefix`  
+Prefix that gets prepended to view names when building a URL. (Default value: classpath:/templates/)
+* `spring.thymeleaf.suffix`  
+Suffix that gets appended to view names when building a URL. (Default value: .html)
+* `spring.thymeleaf.template-resolver-order`  
+Order of the template resolver in the chain. By default, the template resolver is first in the chain. Ordering starts at 1 and should only be set if you have defined additional TemplateResolver beans.
+* `spring.thymeleaf.view-names`  
+Comma-separated list of view names that can be resolved.
+* `spring.velocity.allow-request-override`  
+Set whether HttpServletRequest attributes are allowed to override (hide) controller-generated model attributes of the same name.
+* `spring.velocity.allow-session-override`  
+Set whether HttpSession attributes are allowed to override (hide) controllergenerated model attributes of the same name.
+* `spring.velocity.cache`  
+Enable template caching.
+* `spring.velocity.charset`  
+Template encoding.
+* `spring.velocity.check-template-location`  
+Check that the templates location exists.
+* `spring.velocity.content-type`  
+Content-Type value.
+* `spring.velocity.date-tool-attribute`  
+Name of the DateTool helper object to expose in the Velocity context of the view.
+* `spring.velocity.enabled`  
+Enable MVC view resolution for this technology.
+* `spring.velocity.expose-request-attributes`  
+Set whether all request attributes should be added to the model prior to merging with the template.
+* `spring.velocity.expose-session-attributes`  
+Set whether all HttpSession attributes should be added to the model prior to merging with the template.
+* `spring.velocity.expose-spring-macro-helpers`  
+Set whether to expose a RequestContext for use by Spring’s macro library, under the name springMacroRequestContext.
+* `spring.velocity.number-tool-attribute`  
+Name of the NumberTool helper object to expose in the Velocity context of the view.
+* `spring.velocity.prefer-file-system-access`  
+Prefer filesystem access for template loading. Filesystem access enables hot detection of template changes. (Default value: true)
+* `spring.velocity.prefix`  
+Prefix that gets prepended to view names when building a URL.
+* `spring.velocity.properties`  
+Additional velocity properties.
+* `spring.velocity.request-context-attribute`  
+Name of the RequestContext attribute for all views.
+* `spring.velocity.resource-loader-path`  
+Template path. (Default value: classpath:/templates/)
+* `spring.velocity.suffix`  
+Suffix that gets appended to view names when building a URL.
+* `spring.velocity.toolbox-config-location`  
+Velocity Toolbox config location, such as /WEB-INF/toolbox.xml. Automatically loads a Velocity Tools toolbox definition file and exposes all defined tools in the specified scopes.
+* `spring.velocity.view-names`  
+Whitelist of view names that can be resolved.
+* `spring.view.prefix`  
+Spring MVC view prefix.
+* `spring.view.suffix`  
+Spring MVC view suffix.
