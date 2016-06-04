@@ -891,7 +891,7 @@ Set whether HttpServletRequest attributes are allowed to override (hide) control
 Enable template caching.  开启模板缓存。* `spring.freemarker.charset`  
 Template encoding.  模板编码。* `spring.freemarker.check-template-location`  
 Check that the templates location exists.  检查模板位置是否存在。* `spring.freemarker.content-type`  
-Content-Type value.  `Content-Type`的值。* `spring.freemarker.enabled`  Enable MVC view resolution for this technology.  开启FreeMarker的MVC视图解析。* `spring.freemarker.expose-request-attributes`  Set whether all request attributes should be added to the model prior to merging with the template.  在模型合并到模板前，是否要把所有的请求属性添加到模型里。* `spring.freemarker.expose-session-attributes`  Set whether all HttpSession attributes should be added to the model prior to merging with the template.  在模型合并到模板前，是否要把所有的`HttpSession`属性添加到模型里。* `spring.freemarker.expose-spring-macro-helpers`  Set whether to expose a RequestContext for use by Spring’s macro library, under the name springMacroRequestContext.  是否要用Spring的宏发布一个`RequestContext`，名为`springMacroRequestContext`。* `spring.freemarker.prefer-file-system-access`  Prefer filesystem access for template loading. Filesystem access enables hot detection of template changes. (Default value: true)  加载模板时优先通过文件系统访问。文件系统访问能够实时检测到模板变更。（默认值：`true`）* `spring.freemarker.prefix`  Prefix that gets prepended to view names when building a URL.  在构建URL时添加到视图名称前的前缀。* `spring.freemarker.request-context-attribute`  
+Content-Type value.  `Content-Type`的值。* `spring.freemarker.enabled`  Enable MVC view resolution for this technology.  开启FreeMarker的MVC视图解析。* `spring.freemarker.expose-request-attributes`  Set whether all request attributes should be added to the model prior to merging with the template.  在模型合并到模板前，是否要把所有的请求属性添加到模型里。* `spring.freemarker.expose-session-attributes`  Set whether all HttpSession attributes should be added to the model prior to merging with the template.  在模型合并到模板前，是否要把所有的`HttpSession`属性添加到模型里。* `spring.freemarker.expose-spring-macro-helpers`  Set whether to expose a RequestContext for use by Spring’s macro library, under the name springMacroRequestContext.  是否要用Spring的宏发布`RequestContext`，名为`springMacroRequestContext`。* `spring.freemarker.prefer-file-system-access`  Prefer filesystem access for template loading. Filesystem access enables hot detection of template changes. (Default value: true)  加载模板时优先通过文件系统访问。文件系统访问能够实时检测到模板变更。（默认值：`true`）* `spring.freemarker.prefix`  Prefix that gets prepended to view names when building a URL.  在构建URL时添加到视图名称前的前缀。* `spring.freemarker.request-context-attribute`  
 Name of the RequestContext attribute for all views.  所有视图里使用的`RequestContext`属性的名称。* `spring.freemarker.settings`  Well-known FreeMarker keys that will be passed to FreeMarker’s configuration.  要传递给FreeMarker配置的各种键。* `spring.freemarker.suffix`  Suffix that gets appended to view names when building a URL.  在构建URL时添加到视图名称后的后缀。* `spring.freemarker.template-loader-path`  Comma-separated list of template paths. (Default value: ["classpath:/templates/"])  
 模板路径列表，用逗号分隔。（默认值：`["classpath:/templates/"]`）
 * `spring.freemarker.view-names`  Whitelist of view names that can be resolved.  可解析的视图名称的白名单。* `spring.groovy.template.allow-request-override`  Set whether HttpServletRequest attributes are allowed to override (hide) controller-generated model attributes of the same name.  `HttpServletRequest`的属性是否允许覆盖（隐藏）控制器生成的同名模型属性。* `spring.groovy.template.allow-session-override`  Set whether HttpSession attributes are allowed to override (hide) controller-generated model attributes of the same name.  `HttpSession`的属性是否允许覆盖（隐藏）控制器生成的同名模型属性。* `spring.groovy.template.cache`  Enable template caching.  开启模板缓存。* `spring.groovy.template.charset`  Template encoding.  模板编码。* `spring.groovy.template.check-template-location`  Check that the templates location exists.  检查模板位置是否存在。* `spring.groovy.template.configuration.auto-escape`  Whether or not model variables are escaped when rendered in the template. (Default value: false)  模型变量在模板里呈现时是否要做转义。（默认值：`false`）* `spring.groovy.template.configuration.auto-indent`  Whether or not the template renders indentation automatically. (Default value: false)  模板是否要自动呈现缩进。（默认值：`false`）* `spring.groovy.template.configuration.auto-indent-string`  The string used for indentation when auto-indentation is enabled. Either SPACES or TAB. (Default value: SPACES)  开启自动缩进时用于缩进的字符串。可以是`SPACES`，也可以是`TAB`。（默认值：`SPACES`）* `spring.groovy.template.configuration.auto-new-line`  Whether or not new lines should be rendered by the template. (Default value: false)  模板里是否要呈现新的空行。（默认值：`false`）* `spring.groovy.template.configuration.base-template-class`  The template base class.  模板基类。* `spring.groovy.template.configuration.cache-templates`  
@@ -906,7 +906,7 @@ Content-Type value.
 开启Groovy模板的MVC视图解析。* `spring.groovy.template.expose-request-attributes`  Set whether all request attributes should be added to the model prior to merging with the template.  
 在模型合并到模板前，是否要把所有的请求属性添加到模型里。* `spring.groovy.template.expose-session-attributes`  Set whether all HttpSession attributes should be added to the model prior to merging with the template.  
 在模型合并到模板前，是否要把所有的`HttpSession`属性添加到模型里。* `spring.groovy.template.expose-spring-macro-helpers`  Set whether to expose a RequestContext for use by Spring’s macro library, under the name springMacroRequestContext.  
-是否要用Spring的宏发布一个`RequestContext`，名为`springMacroRequestContext`。* `spring.groovy.template.prefix`  Prefix that gets prepended to view names when building a URL.  
+是否要用Spring的宏发布`RequestContext`，名为`springMacroRequestContext`。* `spring.groovy.template.prefix`  Prefix that gets prepended to view names when building a URL.  
 在构建URL时添加到视图名称前的前缀。* `spring.groovy.template.request-context-attribute`  
 Name of the RequestContext attribute for all views.  
 所有视图里使用的`RequestContext`属性的名称。* `spring.groovy.template.resource-loader-path`  
@@ -1221,48 +1221,71 @@ Suffix that gets appended to view names when building a URL. (Default value: .ht
 Order of the template resolver in the chain. By default, the template resolver is first in the chain. Ordering starts at 1 and should only be set if you have defined additional TemplateResolver beans.  
 Thymeleaf模板解析器在解析器链中的顺序。默认情况下，它排在第一位。顺序从1开始，只有在定义了额外的`TemplateResolver` Bean时才需要设置这个属性。
 * `spring.thymeleaf.view-names`  
-Comma-separated list of view names that can be resolved.
+Comma-separated list of view names that can be resolved.  
+可解析的视图名称列表，用逗号分隔。
 * `spring.velocity.allow-request-override`  
-Set whether HttpServletRequest attributes are allowed to override (hide) controller-generated model attributes of the same name.
+Set whether HttpServletRequest attributes are allowed to override (hide) controller-generated model attributes of the same name.  
+`HttpServletRequest`的属性是否允许覆盖（隐藏）控制器生成的同名模型属性。
 * `spring.velocity.allow-session-override`  
-Set whether HttpSession attributes are allowed to override (hide) controllergenerated model attributes of the same name.
+Set whether HttpSession attributes are allowed to override (hide) controller-generated model attributes of the same name.  
+`HttpSession`的属性是否允许覆盖（隐藏）控制器生成的同名模型属性。
 * `spring.velocity.cache`  
-Enable template caching.
+Enable template caching.  
+开启模板缓存。
 * `spring.velocity.charset`  
-Template encoding.
+Template encoding.  
+模板编码。
 * `spring.velocity.check-template-location`  
-Check that the templates location exists.
+Check that the templates location exists.  
+检查模板位置是否存在。
 * `spring.velocity.content-type`  
-Content-Type value.
+Content-Type value.  
+`Content-Type`的值。
 * `spring.velocity.date-tool-attribute`  
-Name of the DateTool helper object to expose in the Velocity context of the view.
+Name of the DateTool helper object to expose in the Velocity context of the view.  
+`DateTool`辅助对象在视图的Velocity上下文里呈现的名字。
 * `spring.velocity.enabled`  
-Enable MVC view resolution for this technology.
+Enable MVC view resolution for this technology.  
+开启Velocity的MVC视图解析。
 * `spring.velocity.expose-request-attributes`  
-Set whether all request attributes should be added to the model prior to merging with the template.
+Set whether all request attributes should be added to the model prior to merging with the template.  
+在模型合并到模板前，是否要把所有的请求属性添加到模型里。
 * `spring.velocity.expose-session-attributes`  
-Set whether all HttpSession attributes should be added to the model prior to merging with the template.
+Set whether all HttpSession attributes should be added to the model prior to merging with the template.  
+在模型合并到模板前，是否要把所有的`HttpSession`属性添加到模型里。
 * `spring.velocity.expose-spring-macro-helpers`  
-Set whether to expose a RequestContext for use by Spring’s macro library, under the name springMacroRequestContext.
+Set whether to expose a RequestContext for use by Spring’s macro library, under the name springMacroRequestContext.  
+是否要用Spring的宏发布`RequestContext`，名为`springMacroRequestContext`。
 * `spring.velocity.number-tool-attribute`  
-Name of the NumberTool helper object to expose in the Velocity context of the view.
+Name of the NumberTool helper object to expose in the Velocity context of the view.  
+`NumberTool`辅助对象在视图的Velocity上下文里呈现的名字。
 * `spring.velocity.prefer-file-system-access`  
-Prefer filesystem access for template loading. Filesystem access enables hot detection of template changes. (Default value: true)
+Prefer filesystem access for template loading. Filesystem access enables hot detection of template changes. (Default value: true)  
+加载模板时优先通过文件系统访问。文件系统访问能够实时检测到模板变更。（默认值：`true`）
 * `spring.velocity.prefix`  
-Prefix that gets prepended to view names when building a URL.
+Prefix that gets prepended to view names when building a URL.  
+在构建URL时添加到视图名称前的前缀。
 * `spring.velocity.properties`  
-Additional velocity properties.
+Additional velocity properties.  
+额外的Velocity属性。
 * `spring.velocity.request-context-attribute`  
-Name of the RequestContext attribute for all views.
+Name of the RequestContext attribute for all views.  
+所有视图里使用的`RequestContext`属性的名称。
 * `spring.velocity.resource-loader-path`  
-Template path. (Default value: classpath:/templates/)
+Template path. (Default value: classpath:/templates/)  
+模板路径。（默认值：`classpath:/templates/`）
 * `spring.velocity.suffix`  
-Suffix that gets appended to view names when building a URL.
+Suffix that gets appended to view names when building a URL.  
+在构建URL时添加到视图名称后的后缀。
 * `spring.velocity.toolbox-config-location`  
-Velocity Toolbox config location, such as /WEB-INF/toolbox.xml. Automatically loads a Velocity Tools toolbox definition file and exposes all defined tools in the specified scopes.
+Velocity Toolbox config location, such as /WEB-INF/toolbox.xml. Automatically loads a Velocity Tools toolbox definition file and exposes all defined tools in the specified scopes.  
+Velocity Toolbox的配置位置，比如`/WEB-INF/toolbox.xml`。自动加载Velocity Tools工具定义文件，将所定义的全部工具发布到指定的作用域内。
 * `spring.velocity.view-names`  
-Whitelist of view names that can be resolved.
+Whitelist of view names that can be resolved.  
+可解析的视图名称白名单。
 * `spring.view.prefix`  
-Spring MVC view prefix.
+Spring MVC view prefix.  
+Spring MVC视图前缀。
 * `spring.view.suffix`  
-Spring MVC view suffix.
+Spring MVC view suffix.  
+Spring MVC视图后缀。
