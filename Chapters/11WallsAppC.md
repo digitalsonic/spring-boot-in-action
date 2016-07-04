@@ -2,11 +2,11 @@
 
 虽然Spring Boot在应用程序配置组件时处理了很多“粗活”，但你可能还是想对其中某些组件进行微调。这时就该配置属性登场了。
 
-第3章介绍了`@ConfigurationProperties`注解，以及它如何暴露配置在代码外部的属性。正如你可以在自己创建的组件上使用`@ConfigurationProperties`注解，很多Spring Boot自动配置的组件也添加了`@ConfigurationProperties`注解，可以通过Spring Boot支持的各种属性源对其进行配置。
+第3章介绍了`@ConfigurationProperties`注解，以及它如何暴露配置在代码外部的属性。你可以在自己创建的组件上使用`@ConfigurationProperties`注解，而Spring Boot自动配置的很多组件也添加了`@ConfigurationProperties`注解，可以通过Spring Boot支持的各种属性源对其进行配置。
 
-例如，要指定内嵌的Tomcat或Jetty服务器要监听的端口，可以设置`server.port`属性。这个属性可以设置于application.properties、application.yml、操作系统环境变量，或者是3.2节列出的其他地方。
+例如，要指定内嵌的Tomcat或Jetty服务器应监听的端口，可以设置`server.port`属性。这个属性可以设置于application.properties、application.yml、操作系统环境变量，或者是3.2节列出的其他地方。
 
-本附录列出了Spring Boot组件提供的全部配置属性。请注意，这些属性是否生效取决于对应的组件是否声明为Spring应用程序上下文里的Bean（基本是自动配置的），设置为一个不生效的组件设置属性是没用的。
+本附录列出了Spring Boot组件提供的全部配置属性。请注意，这些属性是否生效取决于对应的组件是否声明为Spring应用程序上下文里的Bean（基本是自动配置的），设置为一个不生效的组件设置属性是没有用的。
 
 * `flyway.baseline-description`  ：执行基线时标记已有Schema的描述。
 * `flyway.baseline-on-migrate`  ：在没有元数据表的情况下，针对非空Schema执行迁移时是否自动调用基线。（默认值：`false`。）
@@ -44,10 +44,10 @@
 * `liquibase.url`：待迁移数据库的JDBC URL。如果没有设置，就使用配置的主数据源。
 * `liquibase.user`：待迁移数据库的登录用户。
 * `multipart.enabled`：开启分段（multi-part）上传支持。（默认值：`true`。）
-* `multipart.file-size-threshold`：大于该阈值的文件会写到磁盘上。这里的值可以使用“MB”或“KB”后缀来表明是兆字节还是千字节。（默认值：`0`。）
+* `multipart.file-size-threshold`：大于该阈值的文件会写到磁盘上。这里的值可以使用`MB`或`KB`后缀来表明是兆字节还是千字节。（默认值：`0`。）
 * `multipart.location`：上传文件的中间存放位置。
-* `multipart.max-file-size`：最大文件大小。这里的值可以使用“MB”或“KB”的后缀来表明是兆字节还是千字节。（默认值：`1MB`。）
-* `multipart.max-request-size`：最大请求大小。这里的值可以使用“MB”或“KB”的后缀来表明是兆字节还是千字节。（默认值：`10MB`。）
+* `multipart.max-file-size`：最大文件大小。这里的值可以使用`MB`或`KB`后缀来表明是兆字节还是千字节。（默认值：`1MB`。）
+* `multipart.max-request-size`：最大请求大小。这里的值可以使用`MB`或`KB`后缀来表明是兆字节还是千字节。（默认值：`10MB`。）
 * `security.basic.authorize-mode`：要运用的安全授权模式。
 * `security.basic.enabled`：开启基本身份验证。（默认值：`true`。）
 * `security.basic.path`：要保护的路径，用逗号分隔。（默认值：`[/**]`。）
@@ -76,9 +76,7 @@
 * `security.oauth2.client.refresh-token-validity-seconds`：刷新令牌在过期前的有效时间。
 * `security.oauth2.client.registered-redirect-uri`：客户端里注册的重定向URI，用逗号分隔。
 * `security.oauth2.client.resource-ids`：与客户端关联的资源ID，用逗号分隔。
-* `security.oauth2.client.scope`  
-Scope assigned to the client.  
-客户端分配的域。
+* `security.oauth2.client.scope`：客户端分配的域。
 * `security.oauth2.client.token-name`：令牌名称。
 * `security.oauth2.client.use-current-uri`：请求里的当前URI（如果设置了的话）是否优先于预建立的重定向URI。（默认值：`true`。）
 * `security.oauth2.client.user-authorization-uri`：用户要重定向以便授访问令牌的URI。
