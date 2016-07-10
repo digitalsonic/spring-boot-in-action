@@ -1,119 +1,111 @@
-# 推荐序
+# 序
 
-2014年春天，Netflix的交付工程团队（Delivery Engineering team）开始着手实现一个伟大的目标——通过一个软件平台来实现端到端的全局持续交付，该平台有利于系统的可扩展性及系统的弹性。为了满足Netflix的交付与部署需要，我的团队曾构建了两套不同的应用程序，但这两套应用程序都有演变成庞然大物的趋势，而且都没能满足灵活性和弹性的目标。更重要的是，这些庞大的应用程序最终还拖了我们的后腿，让我们跟不上合作伙伴创新的步伐。用户们开始规避我们的工具，而不是使用它们。
+2014年春天，Netflix的交付工程团队开始着手实现一个伟大的目标——通过一个软件平台来实现端到端的全局持续交付，该平台有利于系统的可扩展性及弹性。为了满足Netflix的交付与部署需要，我的团队曾构建了两套不同的应用程序，但这两套应用程序都有演变成庞然大物的趋势，而且都没能满足灵活性和弹性的目标。更重要的是，这些庞大的应用程序最终还拖了我们的后腿，让我们跟不上合作伙伴的创新步伐。用户开始回避我们的工具，而不是使用它们。
 
-很明显，如果想要向公司证明自己的真正价值并快速创新，我们需要把庞然大物打散成小的独立服务，这些服务要能随时发布。拥抱微服务架构给我们带来了希望，让我们能实现灵活性与弹性的双重目标。但是我们需要在一个可靠的基础上实现这一架构，它要能做到真正的并发、合理的监控、可靠易用的服务发现，运行时还要有极好的性能。
+很明显，如果想要向公司证明自己的真正价值并快速创新，我们需要把庞然大物分解成小的独立服务，这些服务要能随时发布。拥抱微服务架构给我们带来了希望，让我们能实现灵活性与弹性的双重目标。但是我们需要在一个可靠的基础上实现这一架构，它要能实现真正的并发、合理的监控、可靠易用的服务发现，运行时还要有极好的性能。
 
-我们要在JVM上寻找一款框架，它要直接提供快速开发能力和强大运维的能力。最终，我们找到了Spring Boot。
+我们要在JVM上寻找一款框架，它要直接提供快速开发的能力和强大的运维能力。最终，我们找到了Spring Boot。
 
-Spring Boot能在寥寥数行代码下构建一套基于Spring并满足生产要求的服务，一切不费吹灰之力！实际上，一个简单的Spring Boot Hello World应用程序能放进一条推文里，这在短短几年之前还是完全不可能的事情。它还自带了不少非功能性的特性，比如安全、度量、健康检查、内嵌服务器和外置配置，这些都让选择Spring Boot成为了一件顺理成章的事情。
+Spring Boot能用寥寥数行代码构建一套基于Spring并满足生产要求的服务，不费吹灰之力！实际上，一个简单的Spring Boot Hello World应用程序能放进一条推文里，这在短短几年之前还是完全不可能的事情。它还自带了不少非功能性的特性，比如安全、度量、健康检查、内嵌服务器和外置配置，这些都让选择Spring Boot成为了一件顺理成章的事情。
 
-然而，踏上Spring Boot之旅后，我们却发现手头没有好的文档。要搞明白怎么利用好框架的特性，只能依托于源码，这可不是个让人愉快的办法。
+然而，踏上Spring Boot之旅后，我们却发现手头没有好的文档。要搞明白怎么利用好框架的特性，只能依靠源码，这可不是个让人愉快的办法。
 
-Manning那本著名的《Spring实战》的作者再度接受挑战，将Spring Boot的核心用法写成了另一本好书，得知这一消息后我一点都不吃惊，毫无疑问，克雷格和Manning的团队又做成了一件了不起的大事！正如我们所料，《Spring Boot实战》是一本通俗易懂的好书。
+Manning那本著名的《Spring实战》的作者再度接受挑战，将Spring Boot的核心用法写成了另一本好书，对此我一点都不吃惊。毫无疑问，Craig和Manning的团队又做成了一件了不起的大事！正如我们所料，《Spring Boot实战》是一本通俗易懂的好书。
 
-从第1章那引人入胜的介绍以及富有传奇色彩的90字符推文应用程序，一直到第7章里对Spring Boot的Actuator（它提供了很多生产应用程序所需的神奇的运维特性）的深度分析，《Spring Boot实战》做到了知无不言，言无不尽。实际上，对我而言，第7章里对Actuator的深度分析解答了不少问题，这些问题自一年多以前我开始使用Spring Boot之后就一直萦绕在我的脑海里。第8章里对部署选项的彻底研究让我大开眼界，了解了Cloud Foundry在云部署方面是如此简便。第4章是我最喜欢的章节之一，克雷格揭示了很多强大的选项，它们能很方便地测试一个Spring Boot应用程序。打一开始我就惊熹于Spring的测试特性，而Spring Boot将它们发挥得淋漓尽致。
+从第1章引人入胜的介绍以及富有传奇色彩的90字符推文应用程序，一直到第7章对Spring Boot的Actuator（提供了很多生产应用程序所需的神奇的运维特性）的深度分析，《Spring Boot实战》做到了知无不言，言无不尽。实际上，对我而言，第7章对Actuator的深度分析解答了不少问题，这些问题自一年多以前我开始使用Spring Boot后，就一直萦绕在我的脑海里。第8章对部署选项的透彻研究让我大开眼界，了解到Cloud Foundry在云部署方面是如此简便。第4章是我最喜欢的章节之一，Craig揭示了很多强大的选项，它们能很方便地测试Spring Boot应用程序。从一开始我就惊喜于Spring的测试特性，而Spring Boot将它们发挥得淋漓尽致。
 
-正如上文中我所说的那样，Spring Boot正是十几年来Java社区所探寻的那种框架。它那简单易用的开发特性和开箱即用（out-of-the-box）的运维能力让Java开发又有趣起来了。我很高兴地向大家宣布Spring和Spring Boot已经成为了Netflix新持续交付平台的基础。而且，Netflix的其他团队也参考了我们的做法，因为他们也看到了Spring Boot的巨大益处。
+正如上文中我所说的那样，Spring Boot正是十几年来Java社区所探寻的那种框架。它那简单易用的开发特性和开箱即用的运维能力，让Java开发再度趣味横生。我欣然向大家宣布，Spring和Spring Boot已经成为了Netflix新持续交付平台的基础。而且，Netflix的其他团队也参考了我们的做法，因为他们也看到了Spring Boot的巨大益处。
 
-我怀着兴奋与激动的心情，向大家强烈推荐克雷格的书，作为Spring Boot的文档，本书可谓通俗易懂、趣味横生，是Spring Boot征服Java社区后大家翘首以盼的佳作。克雷格浅显易懂的写作风格，对Spring Boot核心特性与功能的全面分析，一定能让读者对Spring Boot有个彻底的认识（同时还伴随着喜悦与肃然起敬交织的心情）。
+我怀着兴奋与激动的心情，向大家强烈推荐Craig的书。作为Spring Boot的文档，本书可谓通俗易懂、趣味横生，是Spring Boot征服Java社区后，大家翘首以盼的佳作。Craig浅显易懂的写作风格，对Spring Boot核心特性与功能的全面分析，一定能让读者对Spring Boot有个彻底的认识（而且在满心欢喜的同时还肃然起敬）。
 
-克雷格加油！Manning出版社加油！那些开发出Spring Boot的天才开发者们加油！请你们一定坚持下去！就是你们确保了JVM的光明未来。
+Craig加油！Manning出版社加油！那些开发出Spring Boot的天才开发者们加油！请你们一定坚持下去！正是你们确保了JVM的光明未来。
 
-ANDREW GLOVER  
+{--:}Andrew Glover   
 Netflix交付工程团队经理
 
 #前言
 
-在1964年的纽约世界博览会（New York World’s Fair）上，沃特·迪士尼向世界介绍了三件有开创意义的东西：“小小世界”（it's a small world）、“与林肯先生共度的伟大时刻”（Great Moments with Mr. Lincoln）以及“文明演进之旋转木马”（Carousel of Progress）<sup>【[译注1][P1]】</sup>。所有这三样东西随后都被搬进了迪士尼乐园（Disneyland）和迪士尼世界（Walt Disney World），你今天仍能看见它们。
+在1964年的纽约世界博览会上，沃特·迪士尼向世界介绍了三件有开创意义的东西：“小小世界”（it's a small world）、“与林肯先生共度的伟大时刻”（Great Moments with Mr. Lincoln）以及“文明演进之旋转木马”（Carousel of Progress）。***{![关于这届世博会里迪士尼相关的信息，详见[http://www.dwz.cn/2Hrvyh](http://www.dwz.cn/2Hrvyh)中的Disney influence部分。——译者注]}***所有这三样东西随后都搬进了迪士尼乐园和迪士尼世界，你今天仍能看见它们。
 
-其中，我最喜欢的是文明演进之旋转木马，恐怕这也是沃特·迪士尼的最爱之一。这既是骑行，又是舞台表演，座位区域围绕着中心区域旋转，上演四场表演，讲述了一个家庭在20世纪不同时代的故事，分别是1900年代早期、1920年代、1940年代和近代，突出了不同年代的技术进步。从手摇洗衣机，到电灯和收音机，到自动洗碗机和电视，再到电脑和声控家电，无一不在述说着创新的故事。<sup>【[译注2][P2]】</sup>
+其中，我最喜欢的是“文明演进之旋转木马”，这大约也是沃特·迪士尼的最爱之一。这既是骑行，又是舞台表演，座位区域围绕着中心区域旋转，上演四场表演，讲述了一个家庭在20世纪不同时代（分别是20世纪初、20世纪20年代、20世纪40年代和近年）的故事，突出了不同年代技术的进步。从手摇洗衣机，到电灯和收音机，到自动洗碗机和电视，再到电脑和声控家电，无一不在述说着创新的故事。***{![关于这个游乐设施，详见[http://www.yesterland.com/progress.html](http://www.yesterland.com/progress.html)的介绍。——译者注]}***
 
-在每幕表演中，父亲（也是演出的叙述者）都会讲述最新的发明，并带上一句“这玩意儿不能更好了（It can’t get any better）”，到头来却发现随着技术的进步，它的确变得更好了。
+在每幕表演中，父亲（也是演出的叙述者）都会讲述最新的发明，并带上一句“这玩意儿不能更好了”，到头来却发现随着技术的进步，它的确变得更好了。
 
-比起这场舞台演出，Spring的历史要短得多，但是关于Spring，我还是和“演进老爹”（Progress Dad）对20世纪的体会有类似的感受。看起来每个Spring应用程序都让开发者的生活更上一个台阶，仅从Spring组件的声明和织入方式就能看出端倪，让我们来看看Spring历史中的一些演化历程：
+比起这场舞台演出，Spring的历史要短得多。但是对于Spring，我的感受和“演进老爹”（Progress Dad）对20世纪的体会相似。似乎每个Spring应用程序都让开发者的生活更上一个台阶，仅从Spring组件的声明和织入方式就能看出端倪。让我们来看看Spring历史中的一些演化历程。
 
->- Spring 1.0的出现彻底改变了我们开发企业级Java应用程序的方式。Spring的依赖注入与声明式事务意味着组件之间再也不存在紧耦合，可以再也不用重量级的EJB了。这玩意儿不能更好了。
-- 到了Spring 2.0，我们可以在配置里使用自定义的XML命名空间，更小、更简单易懂的配置文件让Spring本身变得更便于使用。这玩意儿不能更好了。
--Spring 2.5让我们有了更优雅的面向注解的依赖注入模型（即`@Component`和`@Autowired`注解），以及面向注解的Spring MVC编程模型。不用再去显式地声明应用程序组件了，也不再需要去继承某个基础的控制器类。这玩意儿不能更好了。
-- 然后就到了Spring 3.0，我们有了一套基于Java的全新配置，它能够取代XML。在Spring 3.1里，一系列以`@Enable`为前缀的注解进一步完善了这一特性。终于，我们第一次可以写出一个没有任何XML配置的Spring应用程序。这玩意儿不能更好了。
-- Spring 4.0对条件化配置（conditional configuration）提供了支持，根据应用程序的Classpath、环境和其他因素，运行时决策将决定使用哪些配置，忽略哪些配置。那些决策不需要在构建时通过编写脚本确定了，以前会把选好的配置放在部署的包里，现在情况不同了。这玩意儿不能更好了。
+- Spring 1.0的出现彻底改变了我们开发企业级Java应用程序的方式。Spring的依赖注入与声明式事务意味着组件之间再也不存在紧耦合，再也不用重量级的EJB了。这玩意儿不能更好了。
+- 到了Spring 2.0，我们可以在配置里使用自定义的XML命名空间，更小、更简单易懂的配置文件让Spring本身更便于使用。这玩意儿不能更好了。
+- Spring 2.5让我们有了更优雅的面向注解的依赖注入模型（即`@Component`和`@Autowired`注解），以及面向注解的Spring MVC编程模型。不用再去显式地声明应用程序组件了，也不再需要去继承某个基础的控制器类了。这玩意儿不能更好了。
+- 到了Spring 3.0，我们有了一套基于Java的全新配置，它能够取代XML。在Spring 3.1里，一系列以`@Enable`开头的注解进一步完善了这一特性。终于，我们第一次可以写出一个没有任何XML配置的Spring应用程序了。这玩意儿不能更好了。
+- Spring 4.0对条件化配置提供了支持，根据应用程序的Classpath、环境和其他因素，运行时决策将决定使用哪些配置，忽略哪些配置。那些决策不需要在构建时通过编写脚本确定了；以前会把选好的配置放在部署的包里，现在情况不同了。这玩意儿不能更好了。
 
-现在轮到Spring Boot了。虽然Spring的每个版本都让我们觉得一切都不能更好了，但Spring Boot还是向我们证明了Spring仍然有巨大的潜力。事实上，我相信Spring Boot是长久以来Java开发历程里最意味深长和激动人心的东西。
+现在轮到Spring Boot了。虽然Spring的每个版本都让我们觉得一切都不能更好了，但Spring Boot还是向我们证明了Spring仍然有巨大的潜力。事实上，我相信Spring Boot是长久以来Java开发历程里最意义深刻、激动人心的东西。
 
-以历代Spring Framework的进步为基础，Spring Boot实现了自动配置，这让Spring能智能探测正在构建何种应用程序，自动配置必要的组件来满足应用程序的需要。对于那些常见配置场景，不再需要显式地编写配置了，Spring会替你料理好一切的。
+以历代Spring Framework的进步为基础，Spring Boot实现了自动配置，这让Spring能够智能探测正在构建何种应用程序，自动配置必要的组件以满足应用程序的需要。对于那些常见的配置场景，不再需要显式地编写配置了，Spring会替你料理好一切。
 
-选择在构建时和运行时要包含在应用程序里的库，往往要花费不少功夫，而Spring Boot的起步依赖（starter dependency）将常用依赖聚合在一起，藉此让一切都变简单。它不仅简化了你的构建说明，还让你免受苦思冥想特定库和版本之苦。
+选择在构建时和运行时要包含在应用程序里的库，往往要花费不少工夫，而Spring Boot的起步依赖（starter dependency）将常用依赖聚合在一起，借此简化一切。它不仅简化了你的构建说明，还让你不必苦思冥想特定库和版本。
 
-针对使用Groovy来开发Spring应用程序，Spring Boot的命令行界面提供了一个引人瞩目的选项，它让Java应用程序开发过程中的噪音降到最低，开发方式平易近人。有了Spring Boot CLI，就不再需要存取方法（accessor method），不再需要诸如`public`与`private`之类的访问修饰符（access modifier），也不再需要分号或者`return`关键字。在一些场景中，`import`语句都可以去掉。因为你是在命令行里以脚本方式运行应用程序，连构建说明都能免了。
+针对使用Groovy来开发Spring应用程序，Spring Boot的命令行界面提供了一个令人瞩目的选项，它将Java应用程序开发过程中的噪声降到最低，开发方式平易近人。有了Spring Boot CLI，就不再需要访问方法了，不再需要诸如`public`与`private`之类的访问修饰符，也不再需要分号或者`return`关键字。在许多场景中，`import`语句都可以去掉。因为你是在命令行里以脚本方式运行应用程序，所以连构建说明都能免了。
 
-Spring Boot的Actuator让你能一窥应用程序运行时的内部工作细节，看看Spring应用程序上下文里都有哪些Bean，Spring MVC控制器是怎么与路径映射的，应用程序都能取到哪些配置属性等等。
+Spring Boot的Actuator让你能一窥应用程序运行时的内部工作细节，看看Spring应用程序上下文里都有哪些Bean，Spring MVC控制器是怎么与路径映射的，应用程序都能取到哪些配置属性，诸如此类。
 
 Spring Boot为我们带来了这么多奇妙的特性，这玩意儿当然不能更好了！
 
-本书中你将看到，Spring Boot着实让Spring比以前更好了，我们将一同去了解自动配置、Spring Boot起步依赖、Spring Boot CLI和Actuator。我们还会去摆弄下Grails的最新版本，它就是基于Spring Boot的。临近末尾，你也许会觉得Spring不可能更好了。
+本书中你将看到，Spring Boot着实让Spring比以前更好了。我们将一同去了解自动配置、Spring Boot起步依赖、Spring Boot CLI和Actuator。我们还会去摆弄一下Grails的最新版本，它就是基于Spring Boot的。临近末尾，你也许会觉得Spring不可能更好了。
 
-如果说沃特·迪士尼的文明演进之旋转木马告诉了我们什么事情，那就是当我们觉得什么东西不可能更好了的时候，它一定会变得更好。之前Spring Boot提供的益处已经能撬动更大的利益了，现在真的很难想象Spring还能变得更好，但它显然能更好。毫无疑问，Spring的前景总是美好的。
-
-[P1]: # "关于这届世博会里迪士尼相关的信息，详见http://www.dwz.cn/2Hrvyh中的Disney influence部分。"
-[P2]: # "关于这个游乐设施，详见http://www.yesterland.com/progress.html的介绍。"
+如果说沃特·迪士尼的“文明演进之旋转木马”告诉了我们什么事情，那就是当我们觉得什么东西不可能更好了的时候，它一定会变得更好。Spring Boot的进步正在带来越来越大的益处。真的难以想象Spring还能变得更好，但它肯定会更好。毫无疑问，Spring的前景总是美好的。
 
 #关于本书
 
-Spring Boot旨在简化Spring的开发，就这点而论，Spring Boot涉及了Spring的方方面面。通过一本书来讲清楚Spring Boot的每种用法是不可能的，因为这样就必须涵盖Spring本身所支持的各种技术。所以《Spring Boot实战》把Spring Boot大致分为四个主题：自动配置、起步依赖、命令行界面和Actuator。书中还会讲到一些必要的Spring特性，但主要篇幅还是集中在Spring Boot上。
+Spring Boot旨在简化Spring的开发，就这点而论，Spring Boot涉及了Spring的方方面面。用一本书讲清楚Spring Boot的所有用法是不可能的，因为这必须涵盖Spring本身所支持的各种技术。所以《Spring Boot实战》把Spring Boot大致分为四个主题：自动配置、起步依赖、命令行界面和Actuator。书中还会讲到一些必要的Spring特性，但重点还是在Spring Boot上。
 
-《Spring Boot实战》面向的是全体Java开发者。虽然会要求读者有一些Spring使用背景，但Spring Boot能让那些新接触Spring的人更容易上手。话虽如此，但本书的焦点还是Spring Boot，不会深入Spring本身，手边再准备一本Spring读物也许效果会更好，比如说《Spring实战》第四版（Manning，2014）。
+《Spring Boot实战》面向的是全体Java开发者。虽然读者需要有一些Spring背景，但Spring Boot让那些新接触Spring的人也更容易上手。然而，因为本书的重点是Spring Boot，不会深入Spring本身，所以手边再准备一本Spring读物也许效果会更好，比如说《Spring实战（第4版）》。
 
 ##章节安排
 
-《Spring Boot实战》全书分为八个章<sup>【[译注1][A1]】</sup>：
+《Spring Boot实战》全书分为八章。
 
->- 第1章会对Spring Boot进行概述，内容涵盖最基本的自动配置、起步依赖、命令行界面和Actuator。
-- 第2章会进一步深入Spring Boot，聚焦于自动配置和起步依赖。在这一章里，你将用很少的显式配置来构建一个完整的Spring应用程序。
-- 第3章是对第2章的一个补充，演示了如何通过设置应用程序属性来改变自动配置，或者是在自动配置无法满足需要时彻底覆盖它。
+- 第1章会对Spring Boot进行概述，内容涵盖最基本的自动配置、起步依赖、命令行界面和Actuator。
+- 第2章会进一步深入Spring Boot，重点介绍自动配置和起步依赖。在这一章里，你将用很少的显式配置来构建一个完整的Spring应用程序。
+- 第3章是对第2章的一个补充，演示了如何通过设置应用程序属性来改变自动配置，或者在自动配置无法满足需要时彻底覆盖它。
 - 在第4章里我们会看到如何为Spring Boot应用程序编写自动化集成测试。
--   在第5章里你将看到一种有别于传统Java开发方式的做法，Spring Boot CLI让你能通过命令行来运行应用程序，这个应用程序完全是由Groovy脚本构成的。
-- 讲到Groovy，第6章会介绍Grails 3，这是Grails框架的最新版本，它就是基于Spring Boot的。
-- 在第7章里你将看到如何通过Spring Boot的Actuator了解运行中的应用程序，以及它是如何工作的。你还会看到如何使用Actuator的Web端点、远程Shell和JMX MBean对应用程序一窥究竟。
--   第8章讨论了各种部署Spring Boot应用程序的方法，包括传统的应用程序服务器部署和云部署。
+- 在第5章里你将看到一种有别于传统Java开发方式的做法，Spring Boot CLI能让你通过命令行来运行应用程序，这个应用程序完全是由Groovy脚本构成的。
+- 讲到Groovy，第6章会介绍Grails 3，这是Grails框架的最新版本，它基于Spring Boot。
+- 在第7章里你将看到如何通过Spring Boot的Actuator了解运行中的应用程序，以及它是如何工作的。你还会看到如何使用Actuator的Web端点、远程shell和JMX MBean对应用程序一窥究竟。
+- 第8章讨论了各种部署Spring Boot应用程序的方法，包括传统的应用程序服务器部署和云部署。
 
 ## 编码规范及代码下载
 
-全书包含了很多代码示例，这些代码使用了`类似这样的等宽字体`，正文中出现的所有类名、方法名或者是XML片段也会用这种字体。不少Spring的类和包的名字都特别长（但是很有表现力，一看就懂），因此在需要时会使用续行符（➥）。书中的代码并非都是完整的，通常我只会就某个特定主题摘出类中的一两个方法。
+书中包含了很多代码示例，这些代码使用了等宽字体，如`DispatcherServlet`。正文中出现的所有类名、方法名或者是XML片段也会用这种字体。不少Spring的类和包的名字都特别长（但是一目了然），因此在需要时会使用续行符（➥）。书中的代码并非都是完整的，通常我只会就某个特定主题摘出类中的一两个方法。
 
-你可以在出版社的网站上下载书中应用程序的完整代码，地址是[www.manning.com/books/spring-boot-in-action](www.manning.com/books/spring-boot-in-action)。
+你可以在Manning出版社的网站上下载书中应用程序的完整代码，地址是[www.manning.com/books/spring-boot-in-action](www.manning.com/books/spring-boot-in-action)。
 
-## Author Online 作者在线
+## 作者在线
 
-购买本书还能免费访问Manning出版社的私有Web论坛，在那里你能就本书发表评论，询问技术问题，向作者以及其他用户处寻求帮助。如需访问并订阅该论坛，请打开浏览器访问[www.manning.com/books/spring-boot-in-action](www.manning.com/books/spring-boot-in-action)。该页面提供了详细的信息，告诉你在注册后如何访问论坛，论坛里都能提供哪些帮助以及论坛的管理规则。
+购买本书的读者还能免费访问Manning出版社的私有Web论坛，在那里你能就本书发表评论，询问技术问题，向作者以及其他用户寻求帮助。如需访问并订阅该论坛，请打开浏览器访问[www.manning.com/books/spring-boot-in-action](www.manning.com/books/spring-boot-in-action)。该页面提供了详细的信息，告诉你在注册后如何访问论坛，论坛里都能提供哪些帮助，以及论坛的管理规则。
 
-Manning向读者承诺，为读者与读者之间，读者与作者之间的沟通建立一个桥梁。但Manning并不保证作者在论坛中的参与程度，他们在论坛上投入精力是自愿的（并且是无偿的）。我们强烈建议您向作者问些有挑战性的问题，让他有兴趣留在论坛里。
+Manning向读者承诺，为读者与读者之间以及读者与作者之间的沟通建立桥梁。但Manning并不保证作者在论坛中的参与程度，他们在论坛上投入多少精力是全凭自愿的（并且是无偿的）。我们强烈建议你向作者问些有挑战性的问题，让他有兴趣留在论坛里。
 
-只要本书仍在销售中，您就能在出版商的网站上查找作者在线论坛及其讨论归档。
+只要本书仍在销售，你就能在出版商的网站上查找作者在线论坛及其讨论归档。
 
-[A1]: # "原文写的是seven chapters，估计是笔误。"
+# 关于封面图
 
-# 关于封面插画
+本书封面上的插画题为“喀山鞑靼民族服饰”（Habit of a Tartar in Kasan），喀山是俄罗斯联邦鞑靼斯坦共和国首府。这幅图选自Thomas Jefferys的《各国古代和现代服饰集》（*A Collection of the Dresses of Different Nations, Ancient and Modern*，共四卷，1757–1772年间出版于伦敦），该书扉页中谈到，这些插画都是手工上色、铜版雕刻，还用了阿拉伯树胶。Thomas Jefferys（1719–1771）被誉为“乔治三世国王的御用地理学家”（Geographer to King George III）。他是一名英国地图制图师，是当时地图行业的领导者。他为政府和其他官方机构雕刻并印刷地图，还制作了各种不同的商用地图和地图集，尤其是北美洲地图。地图制图师的工作引发了他调研当地民族服饰的兴趣，这一兴趣在这套服饰集里体现得淋漓尽致。
 
-《Spring Boot实战》的封面插画题为《喀山鞑靼名族服饰》（Habit of a Tartar in Kasan），喀山是俄罗斯联邦鞑靼自治共和国首府。这副插画选自Thomas Jefferys的《古今多名族服饰集》（四卷）（A Collection of the Dresses of Different Nations, Ancient and Modern），1757至1772年出版于伦敦，该书的扉页里说这些插画都是手工上色、铜版雕刻、还用了阿拉伯树胶。Thomas Jefferys（1719–1771）被誉为“乔治三世国王的御用地理学家”（Geographer to King George III）。他是一名英国地图制图师，是当时地图行业的领导者。他为政府和其他官方机构雕刻并印刷地图，还制作了各种不同的商用地图和地图集，尤其是北美洲地图。地图制图师的工作引发了他调研地当地民族服饰的兴趣，这一兴趣在这本服饰集里体现得淋漓尽致。
+着迷于远方的大陆，为了消遣而去旅行，这在18世纪晚期还是相对新鲜的现象，而像这套服饰集这样的合集在当时非常流行，向观光客和足不出户的“游客”介绍其他国家的居民。Jefferys著作中异彩纷呈的图画生动地描绘了200年前世界各国的特色。自那以后，服饰文化发生了变化，各个国家与地区之间一度非常丰富的多样性已逐渐消失。现在，不同大洲的居民往往很难通过服饰来分辨了。也许，我们该乐观一点儿，我们用文化和视觉上的多样性换来了更多样的人生，或者说是更多样、更有趣、更智能的科技人生。
 
-着迷于远方的大陆，为了消遣而去旅行，这在18世纪晚期还是一个相对新鲜的现象，像这本服饰集这样的合集在当时非常流行，向观光客和足不出户的“游客”介绍其他国家的居民。Jefferys著作中各种各样的插画生动地描绘了200年前世界各国所独有的特色。自那以后，服饰文化已经发生了变化，那时地区与国家之间的差异如此丰富，这一切正在逐渐消失。现在不同大洲的居民往往很难分辨。也许，我们该乐观一点，我们用文化和视觉上的多样性换来了更多样的人生，或者说是更多样、更有趣、更聪慧的科技人生。
+在很难从外观上分辨不同计算机读物的年代里，Manning出版社脱颖而出，在图书封面上采用了两个世纪以前各地居民丰富多样的形象，以此体现了计算机行业别出心裁、独具创新的特性。这些都得归功于Jeffreys的绘画。
 
-Manning celebrates the inventiveness and initiative of the computer business with book covers based on the rich diversity of regional life of two centuries ago, brought back to life by Jeffreys’ pictures.  
-在很难从外观上分辨不同计算机读物的年代里，Manning脱颖而出，以两个世纪以前各地居民丰富的多样性，在出版图书的封面上体现了计算机行业别出心裁、独具创新的气质。这些都得归功于Jeffreys的插画。
+# 致谢
 
-# acknowledgments 致谢
+本书将告诉你Spring Boot如何自动处理应用程序幕后的各种杂事，让你专注于做那些使应用程序独特的工作。从很多方面来说，这和本书的诞生经历非常类似。很多人帮我操心了不少事情，让我能专心撰写本书的内容。我要感谢Manning出版社的Cynthia Kane、Robert Casazza、Andy Carroll、Corbin Collins、Kevin Sullivan、Mary Piergies、Janet Vail、Ozren Harlovic以及Candace Gillhoolley，他们做了很多幕后工作。
 
-本书将告诉你Spring Boot是如何自动处理应用程序幕后各种杂事，把你从这些琐事中解放出来，以便专注于应用程序真正的独特性。从很多方面来说，这和本书的诞生经历非常类似。很多人帮我操心了不少事情，让我能专心撰写本书的内容。比如Manning的各种事情，我就要感谢Cynthia Kane、Robert Casazza、Andy Carroll、Corbin Collins、Kevin Sullivan、Mary Piergies、Janet Vail、Ozren Harlovic以及Candace Gillhoolley。
+编写测试能让你知道自己的软件是否实现了目标。同样，很多人在本书撰写过程中就审稿并提供了反馈意见，他们让我确信本书没有偏离方向。为此，我要感谢Aykut Acikel、Bachir Chihani、Eric Kramer、Francesco Persico、Furkan Kamaci、Gregor Zurowski、Mario Arias、Michael A. Angelo、Mykel Alvis、Norbert Kuchenmeister、Phil Whiles、Raphael Villela、Sam Kreter、Travis Nelson、Wilfredo R. Ronsini Jr.以及William Fly。还要特别感谢John Guthrie在原稿即将付印前的最终技术审校，也感谢Andrew Glover为本书作序。
 
-编写测试能让你知道自己的软件是否实现了目标。同样，在撰写过程中就为《Spring Boot实战》审稿并提供反馈意见的各位，是你们让我确信本书没有偏离方向。为此，我要感谢Aykut Acikel、Bachir Chihani、Eric Kramer、Francesco Persico、Furkan Kamaci、Gregor Zurowski、Mario Arias、Michael A. Angelo、Mykel Alvis、Norbert Kuchenmeister、Phil Whiles、Raphael Villela、Sam Kreter、Travis Nelson、Wilfredo R. Ronsini Jr.以及William Fly。还要特别鸣谢John Guthrie在原稿即将付印前的最终技术审校，也感谢Andrew Glover为本书所写的推荐序。
+当然，如果没有Spring团队中各位天才成员的杰出工作，本书就不可能也不必问世。你们太棒了！能成为改变软件开发方式的团队的成员，我十分激动。
 
-当然，离开了Spring团队中各位天才成员的杰出工作，本书就不可能也不必问世。你们太棒了，能成为改变软件开发方式的团队的成员，我的内心十分激动。
+我还要感谢所有参加了No Fluff/Just Stuff活动***{![这是一个面向JVM软件开发者的活动，详见[https://nofluffjuststuff.com](https://nofluffjuststuff.com)。——译者注]}***的人，无论是演讲嘉宾还是出席的听众。我们之间的对话某种程度上也促成了本书。
 
-我还要感谢所有那些参加了No Fluff/Just Stuff活动<sup>【[译注2][A2]】</sup>的人们，无论是演讲嘉宾还是出席的听众，谢谢大家。我们之间的对话某种程度上也促成了本书。
+没有那些组成文字的字母，像这样的书也不可能出现。因此，就和我之前的书一样，我想借此机会感谢发明第一个字母表的腓尼基人。
 
-没有那些组成文字的字母，像这样的书也不可能出现。因此，就和我之前的书一样，我想借此机会感谢发明第一个字母表的腓尼基人（the Phoenicians）。
-
-最后，我要隆重感谢我的挚爱，我美丽的妻子Raymie，还有我了不起的女儿Maisy和Madi。你们又一次忍受住了我的写作项目。现在，书写完了，我们该去迪士尼世界了，你们说呢？
-
-[A2]: # "这是一个面向JVM软件开发者的活动，详见https://nofluffjuststuff.com。"
+最后，我要隆重感谢我的挚爱，我美丽的妻子Raymie，还有我了不起的女儿Maisy和Madi。你们又一次忍受我从事一个写作项目。现在，书写完了，我们该去迪士尼世界了，你们说呢？
